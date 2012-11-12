@@ -1,7 +1,5 @@
-skyldav
-=======
-
 Skyld AV - online virus scanner invocation
+==========================================
 
  The target of this project is to provide online virus scanning functionality
  for Linux.
