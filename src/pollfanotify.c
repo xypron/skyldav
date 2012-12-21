@@ -20,6 +20,7 @@
 #define _GNU_SOURCE // enable ppoll
 #include <errno.h>
 #include <fcntl.h>
+#include <linux/limits.h>
 #include <poll.h>
 #include <pthread.h>
 #include <signal.h>
@@ -27,9 +28,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/fanotify.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include "pollfanotify.h"
+#include "virusscan.h"
 
 #define SKYLD_POLLFANOTIFY_STATUS_INITIAL 0
 #define SKYLD_POLLFANOTIFY_STATUS_RUNNING 1
@@ -183,6 +186,64 @@ static void *run(void *cbptr) {
     close(fd);
     status = SKYLD_POLLFANOTIFY_STATUS_SUCCESS;
     return NULL;
+}
+
+/**
+ * @file displaymounts.c
+ * @brief Display fanotify event.
+ */
+void skyld_displayfanotify(const int fd, const void *buf, int len) {
+    const struct fanotify_event_metadata *metadata = buf;
+    char path[PATH_MAX];
+    int path_len;
+    int ret;
+    struct stat statbuf;
+    struct fanotify_response response;
+
+    while (FAN_EVENT_OK(metadata, len)) {
+
+        if (metadata->fd == FAN_NOFD) {
+            printf("FAN_NOFD");
+            metadata = FAN_EVENT_NEXT(metadata, len);
+            continue;
+        }
+
+        if (metadata->mask & FAN_ALL_PERM_EVENTS) {
+            ret = fstat(metadata->fd, &statbuf);
+            if (ret == -1) {
+                fprintf(stderr, "Failure read status: %s\n",
+                        strerror(errno));
+                close (metadata->fd);
+                metadata = FAN_EVENT_NEXT(metadata, len);
+                continue;
+            }
+            response.fd = metadata->fd;
+            if (S_ISDIR(statbuf.st_mode)
+                    || skyld_scan(metadata->fd) == SKYLD_SCANOK) {
+                response.response = FAN_ALLOW;
+            } else {
+                response.response = FAN_DENY;
+                
+                if (metadata->fd >= 0) {
+                    sprintf(path, "/proc/self/fd/%d", metadata->fd);
+                    path_len = readlink(path, path, sizeof (path) - 1);
+                    if (path_len > 0) {
+                        path[path_len] = '\0';
+                        printf("File %s\n\n", path);
+                    }
+                }
+            }
+            ret = write(fd, &response, sizeof (struct fanotify_response));
+            if (ret == -1) {
+                fprintf(stderr, "Failure to write response: %s\n",
+                        strerror(errno));
+            }
+        }
+        close(metadata->fd);
+        fflush(stdout);
+        metadata = FAN_EVENT_NEXT(metadata, len);
+    }
+    return;
 }
 
 int skyld_pollfanotifystart(skyld_pollfanotifycallbackptr cbptr) {

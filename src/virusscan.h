@@ -1,5 +1,5 @@
 /* 
- * File:   pollfanotify.h
+ * File:   virusscan.h
  * 
  * Copyright 2012 Heinrich Schuchardt <xypron.glpk@gmx.de>
  *
@@ -14,26 +14,24 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
-#ifndef POLLFANOTIFY_H
-#define	POLLFANOTIFY_H
+#ifndef VIRUSSCAN_H
+#define	VIRUSSCAN_H
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-    typedef void (*skyld_pollfanotifycallbackptr)(const int fd,
-            const void *buf, int len);
-
-    void skyld_displayfanotify(const int fd, const void *buf, int len);
-    int skyld_pollfanotifystart(skyld_pollfanotifycallbackptr cbptr);
-    int skyld_pollfanotifystop();
-    int skyld_pollfanotifymarkmount(const char *mount);
-
+#define SKYLD_SCANOK 0
+#define SKYLD_SCANERROR -1
+#define SKYLD_SCANVIRUS 1
+    
+    int skyld_scaninit();
+    int skyld_scan(const int fd);
+    int skyld_scanfinalize();
 #ifdef	__cplusplus
 }
 #endif
 
-#endif	/* POLLFANOTIFY_H */
+#endif	/* VIRUSSCAN_H */
