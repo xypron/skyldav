@@ -1,0 +1,29 @@
+Building from git repository
+============================
+
+Install build dependencies. For Debian use the following command
+sudo apt-get install git autoconf-archive libclamav-dev libmount-dev
+
+# Clone repository
+git clone https://github.com/xypron/skyldav.git skyldav
+
+# Move to target directory
+cd skyldav/
+
+# Update from git repository
+git pull
+
+# Create configure script
+./autogen.sh
+
+# Configure
+./configure
+
+# Make
+./make -j6
+
+# Test
+./make check
+
+# Install
+sudo make install
