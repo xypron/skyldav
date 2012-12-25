@@ -29,6 +29,7 @@ AC_CONFIG_HEADERS([config.h])
 dnl Set compiler flags
 CPPFLAGS="-I`cd $srcdir && pwd`/src $CPPFLAGS"
 CPPFLAGS="`pkg-config --cflagslibclamav` $CPPFLAGS"
+LDFLAGS="-lcap $LDFLAGS"
 LDFLAGS="`pkg-config --libs libclamav` $LDFLAGS"
 
 dnl Thread support

@@ -17,6 +17,7 @@
  *
  */
 
+#include <sys/capability.h>
 #include <errno.h>
 #include <signal.h>
 #include <stdio.h>
@@ -27,11 +28,6 @@
 #include <unistd.h>
 #include "pollfanotify.h"
 #include "virusscan.h"
-
-/**
- * Flag that tells the program to exit.
- */
-static volatile sig_atomic_t exit_request = 0;
 
 /**
  * Handles signal.
@@ -56,11 +52,11 @@ static void daemonize() {
     pid_t pid;
 
     // Check if this process is already a daemon.
-    if ( getppid() == 1 ) {
+    if (getppid() == 1) {
         return;
     }
     pid = fork();
-    if (pid = -1) {
+    if (pid == -1) {
         perror("Cannot fork");
         exit(EXIT_FAILURE);
     }
@@ -73,14 +69,42 @@ static void daemonize() {
         perror("Cannot change directory");
         exit(EXIT_FAILURE);
     }
+    // Set the user file creation mask to zero.
+    umask(0);
     // Set new session ID
     if (setsid() == -1) {
         perror("Cannot create session");
     }
     // Redirect standard files
-    freopen( "/dev/null", "r", stdin);
-    freopen( "/dev/null", "w", stdout);
-    freopen( "/dev/null", "w", stderr);
+    freopen("/dev/null", "r", stdin);
+    freopen("/dev/null", "w", stdout);
+    freopen("/dev/null", "w", stderr);
+}
+
+/**
+ * Check if the process has a capability.
+ * @param cap capability
+ * @return 1 if process has capability, else 0.
+ */
+static int capable(cap_value_t cap) {
+    cap_t caps;
+    cap_flag_value_t value;
+    int ret = 0;
+    caps = cap_get_proc();
+    if (caps == NULL) {
+        fprintf(stderr, "Cannot access capabilities\n");
+        return 0;
+    }
+    if (cap_get_flag(caps, cap, CAP_EFFECTIVE, &value) == -1) {
+        fprintf(stderr, "Cannot get capability 1.\n");
+    } else if (value == CAP_SET) {
+        ret = 1;
+    }
+    if (cap_free(caps)) {
+        fprintf(stderr, "Failure to free capability state");
+        ret = 0;
+    };
+    return ret;
 }
 
 /**
@@ -90,6 +114,13 @@ static void daemonize() {
  * @return 
  */
 int main(int argc, char *argv[]) {
+    /**
+     * running as daemon
+     */
+    int daemonized = 0;
+    /**
+     * retrun value
+     */
     int ret;
     /**
      * action to take when signal occurs
@@ -100,9 +131,15 @@ int main(int argc, char *argv[]) {
      */
     sigset_t blockset;
 
-	if (argc > 1 && 0 == strcmp(argv[1], "-d")) {
-	    daemonize();
-	}
+    if (!capable(CAP_SYS_ADMIN)) {
+        fprintf(stderr, "Missing capability CAP_SYS_ADMIN\n");
+        return EXIT_FAILURE;
+    }
+
+    if (argc > 1 && 0 == strcmp(argv[1], "-d")) {
+        daemonize();
+        daemonized = 1;
+    }
 
     // Open syslog
     setlogmask(LOG_UPTO(LOG_NOTICE));
@@ -149,8 +186,12 @@ int main(int argc, char *argv[]) {
         syslog(LOG_ERR, "Failure setting mark.");
     } else {
         syslog(LOG_NOTICE, "On access scanning started.");
-        printf("Press any key to terminate\n");
-        getchar();
+        if (daemonized) {
+            pause();
+        } else {
+            printf("Press any key to terminate\n");
+            getchar();
+        }
     }
 
     ret = skyld_pollfanotifystop();
@@ -158,6 +199,7 @@ int main(int argc, char *argv[]) {
     ret = skyld_scanfinalize();
     syslog(LOG_NOTICE, "On access scanning stopped.");
     closelog();
+    printf("done\n");
     if (ret != SKYLD_SCANOK) {
         return EXIT_FAILURE;
     }
