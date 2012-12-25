@@ -19,6 +19,7 @@
 
 #include <sys/capability.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,6 +46,21 @@ static void hdl(int sig) {
     }
 }
 
+static void pidfile() {
+    char buffer[40];
+    int len;
+    const char filename[] = "/var/run/skyldav/skyldav.pid";
+    int fd;
+    fd = open(filename, O_CREAT | O_TRUNC | O_WRONLY,
+            S_IRUSR | S_IWUSR);
+    if (fd == -1) {
+        syslog(LOG_ERR, "Cannot create pid file '%s'.", filename);
+    }
+    len = snprintf(buffer, sizeof(buffer), "%d", (int) getpid());
+    write (fd, buffer, len);
+    close(fd);
+}
+
 /**
  * Daemonize
  */
@@ -60,7 +76,7 @@ static void daemonize() {
         perror("Cannot fork");
         exit(EXIT_FAILURE);
     }
-    if (pid > 1) {
+    if (pid != 0) {
         // Exit calling process.
         exit(EXIT_SUCCESS);
     }
@@ -79,6 +95,7 @@ static void daemonize() {
     freopen("/dev/null", "r", stdin);
     freopen("/dev/null", "w", stdout);
     freopen("/dev/null", "w", stderr);
+    pidfile();
 }
 
 /**
