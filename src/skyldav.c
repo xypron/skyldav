@@ -21,7 +21,10 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <syslog.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include "pollfanotify.h"
 #include "virusscan.h"
 
@@ -47,6 +50,40 @@ static void hdl(int sig) {
 }
 
 /**
+ * Daemonize
+ */
+static void daemonize() {
+    pid_t pid;
+
+    // Check if this process is already a daemon.
+    if ( getppid() == 1 ) {
+        return;
+    }
+    pid = fork();
+    if (pid = -1) {
+        perror("Cannot fork");
+        exit(EXIT_FAILURE);
+    }
+    if (pid > 1) {
+        // Exit calling process.
+        exit(EXIT_SUCCESS);
+    }
+    // Change working directory.
+    if (chdir("/") == -1) {
+        perror("Cannot change directory");
+        exit(EXIT_FAILURE);
+    }
+    // Set new session ID
+    if (setsid() == -1) {
+        perror("Cannot create session");
+    }
+    // Redirect standard files
+    freopen( "/dev/null", "r", stdin);
+    freopen( "/dev/null", "w", stdout);
+    freopen( "/dev/null", "w", stderr);
+}
+
+/**
  * Main.
  * @param argc argument count
  * @param argv arguments
@@ -62,6 +99,10 @@ int main(int argc, char *argv[]) {
      * signal mask
      */
     sigset_t blockset;
+
+	if (argc > 1 && 0 == strcmp(argv[1], "-d")) {
+	    daemonize();
+	}
 
     // Open syslog
     setlogmask(LOG_UPTO(LOG_NOTICE));
