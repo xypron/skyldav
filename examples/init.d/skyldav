@@ -15,6 +15,7 @@ DAEMON=/usr/local/bin/skyldav
 NAME=skyldav
 PIDFILE=/var/run/skyldav/$NAME.pid
 DESC="Skyld AV on access virus scanning"
+ENABLED=true
 
 unset TMPDIR
 
@@ -25,6 +26,17 @@ if [ -r /etc/default/skyldav ]; then
 fi
 
 . /lib/lsb/init-functions
+
+test -f /etc/default/rcS && . /etc/default/rcS
+
+if [ -f /etc/default/skyldav ] ; then
+  . /etc/default/skyldav
+fi
+
+if [ "$ENABLED" != "true" ] ; then
+  echo "Skyld AV is disabled."
+  exit 1
+fi
 
 case "$1" in
   start)

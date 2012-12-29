@@ -1,0 +1,9 @@
+# Defaults for Skyld AV initscript
+# sourced by /etc/init.d/skyldav
+# installed at /etc/default/skyldav by the maintainer scripts
+#
+
+#
+# This is a POSIX shell fragment
+#
+ENABLED=false

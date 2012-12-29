@@ -27,9 +27,15 @@ dnl Create config.h
 AC_CONFIG_HEADERS([config.h])
 
 dnl Set compiler flags
+dnl add large file support on 32bit systems
+CPPFLAGS="-D_FILE_OFFSET_BITS=64 $CPPFLAGS"
+dnl add src/ to include path
 CPPFLAGS="-I`cd $srcdir && pwd`/src $CPPFLAGS"
+dnl add package specific include paths
 CPPFLAGS="`pkg-config --cflagslibclamav` $CPPFLAGS"
+dnl Set linker flags
 LDFLAGS="-lcap $LDFLAGS"
+dnl add package specific libraries
 LDFLAGS="`pkg-config --libs libclamav` $LDFLAGS"
 
 dnl Thread support
