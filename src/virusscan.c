@@ -33,12 +33,12 @@ static void writelog(const int fd, const char *virname) {
         path_len = 0;
     }
     path[path_len] = '\0';
-    syslog(LOG_CRIT, "Virus \"%s\" detected in file \"%s\".\n", virname, path);
+    syslog(LOG_CRIT, "Virus \"%s\" detected in file \"%s\".", virname, path);
 }
 
 int skyld_scaninit() {
     int ret;
-    unsigned int sigs = 0;
+    unsigned int sigs;
 
     ret = cl_init(CL_INIT_DEFAULT);
     if (ret != CL_SUCCESS) {
@@ -50,6 +50,8 @@ int skyld_scaninit() {
         printf("Can't create new engine\n");
         return SKYLD_SCANERROR;
     }
+    // sigs must be zero before calling cl_load.
+    sigs = 0;
     ret = cl_load(cl_retdbdir(), engine, &sigs, CL_DB_STDOPT);
     if (ret != CL_SUCCESS) {
         printf("cl_retdbdir error: %s\n", cl_strerror(ret));

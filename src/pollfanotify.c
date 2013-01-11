@@ -30,6 +30,7 @@
 #include <sys/fanotify.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <syslog.h>
 #include <unistd.h>
 #include "pollfanotify.h"
 #include "virusscan.h"
@@ -163,10 +164,12 @@ static void *run(void *cbptr) {
                         }
                         break;
                     } else if (ret < 0) {
-                        if (errno & ( EINTR | EAGAIN | ETXTBSY | EWOULDBLOCK)) {
+                        if (errno & (EINTR | EAGAIN | ETXTBSY | EWOULDBLOCK)) {
                             break;
                         }
                         perror("reading failed");
+                        syslog(LOG_CRIT, "Reading from fanotiy failed.");
+                        syslog(LOG_INFO, "Fanotiy thread stopped.");
                         close(fd);
                         status = SKYLD_POLLFANOTIFY_STATUS_FAILURE;
                         return NULL;
@@ -177,12 +180,15 @@ static void *run(void *cbptr) {
         } else if (ret < 0) {
             if (errno != EINTR) {
                 perror("ppoll failed");
+                syslog(LOG_CRIT, "Polling fanotiy failed.");
+                syslog(LOG_INFO, "Fanotiy thread stopped.");
                 close(fd);
                 status = SKYLD_POLLFANOTIFY_STATUS_FAILURE;
                 return NULL;
             }
         }
     }
+    syslog(LOG_INFO, "Fanotiy thread stopped.");
     close(fd);
     status = SKYLD_POLLFANOTIFY_STATUS_SUCCESS;
     return NULL;
@@ -203,7 +209,8 @@ void skyld_displayfanotify(const int fd, const void *buf, int len) {
     while (FAN_EVENT_OK(metadata, len)) {
 
         if (metadata->fd == FAN_NOFD) {
-            printf("FAN_NOFD");
+            printf("Received FAN_NOFD from fanotiy.");
+            syslog(LOG_CRIT, "Received FAN_NOFD from fanotiy.");
             metadata = FAN_EVENT_NEXT(metadata, len);
             continue;
         }
@@ -211,9 +218,9 @@ void skyld_displayfanotify(const int fd, const void *buf, int len) {
         if (metadata->mask & FAN_ALL_PERM_EVENTS) {
             ret = fstat(metadata->fd, &statbuf);
             if (ret == -1) {
-                fprintf(stderr, "Failure read status: %s\n",
-                        strerror(errno));
-                close (metadata->fd);
+                fprintf(stderr, "Failure read status: %s\n", strerror(errno));
+                syslog(LOG_CRIT, "Failure read status: %s", strerror(errno));
+                close(metadata->fd);
                 metadata = FAN_EVENT_NEXT(metadata, len);
                 continue;
             }
@@ -223,7 +230,7 @@ void skyld_displayfanotify(const int fd, const void *buf, int len) {
                 response.response = FAN_ALLOW;
             } else {
                 response.response = FAN_DENY;
-                
+
                 if (metadata->fd >= 0) {
                     sprintf(path, "/proc/self/fd/%d", metadata->fd);
                     path_len = readlink(path, path, sizeof (path) - 1);
@@ -236,6 +243,8 @@ void skyld_displayfanotify(const int fd, const void *buf, int len) {
             ret = write(fd, &response, sizeof (struct fanotify_response));
             if (ret == -1) {
                 fprintf(stderr, "Failure to write response: %s\n",
+                        strerror(errno));
+                syslog(LOG_CRIT, "Failure to write response: %s",
                         strerror(errno));
             }
         }
