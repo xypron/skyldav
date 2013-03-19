@@ -10,7 +10,6 @@ clean-local:
 
 install-data-local:
 	mkdir -p $(DESTDIR)$(docdir)/examples/
-	cp -rf $(srcdir)/doc/* $(DESTDIR)$(docdir)
 	cp -rf $(srcdir)/examples/* $(DESTDIR)$(docdir)/examples/
 
 dist-hook:
