@@ -101,7 +101,7 @@ static void *run(void *cbptr) {
     /**
      * Properties of event file descriptors.
      */
-    unsigned int event_f_flags = O_RDONLY;
+    unsigned int event_f_flags = O_RDONLY | O_CLOEXEC | O_LARGEFILE;
     /**
      * Behavior of the fanotify file descriptor.
      */
