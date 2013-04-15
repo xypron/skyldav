@@ -1,47 +1,46 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
-
-    <title>Skyldav by xypron</title>
+    <meta http-equiv="content-type" content="text/html; charset=Windows-1252" />
+    <title>Skyld AV</title>
+    <link rel="stylesheet" type="text/css" href="css/default.css" />
+	<link rel="icon" href="/images/favicon.png" type="image/png">
   </head>
-
   <body>
-
-    <header>
-      <div class="container">
-        <h1>Skyldav</h1>
-        <h2>Skyld AV - online virus scanner invocation</h2>
-
-        <section id="downloads">
-          <a href="https://github.com/xypron/skyldav/zipball/master" class="btn">Download as .zip</a>
-          <a href="https://github.com/xypron/skyldav/tarball/master" class="btn">Download as .tar.gz</a>
-          <a href="https://github.com/xypron/skyldav" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
-        </section>
+    <div id="container">
+      <div id="header">
+        <div id="logo">
+          <img src="/images/xypron100.png" alt="Xypron Logo">
+          Skyld AV
+        </div>
+        <div id="nav">
+          <a href="http://www.xypron.de">Xypron</a> &gt;
+          <a href="http://www.xypron.de/projects">Projects</a> &gt;
+		  Skyld AV
+        </div>
       </div>
-    </header>
-
-    <div class="container">
-      <section id="main_content">
-        <p>The target of this project is to provide online virus scanning functionality
- for Linux.</p>
-
-<p>For elder kernel revisions <a href="http://dazuko.dnsalias.org">Dazuko</a>
- provided a filesystem with online scanning capability. The development was
- given up in 2011.</p>
-
-<p>The fanotify kernel interface allows to trigger online scanning. The target
- of this project is to provide the layer between fanotify and a virus scanner.</p>
-
-<p>The target virus scanner is <a href="http://www.clamav.net">ClamAV</a>.</p>
-      </section>
-    </div>
-
-    
+	  <div id="main">
+        <h1 id="downloads">Downloads</h1>
+        <p><a href="https://github.com/xypron/skyldav/zipball/master"
+		>Download as .zip</a><br />
+        <a href="https://github.com/xypron/skyldav/tarball/master"
+		>Download as .tar.gz</a><br />
+        <a href="https://github.com/xypron/skyldav">View on GitHub</a></p>
+        <h1 id="description">Description</h1>
+        <p>The target of this project is to provide online virus scanning
+		functionality for Linux.</p>
+		<p>The <a href="http://www.xypron.de/projects/fanotify-manpages"
+		>fanotify</a> API is used to control file access.</p>
+		<p><a href="http://www.clamav.net">ClamAV</a> is used for scanning.</p>
+      </div>
+      <div id="links">
+	    <ul>
+		  <li><a href="#download">Download</a></li>
+          <li><a href="#description">Description</a></li>
+		<ul>
+	  </div>
+      <div id="footer">
+	  Xypron, 2013-04-15</div>
+	</div>
   </body>
 </html>
