@@ -1,14 +1,19 @@
 Skyld AV - online virus scanner invocation
 ==========================================
 
- The target of this project is to provide online virus scanning functionality
- for Linux.
+ Skyld AV provides on access virus scanning for Linux.
 
- For elder kernel revisions <a href="http://dazuko.dnsalias.org">Dazuko</a>
- provided a filesystem with online scanning capability. The development was
- given up in 2011.
+ The <a href="http://www.xypron.de/projects/fanotify-manpages">fanotify</a>
+ API is used to control file access. This requires a kernel compiled with
 
- The fanotify kernel interface allows to trigger online scanning. The target
- of this project is to provide the layer between fanotify and a virus scanner.
+ <pre>CONFIG\_FANOTIFY=y
+ CONFIGi\_FANOTIFY\_ACCESS\_PERMISSIONS=y</pre>
 
- The target virus scanner is <a href="http://www.clamav.net">ClamAV</a>.
+ On Debian and Fedora you can check the configuration with
+
+ <pre>grep CONFIG\_FANOTIFY /boot/config-`uname -r`</pre>
+
+ Kernel version 3.8.0 or newer is recommended. You can check the
+ version you are using with</p><pre>uname -a</pre>
+
+ <a href="http://www.clamav.net">ClamAV</a> is used for scanning.
