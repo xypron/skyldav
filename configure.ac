@@ -57,7 +57,7 @@ AC_CHECK_HEADER([pthread.h],
   )
 
 dnl Doxygen
-DX_INIT_DOXYGEN(["Statistics for MySQL"], [$srcdir/Doxyfile])
+DX_INIT_DOXYGEN(["Skyld AV"], [$srcdir/Doxyfile])
 
 dnl Makefiles
 AC_CONFIG_FILES([
