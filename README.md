@@ -1,5 +1,5 @@
-Skyld AV - online virus scanner invocation
-==========================================
+Skyld AV - on access virus scanner
+==================================
 
  Skyld AV provides on access virus scanning for Linux.
 
@@ -7,7 +7,7 @@ Skyld AV - online virus scanner invocation
  API is used to control file access. This requires a kernel compiled with
 
  <pre>CONFIG\_FANOTIFY=y
- CONFIGi\_FANOTIFY\_ACCESS\_PERMISSIONS=y</pre>
+CONFIG\_FANOTIFY\_ACCESS\_PERMISSIONS=y</pre>
 
  On Debian and Fedora you can check the configuration with
 
