@@ -14,7 +14,7 @@ CONFIG\_FANOTIFY\_ACCESS\_PERMISSIONS=y</pre>
 
  On Debian and Fedora you can check the configuration with
 
- <pre>grep CONFIG\_FANOTIFY /boot/config-`uname -r`</pre>
+ <pre>grep CONFIG\_FANOTIFY /boot/config-$(uname -r)</pre>
 
  Kernel version 3.8.0 or newer is recommended. You can check the
  version you are using with</p><pre>uname -a</pre>
