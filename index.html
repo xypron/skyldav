@@ -28,7 +28,7 @@
         <pre>CONFIG_FANOTIFY=y
 CONFIG_FANOTIFY_ACCESS_PERMISSIONS=y</pre>
         <p>On Debian and Fedora you can check the configuration with</p>
-        <pre>grep CONFIG_FANOTIFY /boot/config-`uname -r`</pre>
+        <pre>grep CONFIG_FANOTIFY /boot/config-$(uname -r)</pre>
         <p>Kernel version 3.8.0 or newer is recommended. You can check the
         version you are using with</p><pre>uname -a</pre>
         <p><a href="http://www.clamav.net">ClamAV</a> is used for scanning.</p>
