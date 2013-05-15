@@ -27,7 +27,7 @@ static struct cl_engine *engine;
 static void writelog(const int fd, const char *virname) {
     int path_len;
     char path[PATH_MAX+1];
-    snprintf(path, sizeof(path) "/proc/self/fd/%d", fd);
+    snprintf(path, sizeof(path), "/proc/self/fd/%d", fd);
     path_len = readlink(path, path, sizeof (path) - 1);
     if (path_len < 0) {
         path_len = 0;
