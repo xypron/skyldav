@@ -33,7 +33,7 @@ static struct cl_engine *engine;
  * @param fd file descriptor
  * @param virname name of virus
  */
-static void writelog(const int fd, const char *virname) {
+static void log_virus_found(const int fd, const char *virname) {
     int path_len;
     char path[PATH_MAX+1];
     snprintf(path, sizeof(path), "/proc/self/fd/%d", fd);
@@ -94,7 +94,7 @@ int skyld_scan(const int fd) {
     ret = cl_scandesc(fd, &virname, NULL, engine, CL_SCAN_STDOPT);
     if (ret == CL_VIRUS) {
         printf("Virus detected: %s\n", virname);
-        writelog(fd, virname);
+        log_virus_found(fd, virname);
         success = SKYLD_SCANVIRUS;
     } else {
         if (ret != CL_CLEAN)
