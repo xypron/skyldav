@@ -195,7 +195,6 @@ static void *run(void *cbptr) {
 }
 
 /**
- * @file displaymounts.c
  * @brief Display fanotify event.
  */
 void skyld_displayfanotify(const int fd, const void *buf, int len) {

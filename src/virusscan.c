@@ -22,8 +22,17 @@
 #include <syslog.h>
 #include "virusscan.h"
 
+/**
+ * @brief Reference to virus scan engine.
+ */
 static struct cl_engine *engine;
 
+/**
+ * @brief Writes log entry.
+ *
+ * @param fd file descriptor
+ * @param virname name of virus
+ */
 static void writelog(const int fd, const char *virname) {
     int path_len;
     char path[PATH_MAX+1];
@@ -36,6 +45,11 @@ static void writelog(const int fd, const char *virname) {
     syslog(LOG_CRIT, "Virus \"%s\" detected in file \"%s\".", virname, path);
 }
 
+/**
+ * @brief Initializes virus scan engine.
+ *
+ * @return success
+ */
 int skyld_scaninit() {
     int ret;
     unsigned int sigs;
@@ -68,6 +82,11 @@ int skyld_scaninit() {
     return SKYLD_SCANOK;
 }
 
+/**
+ * @brief Scans file for virus.
+ *
+ * @return success
+ */
 int skyld_scan(const int fd) {
     int success = SKYLD_SCANOK;
     int ret;
@@ -84,6 +103,11 @@ int skyld_scan(const int fd) {
     return success;
 }
 
+/**
+ * @brief Finalizes the virus scan engine.
+ *
+ * @return success
+ */
 int skyld_scanfinalize() {
     int ret;
     ret = cl_engine_free(engine);

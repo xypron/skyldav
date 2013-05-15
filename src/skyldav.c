@@ -31,7 +31,8 @@
 #include "virusscan.h"
 
 /**
- * Handles signal.
+ * @brief Handles signal.
+ * 
  * @param sig signal
  */
 static void hdl(int sig) {
@@ -46,6 +47,9 @@ static void hdl(int sig) {
     }
 }
 
+/**
+ * @brief Creates pidfile for daemon.
+ */
 static void pidfile() {
     char buffer[40];
     int len;
@@ -62,7 +66,7 @@ static void pidfile() {
 }
 
 /**
- * Daemonize
+ * @brief Daemonizes.
  */
 static void daemonize() {
     pid_t pid;
@@ -99,7 +103,8 @@ static void daemonize() {
 }
 
 /**
- * Check if the process has a capability.
+ * @brief Check if the process has a capability.
+ * 
  * @param cap capability
  * @return 1 if process has capability, else 0.
  */
@@ -125,10 +130,11 @@ static int capable(cap_value_t cap) {
 }
 
 /**
- * Main.
+ * @brief Main.
+ * 
  * @param argc argument count
  * @param argv arguments
- * @return 
+ * @return success
  */
 int main(int argc, char *argv[]) {
     /**
