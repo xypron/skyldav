@@ -33,8 +33,6 @@ dnl add src/ to include path
 CPPFLAGS="-I`cd $srcdir && pwd`/src $CPPFLAGS"
 dnl add package specific include paths
 CPPFLAGS="`pkg-config --cflagslibclamav` $CPPFLAGS"
-dnl define directory for logfiles
-CPPFLAGS="-DLOGDIR=\"$(localstatedir)/skyldav/\" $CPPFLAGS"
 dnl Set linker flags
 LDFLAGS="-lcap $LDFLAGS"
 dnl add package specific libraries

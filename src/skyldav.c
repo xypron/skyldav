@@ -1,5 +1,5 @@
 /* 
- * File:   main.c
+ * File:   skyldav.c
  * 
  * Copyright 2012 Heinrich Schuchardt <xypron.glpk@gmx.de>
  *
@@ -32,6 +32,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "pollfanotify.h"
+#include "skyldav.h"
 #include "virusscan.h"
 
 /**
@@ -64,9 +65,53 @@ static void pidfile() {
     if (fd == -1) {
         syslog(LOG_ERR, "Cannot create pid file '%s'.", filename);
     }
-    len = snprintf(buffer, sizeof(buffer), "%d", (int) getpid());
-    write (fd, buffer, len);
+    len = snprintf(buffer, sizeof (buffer), "%d", (int) getpid());
+    write(fd, buffer, len);
     close(fd);
+}
+
+static void help() {
+    printf("%s\n", HELP_TEXT);
+    exit(EXIT_FAILURE);
+}
+
+/**
+ * @brief Check if the process has a capability.
+ * 
+ * @param cap capability
+ * @return 1 if process has capability, else 0.
+ */
+static int capable(cap_value_t cap) {
+    cap_t caps;
+    cap_flag_value_t value;
+    int ret = 0;
+    caps = cap_get_proc();
+    if (caps == NULL) {
+        fprintf(stderr, "Cannot access capabilities\n");
+        return 0;
+    }
+    if (cap_get_flag(caps, cap, CAP_EFFECTIVE, &value) == -1) {
+        fprintf(stderr, "Cannot get capability 1.\n");
+    } else if (value == CAP_SET) {
+        ret = 1;
+    }
+    if (cap_free(caps)) {
+        fprintf(stderr, "Failure to free capability state\n");
+        ret = 0;
+    };
+    return ret;
+}
+
+/**
+ * @brief Checks authorization.
+ */
+static void authcheck() {
+    if (!capable(CAP_SYS_ADMIN)) {
+        fprintf(stderr, 
+                "Missing capability CAP_SYS_ADMIN.\n"
+                "Call the program as root.\n");
+        exit(EXIT_FAILURE);
+    }
 }
 
 /**
@@ -107,33 +152,6 @@ static void daemonize() {
 }
 
 /**
- * @brief Check if the process has a capability.
- * 
- * @param cap capability
- * @return 1 if process has capability, else 0.
- */
-static int capable(cap_value_t cap) {
-    cap_t caps;
-    cap_flag_value_t value;
-    int ret = 0;
-    caps = cap_get_proc();
-    if (caps == NULL) {
-        fprintf(stderr, "Cannot access capabilities\n");
-        return 0;
-    }
-    if (cap_get_flag(caps, cap, CAP_EFFECTIVE, &value) == -1) {
-        fprintf(stderr, "Cannot get capability 1.\n");
-    } else if (value == CAP_SET) {
-        ret = 1;
-    }
-    if (cap_free(caps)) {
-        fprintf(stderr, "Failure to free capability state");
-        ret = 0;
-    };
-    return ret;
-}
-
-/**
  * @brief Main.
  * 
  * @param argc argument count
@@ -143,19 +161,47 @@ static int capable(cap_value_t cap) {
 int main(int argc, char *argv[]) {
     // running as daemon
     int daemonized = 0;
-     // return value
+    // shall run as daemon
+    int shalldaemonize = 0;
+    // return value
     int ret;
     // action to take when signal occurs
     struct sigaction act;
     // signal mask
     sigset_t blockset;
+    // counter
+    int i;
+    // command line option
+    char *opt;
+    // configuration file
+    char *cfile = "/etc/skyldav.conf";
 
-    if (!capable(CAP_SYS_ADMIN)) {
-        fprintf(stderr, "Missing capability CAP_SYS_ADMIN\n");
-        return EXIT_FAILURE;
+    // Analyze command line options.
+    for (i = 1; i < argc; i++) {
+        opt = argv[i];
+        opt++;
+        if (*argv[i] = '-') {
+            switch (*opt) {
+                case 'c':
+                    i++;
+                    if (i < argc) {
+                        cfile = argv[i];
+                    } else {
+                        help();
+                    }
+                    break;
+                case 'd':
+                    shalldaemonize = 1;
+                    break;
+                default:
+                    help();
+            }
+        }
     }
+    
+    authcheck();
 
-    if (argc > 1 && 0 == strcmp(argv[1], "-d")) {
+    if (shalldaemonize) {
         daemonize();
         daemonized = 1;
     }

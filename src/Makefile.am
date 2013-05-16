@@ -1,4 +1,4 @@
-AM_CFLAGS = -DLOGDIR=\"$(localstatedir)/log/skyldav/\"
+AM_CFLAGS = -DLOGDIR='"$(localstatedir)/log/skyldav/"'
 
 library_includedir=$(includedir)/skyldav
 library_include_HEADERS = \
