@@ -25,11 +25,13 @@ p.pre {
 }
 
 pre {
+  border: 1px solid #666666;
+  background-color: #cccccc;
   white-space: pre-wrap;
   font-family: monospace;
-  font-size: 16px;
-  padding: 0px;
-  margin: 0px 10px 10px 40px;
+  font-size: 12px;
+  padding: 6px;
+  margin: 0px 10px 10px 0px;
 }
 
 a {
