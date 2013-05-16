@@ -24,6 +24,8 @@
 #ifdef	__cplusplus
 extern "C" {
 #endif
+    
+    const char *CONF_FILE = "/etc/skyldav.conf";
 
     const char *HELP_TEXT =
             "Usage: skyldav [OPTION]\n"
@@ -35,6 +37,8 @@ extern "C" {
             "Report errors to\n"
             "Heinrich Schuchardt <xypron.glpk@gmx.de>";
 
+    const char *PID_FILE = "/var/run/skyldav/skyldav.pid";
+    
 #ifdef	__cplusplus
 }
 #endif

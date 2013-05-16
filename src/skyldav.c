@@ -58,7 +58,7 @@ static void hdl(int sig) {
 static void pidfile() {
     char buffer[40];
     int len;
-    const char filename[] = "/var/run/skyldav/skyldav.pid";
+    const char filename[] = PID_FILE;
     int fd;
     fd = open(filename, O_CREAT | O_TRUNC | O_WRONLY,
             S_IRUSR | S_IWUSR);
@@ -174,7 +174,7 @@ int main(int argc, char *argv[]) {
     // command line option
     char *opt;
     // configuration file
-    char *cfile = "/etc/skyldav.conf";
+    char *cfile = CONF_FILE;
 
     // Analyze command line options.
     for (i = 1; i < argc; i++) {
@@ -199,14 +199,16 @@ int main(int argc, char *argv[]) {
         }
     }
     
+    // Check authorization.
     authcheck();
 
+    // Daemonize if requested.
     if (shalldaemonize) {
         daemonize();
         daemonized = 1;
     }
 
-    // Open syslog
+    // Open syslog.
     setlogmask(LOG_UPTO(LOG_NOTICE));
     openlog("Skyld AV", 0, LOG_USER);
 
