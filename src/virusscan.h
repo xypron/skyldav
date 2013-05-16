@@ -16,6 +16,10 @@
  * limitations under the License.
  */
 
+/**
+ * @file virusscan.h
+ * @brief Scans files for viruses.
+ */
 #ifndef VIRUSSCAN_H
 #define	VIRUSSCAN_H
 

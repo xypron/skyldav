@@ -16,6 +16,10 @@
  * limitations under the License.
  */
 
+/**
+ * @file virusscan.c
+ * @brief Scans files for viruses.
+ */
 #include <clamav.h>
 #include <limits.h>
 #include <stdio.h>

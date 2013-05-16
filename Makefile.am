@@ -18,3 +18,6 @@ dist-hook:
 	rm -rf `find $(distdir) -name '*~'`
 	rm -rf `find $(distdir) -name .git`
 	rm -rf `find $(distdir) -name '*.bak'`
+	
+documentation:
+	doxygen

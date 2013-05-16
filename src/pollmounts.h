@@ -16,6 +16,10 @@
  * limitations under the License.
  */
 
+/**
+ * @file pollmounts.h
+ * @brief Poll /proc/mounts to detect mount events.
+ */
 #ifndef POLLMOUNTS_H
 #define	POLLMOUNTS_H
 

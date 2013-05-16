@@ -17,6 +17,11 @@
  *
  */
 
+/**
+ * @file pollfanotify.h
+ * @brief Poll fanotify events.
+ */
+
 #ifndef POLLFANOTIFY_H
 #define	POLLFANOTIFY_H
 

@@ -17,6 +17,10 @@
  *
  */
 
+/**
+ * @file pollfanotify.c
+ * @brief Poll fanotify events.
+ */
 #define _GNU_SOURCE // enable ppoll
 #include <errno.h>
 #include <fcntl.h>
@@ -43,7 +47,7 @@
 #define SKYLD_POLLFANOTIFY_BUFLEN 4096
 
 /**
- * File descriptor.
+ * @brief File descriptor.
  */
 int fd;
 /**
@@ -254,6 +258,11 @@ void skyld_displayfanotify(const int fd, const void *buf, int len) {
     return;
 }
 
+/**
+ * @brief Starts polling fanotify events.
+ * @param cbptr callback function
+ * @return success
+ */
 int skyld_pollfanotifystart(skyld_pollfanotifycallbackptr cbptr) {
     pthread_attr_t attr;
     int ret;
@@ -288,6 +297,12 @@ int skyld_pollfanotifystart(skyld_pollfanotifycallbackptr cbptr) {
 
 }
 
+/**
+ * @brief Marks a mount for polling fanotify events.
+ * 
+ * @param mount
+ * @return success
+ */
 int skyld_pollfanotifymarkmount(const char *mount) {
     unsigned int flags = FAN_MARK_ADD | FAN_MARK_MOUNT;
     uint64_t mask = FAN_OPEN_PERM | FAN_CLOSE_WRITE;
@@ -302,6 +317,11 @@ int skyld_pollfanotifymarkmount(const char *mount) {
     return EXIT_SUCCESS;
 }
 
+/**
+ * @brief Stops polling fanotify events.
+ * 
+ * @return success
+ */
 int skyld_pollfanotifystop() {
     void *result;
     int ret;

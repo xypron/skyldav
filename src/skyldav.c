@@ -17,6 +17,10 @@
  *
  */
 
+/**
+ * @file skyldav.c
+ * @brief Online virus scanner.
+ */
 #include <sys/capability.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -137,21 +141,13 @@ static int capable(cap_value_t cap) {
  * @return success
  */
 int main(int argc, char *argv[]) {
-    /**
-     * running as daemon
-     */
+    // running as daemon
     int daemonized = 0;
-    /**
-     * retrun value
-     */
+     // return value
     int ret;
-    /**
-     * action to take when signal occurs
-     */
+    // action to take when signal occurs
     struct sigaction act;
-    /**
-     * signal mask
-     */
+    // signal mask
     sigset_t blockset;
 
     if (!capable(CAP_SYS_ADMIN)) {
