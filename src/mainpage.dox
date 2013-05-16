@@ -1,0 +1,38 @@
+/** @mainpage Overview
+ *
+ * @section intro_sec Introduction
+ * <p>Skyld AV provides on access virus scanning for Linux.</p>
+ * <p>The <a href="http://www.xypron.de/projects/fanotify-manpages">fanotify</a>
+ * API is used to control file access. This requires a kernel compiled with</p>
+ * <pre class="fragment">CONFIG_FANOTIFY=y
+ * CONFIG_FANOTIFY_ACCESS_PERMISSIONS=y</pre>
+ * <p>On Debian and Fedora you can check the configuration with</p>
+ * <pre class="fragment">grep CONFIG_FANOTIFY /boot/config-$(uname -r)</pre>
+ * <p>Kernel version 3.8.0 or newer is recommended. You can check the
+ * version you are using with</p><pre class="fragment">uname -a</pre>
+ * <p><a href="http://www.clamav.net">ClamAV</a> is used for scanning.</p>
+ * @section download_sec Downloads
+ * <p><a href="https://github.com/xypron/skyldav/zipball/master"
+ * >Download as .zip</a><br/>
+ * <a href="https://github.com/xypron/skyldav/tarball/master"
+ * >Download as .tar.gz</a><br/>
+ * <a href="https://github.com/xypron/skyldav">View on GitHub</a>
+ * @section install_sec Installation
+ * <p>Install build dependencies. For Debian use the following command</p>
+ * <pre class="fragment">sudo apt-get install git autoconf-archive libclamav-dev libmount-dev \
+ * libcap-dev</pre>
+ * <p>Clone the git repository.</p>
+ * <pre class="fragment">git clone <a
+ * href="https://github.com/xypron/skyldav.git"
+ * >https://github.com/xypron/skyldav.git</a> skyldav</pre>
+ * <p>Move to the source directory.</p><pre class="fragment">cd skyldav/</pre>
+ * <p>Update from git repository.</p><pre class="fragment">git pull</pre>
+ * <p>Create the configure script.</p><pre class="fragment">autogen.sh</pre>
+ * <p>Configure the package.</p><pre class="fragment">./configure</pre>
+ * <p>Build the package.</p><pre class="fragment">make</pre>
+ * <p>Test the package.</p><pre class="fragment">make check</pre>
+ * <p>Install the package.</p><pre class="fragment">sudo make install</pre>
+ * <p>In directory <em>examples</em> files are supplied which can be used
+ * to start Skyld AV as daemon on a Debian system. Copy these to
+ * <em>/etc/init.d</em> and <em>/etc/default</em>.</p>
+ */ 
