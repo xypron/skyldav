@@ -5,6 +5,7 @@ library_include_HEADERS = \
   conf.h \
   pollfanotify.h \
   pollmounts.h \
+  StringSet.h \
   virusscan.h
 
 lib_LTLIBRARIES = libskyldav.la
@@ -12,6 +13,7 @@ libskyldav_la_SOURCES = \
   conf.c \
   pollfanotify.c \
   pollmounts.c \
+  StringSet.cc \
   virusscan.c
 
 libskyldav_la_LDFLAGS = -version-info 1:0:1
