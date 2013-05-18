@@ -30,22 +30,21 @@
 #include <cstring>
 
 /**
- * Compares two strings.
+ * @brief Compares two strings.
  */
 struct StringComperator {
 public:
+
     /**
-     * Compares two terms.
-     * @param left_term left term
-     * @param right_term right term
+     * @brief Compares two strings.
+     * @param value1 left string
+     * @param value2 right string
      * @return 
      */
     bool operator() (std::string *value1, std::string *value2) const {
         return value1->compare(*value2);
     }
 };
-
-typedef std::set<std::string *, StringComperator> _StringSetInternal;
 
 class StringSet {
 public:
@@ -55,8 +54,11 @@ public:
     void print();
     virtual ~StringSet();
 private:
+    /**
+     * @brief Set of pointers to strings.
+     */
+    typedef std::set<std::string *, StringComperator> _StringSetInternal;
     _StringSetInternal strings;
 };
 
 #endif	/* STRINGSET_H */
-
