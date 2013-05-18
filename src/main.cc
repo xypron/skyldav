@@ -18,7 +18,7 @@
  */
 
 /**
- * @file skyldav.c
+ * @file maincc
  * @brief Online virus scanner.
  */
 #include <sys/capability.h>

@@ -17,6 +17,10 @@
  *
  */
 
+/**
+ * @file skyldav.h
+ * @brief Set of strings.
+ */
 
 #ifndef SYKLDAV_H
 #define	SYKLDAV_H

@@ -18,7 +18,7 @@
  */
 
 /**
- * @file StringSet.c
+ * @file StringSet.cc
  * @brief Set of strings.
  */
 
