@@ -236,8 +236,9 @@ int main(int argc, char *argv[]) {
     }
     
     // Parse configuration file
-    conf_parse(cfile, confcb);
-    nomarkfs.print();
+    if (conf_parse(cfile, confcb)) {
+        return EXIT_FAILURE;
+    }
 
     // Check authorization.
     authcheck();
