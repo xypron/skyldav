@@ -50,8 +50,9 @@ typedef std::set<std::string *, StringComperator> _StringSetInternal;
 class StringSet {
 public:
     StringSet();
-    void add(char *value);
-    int find(char *value);
+    void add(const char *value);
+    int find(const char *value);
+    void print();
     virtual ~StringSet();
 private:
     _StringSetInternal strings;

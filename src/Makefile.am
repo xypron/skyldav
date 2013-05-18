@@ -9,6 +9,7 @@ library_include_HEADERS = \
   virusscan.h
 
 lib_LTLIBRARIES = libskyldav.la
+
 libskyldav_la_SOURCES = \
   conf.c \
   pollfanotify.c \
@@ -22,4 +23,4 @@ bin_PROGRAMS = \
   skyldav
 
 skyldav_LDADD = libskyldav.la
-skyldav_SOURCES = skyldav.c
+skyldav_SOURCES = main.cc

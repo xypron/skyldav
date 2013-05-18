@@ -22,19 +22,32 @@
  * @brief Set of strings.
  */
 
+#include <iostream>
 #include "StringSet.h"
 
+/**
+ * @brief Creates string set.
+ */
 StringSet::StringSet() {
 }
 
-void StringSet::add(char *value) {
+/**
+ * @brief Adds entry to string set.
+ * @param value new entry.
+ */
+void StringSet::add(const char *value) {
     std::string *str = new std::string(value);
     if (!this->strings.insert(str).second) {
         delete str;
     }
 }
 
-int StringSet::find(char *value) {
+/**
+ * @brief Finds entry in string set.
+ * @param value entry
+ * @return success
+ */
+int StringSet::find(const char *value) {
     int ret = 0;
     std::string *str = new std::string(value);
     if (this->strings.end() != this->strings.find(str)) {
@@ -44,6 +57,19 @@ int StringSet::find(char *value) {
     return ret;
 }
 
+/**
+ * @brief Prints content of string set to console.
+ */
+void StringSet::print() {
+    _StringSetInternal::iterator pos;
+    for (pos = this->strings.begin(); pos != this->strings.end(); pos++) {
+        std::cout << **pos << std::endl;
+    }
+}
+
+/**
+ * @brief Destroys stringset.
+ */
 StringSet::~StringSet() {
     _StringSetInternal::iterator pos;
     for (pos = this->strings.begin(); pos != this->strings.end(); pos++) {

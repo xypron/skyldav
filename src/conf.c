@@ -93,6 +93,7 @@ static void gettoken(FILE *file, char *token) {
 /**
  * @brief Parses configuration file.
  * If cb is NULL the key value pairs are output to the console.
+ * Returns 0 if successful.
  * @param filename file name
  * @param cb callback function
  * @return success
@@ -132,7 +133,11 @@ int conf_parse(char *filename, conf_cb cb) {
                 if (cb == NULL) {
                     printf("%s = %s\n", key, value);
                 } else {
-                    cb(key, value);
+                    if (cb(key, value)) {
+                    printf("Invalid entry in '%s': %s = %s\n", 
+                            filename, key, value);
+                        ret = 1;
+                    };
                 }
             }
         }

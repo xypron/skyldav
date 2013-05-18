@@ -29,12 +29,47 @@
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include "conf.h"
 #include "pollfanotify.h"
 #include "skyldav.h"
+#include "StringSet.h"
 #include "virusscan.h"
+
+/**
+ * @brief File systems which shall not be scanned.
+ */
+static StringSet nomarkfs;
+/**
+ * @brief Mounts that shall not be scanned.
+ */
+static StringSet nomarkmnt;
+/**
+ * File systems for local drives.
+ */
+static StringSet localfs;
+
+/**
+ * @brief Callback function for reading configuration file.
+ * @param key key value
+ * @param value parameter value
+ * @return success
+ */
+static int confcb(const char *key, const char *value) {
+    int ret = 0;
+    if (!strcmp(key, "NOMARK_FS")) {
+        nomarkfs.add(value);
+    } else if (!strcmp(key, "NOMARK_MNT")) {
+        nomarkmnt.add(value);
+    } else if (!strcmp(key, "LOCAL_FS")) {
+        localfs.add(value);
+    } else {
+        ret = 1;
+    }
+    return ret;
+}
 
 /**
  * @brief Handles signal.
@@ -181,7 +216,7 @@ int main(int argc, char *argv[]) {
     for (i = 1; i < argc; i++) {
         opt = argv[i];
         opt++;
-        if (*argv[i] = '-') {
+        if (*argv[i] == '-') {
             switch (*opt) {
                 case 'c':
                     i++;
@@ -201,7 +236,8 @@ int main(int argc, char *argv[]) {
     }
     
     // Parse configuration file
-    conf_parse(cfile, NULL);
+    conf_parse(cfile, confcb);
+    nomarkfs.print();
 
     // Check authorization.
     authcheck();
