@@ -18,7 +18,7 @@
  */
 
 /**
- * @file maincc
+ * @file main.cc
  * @brief Online virus scanner.
  */
 #include <sys/capability.h>
