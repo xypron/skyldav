@@ -1,5 +1,5 @@
 /* 
- * File:   pollmounts.h
+ * File:   MountPolling.h
  * 
  * Copyright 2012 Heinrich Schuchardt <xypron.glpk@gmx.de>
  *
@@ -17,20 +17,33 @@
  */
 
 /**
- * @file pollmounts.h
+ * @file MountPolling.h
  * @brief Poll /proc/mounts to detect mount events.
  */
 #ifndef POLLMOUNTS_H
 #define	POLLMOUNTS_H
 
+#include "StringSet.h"
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-typedef void (*skyld_pollmountscallbackptr)();
+    typedef void (*skyld_pollmountscallbackptr)();
 
-int skyld_pollmountsstart(skyld_pollmountscallbackptr cbptr);
-int skyld_pollmountsstop();
+    class MountPollingException {
+    };
+
+    class MountPolling {
+    public:
+        static void init(StringSet *nomarkfs, StringSet *nomarkmnt);
+        static int start();
+        static int stop();
+    private:
+        static StringSet *nomarkfs;
+        static StringSet *nomarkmnt;
+    };
+
 
 #ifdef	__cplusplus
 }

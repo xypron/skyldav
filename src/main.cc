@@ -33,6 +33,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "conf.h"
+#include "MountPolling.h"
 #include "pollfanotify.h"
 #include "skyldav.h"
 #include "StringSet.h"
@@ -106,6 +107,9 @@ static void pidfile() {
     close(fd);
 }
 
+/**
+ * @brief Prints help message and exits.
+ */
 static void help() {
     printf("%s\n", HELP_TEXT);
     exit(EXIT_FAILURE);
@@ -143,7 +147,7 @@ static int capable(cap_value_t cap) {
  */
 static void authcheck() {
     if (!capable(CAP_SYS_ADMIN)) {
-        fprintf(stderr, 
+        fprintf(stderr,
                 "Missing capability CAP_SYS_ADMIN.\n"
                 "Call the program as root.\n");
         exit(EXIT_FAILURE);
@@ -234,7 +238,7 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-    
+
     // Parse configuration file
     if (conf_parse(cfile, confcb)) {
         return EXIT_FAILURE;
@@ -283,10 +287,14 @@ int main(int argc, char *argv[]) {
 
     ret = skyld_pollfanotifystart(*skyld_displayfanotify);
     if (ret != 0) {
-        fprintf(stderr, "Failure starting mount listener.\n");
-        syslog(LOG_ERR, "Failure starting mount listener.");
+        fprintf(stderr, "Failure starting fanotify listener.\n");
+        syslog(LOG_ERR, "Failure starting fanotify listener.");
         return EXIT_FAILURE;
     }
+
+    MountPolling::init(&nomarkfs, &nomarkmnt);
+    MountPolling::start();
+
     ret = skyld_pollfanotifymarkmount("/home");
     //    ret = skyld_pollfanotifymarkmount("/");
     if (ret != 0) {
@@ -301,6 +309,8 @@ int main(int argc, char *argv[]) {
             getchar();
         }
     }
+
+    MountPolling::stop();
 
     ret = skyld_pollfanotifystop();
 

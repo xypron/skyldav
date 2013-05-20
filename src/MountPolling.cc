@@ -1,5 +1,5 @@
 /* 
- * File:   pollmounts.c
+ * File:   MountPolling.c
  * 
  * Copyright 2012 Heinrich Schuchardt <xypron.glpk@gmx.de>
  *
@@ -18,10 +18,12 @@
  */
 
 /**
- * @file pollmounts.c
+ * @file MountPolling.c
  * @brief Poll /proc/mounts to detect mount events.
  */
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE // enable ppoll
+#endif // _GNU_SOURCE
 #define _POSIX_C_SOURCE 200809L // enable nanosleep
 #include <errno.h>
 #include <features.h>
@@ -35,13 +37,17 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-#include "pollmounts.h"
+#include "MountPolling.h"
 
 #define SKYLD_POLLMOUNT_STATUS_INITIAL 0
 #define SKYLD_POLLMOUNT_STATUS_RUNNING 1
 #define SKYLD_POLLMOUNT_STATUS_STOPPING 2
 #define SKYLD_POLLMOUNT_STATUS_FAILURE 3
 #define SKYLD_POLLMOUNT_STATUS_SUCCESS 4
+
+
+StringSet *MountPolling::nomarkfs = NULL;
+StringSet *MountPolling::nomarkmnt = NULL;
 
 /**
  * @brief Status of thread.
@@ -164,12 +170,24 @@ static void *run(void *cbptr) {
 }
 
 /**
+ * @brief Tracks mountevents.
+ */
+static void cb() {
+    printf("Mount event has occured.\n");
+}
+
+void MountPolling::init(StringSet *nomarkfs, StringSet *nomarkmnt) {
+    MountPolling::nomarkfs = nomarkfs;
+    MountPolling::nomarkmnt = nomarkmnt;
+}
+
+/**
  * @brief Starts polling of /proc/mounts.
  * 
  * @param cbptr pointer to callback function
  * @return on success return 0
  */
-int skyld_pollmountsstart(skyld_pollmountscallbackptr cbptr) {
+int MountPolling::start() {
     pthread_attr_t attr;
     int ret;
     struct timespec waiting_time_rem;
@@ -187,12 +205,12 @@ int skyld_pollmountsstart(skyld_pollmountscallbackptr cbptr) {
                 strerror(ret));
         return EXIT_FAILURE;
     }
-    ret = pthread_create(&thread, &attr, run, (void *) cbptr);
+    ret = pthread_create(&thread, &attr, run, (void *) cb);
     if (ret != 0) {
         fprintf(stderr, "Failure to create thread: %s\n", strerror(ret));
         return EXIT_FAILURE;
     }
-    waiting_time_req.tv_sec  = 0;
+    waiting_time_req.tv_sec = 0;
     waiting_time_req.tv_nsec = 100;
     while (status == SKYLD_POLLMOUNT_STATUS_INITIAL) {
         nanosleep(&waiting_time_req, &waiting_time_rem);
@@ -208,7 +226,7 @@ int skyld_pollmountsstart(skyld_pollmountscallbackptr cbptr) {
  * 
  * @return on success return 0.
  */
-int skyld_pollmountsstop() {
+int MountPolling::stop() {
     void *result;
     int ret;
 

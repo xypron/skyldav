@@ -3,8 +3,8 @@ AM_CFLAGS = -DLOGDIR='"$(localstatedir)/log/skyldav/"'
 library_includedir=$(includedir)/skyldav
 library_include_HEADERS = \
   conf.h \
+  MountPolling.h \
   pollfanotify.h \
-  pollmounts.h \
   StringSet.h \
   virusscan.h
 
@@ -12,8 +12,8 @@ lib_LTLIBRARIES = libskyldav.la
 
 libskyldav_la_SOURCES = \
   conf.c \
+  MountPolling.cc \
   pollfanotify.c \
-  pollmounts.c \
   StringSet.cc \
   virusscan.c
 
