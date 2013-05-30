@@ -80,12 +80,11 @@ body {
   }
 
 #logo {
-  background-color: #000000;
-  background-image: "../images/skyldav100.png";
+  background: url('../images/skyldav100.png') #000000 no-repeat;
   color: #ffffff;
-  height: 100px;
+  height: 70px;
   font-size: 48px;
-  padding-bottom: 10px;
+  padding: 15px 0px 15px 150px;
   } 
 
 #nav {
