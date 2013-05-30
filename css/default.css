@@ -81,6 +81,7 @@ body {
 
 #logo {
   background-color: #000000;
+  background-image: "../images/skyldav100.png";
   color: #ffffff;
   height: 100px;
   font-size: 48px;
