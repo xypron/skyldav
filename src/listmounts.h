@@ -25,16 +25,13 @@
 #ifndef LISTMOUNTS_H
 #define	LISTMOUNTS_H
 
-int listmountinit();
-int listmountnext(char **dir, char **type);
-void listmountfinalize();
-
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-
-
+int listmountinit();
+int listmountnext(char **dir, char **type);
+void listmountfinalize();
 
 #ifdef	__cplusplus
 }

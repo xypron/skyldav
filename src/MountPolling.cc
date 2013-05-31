@@ -37,6 +37,7 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+#include "listmounts.h"
 #include "MountPolling.h"
 
 #define SKYLD_POLLMOUNT_STATUS_INITIAL 0
@@ -173,10 +174,22 @@ static void *run(void *cbptr) {
  * @brief Tracks mountevents.
  */
 static void cb() {
+    char *dir;
+    char *type;
+
     printf("Mount event has occured.\n");
+    do {
+        if (listmountinit()) {
+            break;
+        }
+        while (!listmountnext(&dir, &type)) {
+            printf("%s (%s)\n", dir, type);
+        }
+    } while (0);
+    listmountfinalize();
 }
 
-void MountPolling::init(StringSet *nomarkfs, StringSet *nomarkmnt) {
+void MountPolling::init(StringSet *nomarkfs, StringSet * nomarkmnt) {
     MountPolling::nomarkfs = nomarkfs;
     MountPolling::nomarkmnt = nomarkmnt;
 }
