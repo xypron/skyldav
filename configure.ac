@@ -34,7 +34,7 @@ CPPFLAGS="-I`cd $srcdir && pwd`/src $CPPFLAGS"
 dnl add package specific include paths
 CPPFLAGS="`pkg-config --cflags libclamav` $CPPFLAGS"
 dnl Set linker flags
-LDFLAGS="-lcap $LDFLAGS"
+LDFLAGS="-lcap -lmount $LDFLAGS"
 dnl add package specific libraries
 LDFLAGS="`pkg-config --libs libclamav` $LDFLAGS"
 
