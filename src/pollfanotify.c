@@ -208,7 +208,8 @@ void skyld_displayfanotify(const int fd, const void *buf, int len) {
     int ret;
     struct stat statbuf;
     struct fanotify_response response;
-
+    pid_t pid;
+    
     while (FAN_EVENT_OK(metadata, len)) {
 
         if (metadata->fd == FAN_NOFD) {
@@ -228,8 +229,12 @@ void skyld_displayfanotify(const int fd, const void *buf, int len) {
                 continue;
             }
             response.fd = metadata->fd;
-            if (S_ISDIR(statbuf.st_mode)
-                    || skyld_scan(metadata->fd) == SKYLD_SCANOK) {
+            pid = getpid();
+            if (pid == metadata->pid) {
+                response.response = FAN_ALLOW;
+            } else if (!S_ISREG(statbuf.st_mode)) {
+                response.response = FAN_ALLOW;
+            } else if (skyld_scan(metadata->fd) == SKYLD_SCANOK) {
                 response.response = FAN_ALLOW;
             } else {
                 response.response = FAN_DENY;

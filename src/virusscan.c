@@ -39,8 +39,8 @@ static struct cl_engine *engine;
  */
 static void log_virus_found(const int fd, const char *virname) {
     int path_len;
-    char path[PATH_MAX+1];
-    snprintf(path, sizeof(path), "/proc/self/fd/%d", fd);
+    char path[PATH_MAX + 1];
+    snprintf(path, sizeof (path), "/proc/self/fd/%d", fd);
     path_len = readlink(path, path, sizeof (path) - 1);
     if (path_len < 0) {
         path_len = 0;
@@ -95,14 +95,23 @@ int skyld_scan(const int fd) {
     int success = SKYLD_SCANOK;
     int ret;
     const char *virname;
+
     ret = cl_scandesc(fd, &virname, NULL, engine, CL_SCAN_STDOPT);
-    if (ret == CL_VIRUS) {
-        printf("Virus detected: %s\n", virname);
-        log_virus_found(fd, virname);
-        success = SKYLD_SCANVIRUS;
-    } else {
-        if (ret != CL_CLEAN)
+    return success;
+    switch (ret) {
+        case CL_CLEAN:
+            success = SKYLD_SCANOK;
+            break;
+        case CL_VIRUS:
+            printf("Virus detected: %s\n", virname);
+            log_virus_found(fd, virname);
+            success = SKYLD_SCANVIRUS;
+            break;
+        default:
             printf("Error: %s\n", cl_strerror(ret));
+            syslog(LOG_CRIT, "Error: %s\n", cl_strerror(ret));
+            success = SKYLD_SCANOK;
+            break;
     }
     return success;
 }
