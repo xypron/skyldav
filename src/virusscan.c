@@ -97,7 +97,6 @@ int skyld_scan(const int fd) {
     const char *virname;
 
     ret = cl_scandesc(fd, &virname, NULL, engine, CL_SCAN_STDOPT);
-    return success;
     switch (ret) {
         case CL_CLEAN:
             success = SKYLD_SCANOK;
