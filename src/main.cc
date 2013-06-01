@@ -295,8 +295,6 @@ int main(int argc, char *argv[]) {
     MountPolling::init(&nomarkfs, &nomarkmnt);
     MountPolling::start();
 
-    ret = skyld_pollfanotifymarkmount("/home");
-    //    ret = skyld_pollfanotifymarkmount("/");
     if (ret != 0) {
         fprintf(stderr, "Failure setting mark.\n");
         syslog(LOG_ERR, "Failure setting mark.");

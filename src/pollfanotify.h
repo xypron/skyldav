@@ -36,6 +36,7 @@ extern "C" {
     int skyld_pollfanotifystart(skyld_pollfanotifycallbackptr cbptr);
     int skyld_pollfanotifystop();
     int skyld_pollfanotifymarkmount(const char *mount);
+    int skyld_pollfanotifyunmarkmount(const char *mount);
 
 #ifdef	__cplusplus
 }

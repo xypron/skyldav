@@ -28,6 +28,7 @@
 #include <errno.h>
 #include <features.h>
 #include <fcntl.h>
+#include <iostream>
 #include <poll.h>
 #include <pthread.h>
 #include <stdio.h>
@@ -38,6 +39,7 @@
 #include <time.h>
 #include <unistd.h>
 #include "listmounts.h"
+#include "pollfanotify.h"
 #include "MountPolling.h"
 
 #define SKYLD_POLLMOUNT_STATUS_INITIAL 0
@@ -46,9 +48,10 @@
 #define SKYLD_POLLMOUNT_STATUS_FAILURE 3
 #define SKYLD_POLLMOUNT_STATUS_SUCCESS 4
 
-
+StringSet *MountPolling::mounts = NULL;
 StringSet *MountPolling::nomarkfs = NULL;
 StringSet *MountPolling::nomarkmnt = NULL;
+
 
 /**
  * @brief Status of thread.
@@ -173,19 +176,43 @@ static void *run(void *cbptr) {
 /**
  * @brief Tracks mountevents.
  */
-static void cb() {
+void MountPolling::cb() {
     char *dir;
     char *type;
+    StringSet *cbmounts;
+    StringSet::iterator pos;
+    std::string *str;
 
-    printf("Mount event has occured.\n");
+    cbmounts = new StringSet();
+
     do {
         if (listmountinit()) {
             break;
         }
         while (!listmountnext(&dir, &type)) {
-            printf("%s (%s)\n", dir, type);
+            if (!MountPolling::nomarkfs->find(type)
+                    && !MountPolling::nomarkmnt->find(dir)) {
+                cbmounts->add(dir);
+            }
         }
     } while (0);
+
+    for (pos = cbmounts->begin(); pos != cbmounts->end(); pos++) {
+        if (0 == MountPolling::mounts->count(*pos)) {
+            str = *pos;
+            skyld_pollfanotifymarkmount(str->c_str());
+        }
+    }
+    for (pos = mounts->begin(); pos != mounts->end(); pos++) {
+        if (0 == cbmounts->count(*pos)) {
+            str = *pos;
+            skyld_pollfanotifyunmarkmount(str->c_str());
+        }
+    }
+
+    delete(MountPolling::mounts);
+    MountPolling::mounts = cbmounts;
+
     listmountfinalize();
 }
 
@@ -197,7 +224,6 @@ void MountPolling::init(StringSet *nomarkfs, StringSet * nomarkmnt) {
 /**
  * @brief Starts polling of /proc/mounts.
  * 
- * @param cbptr pointer to callback function
  * @return on success return 0
  */
 int MountPolling::start() {
@@ -212,13 +238,20 @@ int MountPolling::start() {
     }
     status = SKYLD_POLLMOUNT_STATUS_INITIAL;
 
+    MountPolling::mounts = new StringSet();
+    if (MountPolling::mounts == NULL) {
+        return EXIT_FAILURE;
+    }
+
+    MountPolling::cb();
+
     ret = pthread_attr_init(&attr);
     if (ret != 0) {
         fprintf(stderr, "Failure to set thread attributes: %s\n",
                 strerror(ret));
         return EXIT_FAILURE;
     }
-    ret = pthread_create(&thread, &attr, run, (void *) cb);
+    ret = pthread_create(&thread, &attr, run, (void *) MountPolling::cb);
     if (ret != 0) {
         fprintf(stderr, "Failure to create thread: %s\n", strerror(ret));
         return EXIT_FAILURE;
@@ -242,12 +275,25 @@ int MountPolling::start() {
 int MountPolling::stop() {
     void *result;
     int ret;
+    StringSet::iterator pos;
+    std::string *str;
 
     if (status != SKYLD_POLLMOUNT_STATUS_RUNNING) {
         fprintf(stderr, "Polling not started.\n");
         return EXIT_FAILURE;
     }
     status = SKYLD_POLLMOUNT_STATUS_STOPPING;
+
+    // Unmark all mounts.
+    if (mounts != NULL) {
+        for (pos = mounts->begin(); pos != mounts->end(); pos++) {
+            str = *pos;
+            skyld_pollfanotifyunmarkmount(str->c_str());
+        }
+        delete(MountPolling::mounts);
+        MountPolling::mounts = NULL;
+    }
+
     ret = pthread_kill(thread, SIGUSR1);
     if (ret != 0) {
         fprintf(stderr, "Failure to kill thread: %s\n", strerror(ret));

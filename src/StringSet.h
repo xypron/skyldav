@@ -39,26 +39,35 @@ public:
      * @brief Compares two strings.
      * @param value1 left string
      * @param value2 right string
-     * @return 
+     * @return value1 is less then value2
      */
     bool operator() (std::string *value1, std::string *value2) const {
-        return value1->compare(*value2);
+        if (value1->compare(*value2) < 0) {
+            return 1;
+        } else {
+            return 0;
+        };
     }
 };
 
-class StringSet {
+class StringSet : std::set<std::string *, StringComperator> {
 public:
     StringSet();
     void add(const char *value);
+    using std::set<std::string *, StringComperator>::begin;
+    using std::set<std::string *, StringComperator>::count;
+    using std::set<std::string *, StringComperator>::end;
+    using std::set<std::string *, StringComperator>::find;
     int find(const char *value);
+    using std::set<std::string *, StringComperator>::iterator;
     void print();
     virtual ~StringSet();
 private:
     /**
      * @brief Set of pointers to strings.
      */
-    typedef std::set<std::string *, StringComperator> _StringSetInternal;
-    _StringSetInternal strings;
+//    typedef std::set<std::string *, StringComperator> _StringSetInternal;
+//    _StringSetInternal strings;
 };
 
 #endif	/* STRINGSET_H */

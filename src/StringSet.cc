@@ -37,7 +37,7 @@ StringSet::StringSet() {
  */
 void StringSet::add(const char *value) {
     std::string *str = new std::string(value);
-    if (!this->strings.insert(str).second) {
+    if (!this->insert(str).second) {
         delete str;
     }
 }
@@ -50,7 +50,7 @@ void StringSet::add(const char *value) {
 int StringSet::find(const char *value) {
     int ret = 0;
     std::string *str = new std::string(value);
-    if (this->strings.end() != this->strings.find(str)) {
+    if (this->end() != this->find(str)) {
         ret = 1;
     }
     delete str;
@@ -61,9 +61,9 @@ int StringSet::find(const char *value) {
  * @brief Prints content of string set to console.
  */
 void StringSet::print() {
-    _StringSetInternal::iterator pos;
-    for (pos = this->strings.begin(); pos != this->strings.end(); pos++) {
-        std::cout << **pos << std::endl;
+    StringSet::iterator pos;
+    for (pos = this->begin(); pos != this->end(); pos++) {
+        std::cout << "'" <<**pos << "'" << std::endl;
     }
 }
 
@@ -71,10 +71,10 @@ void StringSet::print() {
  * @brief Destroys stringset.
  */
 StringSet::~StringSet() {
-    _StringSetInternal::iterator pos;
-    for (pos = this->strings.begin(); pos != this->strings.end(); pos++) {
+    StringSet::iterator pos;
+    for (pos = this->begin(); pos != this->end(); pos++) {
         delete *pos;
     }
-    this->strings.clear();
+    this->clear();
 }
 

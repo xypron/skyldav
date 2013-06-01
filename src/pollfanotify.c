@@ -314,6 +314,28 @@ int skyld_pollfanotifymarkmount(const char *mount) {
         fprintf(stderr, "Failure to set mark: %s\n", strerror(errno));
         return EXIT_FAILURE;
     }
+    printf("marked: %s\n", mount);
+    return EXIT_SUCCESS;
+}
+
+/**
+ * @brief Removes a mount from polling fanotify events.
+ * 
+ * @param mount
+ * @return success
+ */
+int skyld_pollfanotifyunmarkmount(const char *mount) {
+    unsigned int flags = FAN_MARK_REMOVE | FAN_MARK_MOUNT;
+    uint64_t mask = FAN_OPEN_PERM | FAN_CLOSE_WRITE;
+    int dfd = AT_FDCWD;
+    int ret;
+
+    ret = fanotify_mark(fd, flags, mask, dfd, mount);
+    if (ret != 0) {
+        fprintf(stderr, "Failure to set mark: %s\n", strerror(errno));
+        return EXIT_FAILURE;
+    }
+    printf("unmarked: %s\n", mount);
     return EXIT_SUCCESS;
 }
 

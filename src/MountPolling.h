@@ -39,7 +39,9 @@ extern "C" {
         static void init(StringSet *nomarkfs, StringSet *nomarkmnt);
         static int start();
         static int stop();
+        static void cb();
     private:
+        static StringSet *mounts;
         static StringSet *nomarkfs;
         static StringSet *nomarkmnt;
     };
