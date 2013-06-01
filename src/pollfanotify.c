@@ -314,7 +314,7 @@ int skyld_pollfanotifymarkmount(const char *mount) {
         fprintf(stderr, "Failure to set mark: %s\n", strerror(errno));
         return EXIT_FAILURE;
     }
-    printf("marked: %s\n", mount);
+    syslog(LOG_NOTICE, "Now watching: %s\n", mount);
     return EXIT_SUCCESS;
 }
 
@@ -335,7 +335,7 @@ int skyld_pollfanotifyunmarkmount(const char *mount) {
         fprintf(stderr, "Failure to set mark: %s\n", strerror(errno));
         return EXIT_FAILURE;
     }
-    printf("unmarked: %s\n", mount);
+    syslog(LOG_NOTICE, "Stopped watching: %s\n", mount);
     return EXIT_SUCCESS;
 }
 

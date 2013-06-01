@@ -20,6 +20,20 @@
 /**
  * @file conf.c
  * @brief Analyze configuration file.
+ * 
+ * <p>Each assignement line must have a key and a value separated by an equal
+ * sign.</p>
+ * <pre>key = value</pre>
+ * <p>Comments start with a number sign.</p>
+ * <pre>This is a comment.</pre>
+ * <p>Multiple values on a line must be separated by comma.</p>
+ * <pre>key = value1, value2</pre>
+ * <p>Alternatively multiple lines may be used.</p>
+ * <pre>key = value1
+ * key = value2</pre>
+ * <p>Use backslashs to escape ' ', ',', '#' and '\'.</p>
+ * <pre>key = value\ with\ spaces</pre>
+ * <p>Lines may be empty.</p>
  */
 
 #include <stdio.h>
