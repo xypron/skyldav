@@ -33,7 +33,7 @@ static struct libmnt_iter *itr = NULL;
 /**
  * Initializes enumeration of mounts.
  * 
- * @return success
+ * @return success = 0
  */
 int listmountinit() {
     int ret = 1;
@@ -58,9 +58,9 @@ int listmountinit() {
  * 
  * @param dir directory
  * @param type type of mount
- * @return success
+ * @return success = 0
  */
-int listmountnext(char **dir, char **type) {
+int listmountnext(const char **dir, const char **type) {
     int ret = 1;
     struct libmnt_fs *fs;
     if (0 == mnt_table_next_fs(tb, itr, &fs)) {

@@ -316,7 +316,8 @@ int skyld_pollfanotifymarkmount(const char *mount) {
 
     ret = fanotify_mark(fd, flags, mask, dfd, mount);
     if (ret != 0) {
-        fprintf(stderr, "Failure to set mark: %s\n", strerror(errno));
+        fprintf(stderr, "Failure to set mark on '%s': %i - %s\n", 
+                mount, errno, strerror(errno));
         return EXIT_FAILURE;
     }
     syslog(LOG_NOTICE, "Now watching: %s\n", mount);
@@ -336,8 +337,9 @@ int skyld_pollfanotifyunmarkmount(const char *mount) {
     int ret;
 
     ret = fanotify_mark(fd, flags, mask, dfd, mount);
-    if (ret != 0) {
-        fprintf(stderr, "Failure to set mark: %s\n", strerror(errno));
+    if (ret != 0 && errno != ENOENT) {
+        fprintf(stderr, "Failure to remove mark from '%s': %i - %s\n", 
+                mount, errno, strerror(errno));
         return EXIT_FAILURE;
     }
     syslog(LOG_NOTICE, "Stopped watching: %s\n", mount);

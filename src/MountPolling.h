@@ -29,17 +29,33 @@
 extern "C" {
 #endif
 
-    typedef void (*skyld_pollmountscallbackptr)();
-
-    class MountPollingException {
-    };
-
+    /**
+     * @brief Polls mount and unmout events
+     */
     class MountPolling {
     public:
+        /**
+         * Pointer to callback function for polling mounts.
+         */
+        typedef void (*callbackptr)();
+        /**
+         * Initializes polling of mounts.
+         * @param nomarkfs file systems that shall not be watched
+         * @param nomarkmnt mounts that shall not be watched
+         */
         static void init(StringSet *nomarkfs, StringSet *nomarkmnt);
+        /**
+         * Starts polling of mounts.
+         */
         static int start();
+        /**
+         * Stops polling of mounts.
+         */
         static int stop();
-        static void cb();
+        /**
+         * Callback function called when mount event occurs.
+         */
+        static void callback();
     private:
         static StringSet *mounts;
         static StringSet *nomarkfs;

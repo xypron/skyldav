@@ -112,7 +112,7 @@ static void *run(void *cbptr) {
     /**
      * Pointer to callback function.
      */
-    skyld_pollmountscallbackptr cb = (skyld_pollmountscallbackptr) cbptr;
+    MountPolling::callbackptr cb = (MountPolling::callbackptr) cbptr;
 
     status = SKYLD_POLLMOUNT_STATUS_INITIAL;
 
@@ -176,9 +176,9 @@ static void *run(void *cbptr) {
 /**
  * @brief Tracks mountevents.
  */
-void MountPolling::cb() {
-    char *dir;
-    char *type;
+void MountPolling::callback() {
+    const char *dir;
+    const char *type;
     StringSet *cbmounts;
     StringSet::iterator pos;
     std::string *str;
@@ -243,7 +243,7 @@ int MountPolling::start() {
         return EXIT_FAILURE;
     }
 
-    MountPolling::cb();
+    MountPolling::callback();
 
     ret = pthread_attr_init(&attr);
     if (ret != 0) {
@@ -251,7 +251,7 @@ int MountPolling::start() {
                 strerror(ret));
         return EXIT_FAILURE;
     }
-    ret = pthread_create(&thread, &attr, run, (void *) MountPolling::cb);
+    ret = pthread_create(&thread, &attr, run, (void *) MountPolling::callback);
     if (ret != 0) {
         fprintf(stderr, "Failure to create thread: %s\n", strerror(ret));
         return EXIT_FAILURE;

@@ -30,7 +30,7 @@ extern "C" {
 #endif
 
 int listmountinit();
-int listmountnext(char **dir, char **type);
+int listmountnext(const char **dir, const char **type);
 void listmountfinalize();
 
 #ifdef	__cplusplus
