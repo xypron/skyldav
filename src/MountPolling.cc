@@ -18,7 +18,7 @@
  */
 
 /**
- * @file MountPolling.c
+ * @file MountPolling.cc
  * @brief Poll /proc/mounts to detect mount events.
  */
 #ifndef _GNU_SOURCE

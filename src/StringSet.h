@@ -50,6 +50,9 @@ public:
     }
 };
 
+/**
+ * @brief Set of pointers to strings.
+ */
 class StringSet : std::set<std::string *, StringComperator> {
 public:
     StringSet();
