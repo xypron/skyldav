@@ -5,10 +5,10 @@ library_include_HEADERS = \
   conf.h \
   listmounts.h \
   MountPolling.h \
-  pollfanotify.h \
+  FanotifyPolling.h \
   StringSet.h \
   ThreadPool.h \
-  virusscan.h
+  VirusScan.h
 
 lib_LTLIBRARIES = libskyldav.la
 
@@ -16,10 +16,10 @@ libskyldav_la_SOURCES = \
   conf.c \
   listmounts.c \
   MountPolling.cc \
-  pollfanotify.c \
+  FanotifyPolling.c \
   StringSet.cc \
   ThreadPool.cc \
-  virusscan.c
+  VirusScan.cc
 
 libskyldav_la_LDFLAGS = -version-info 1:0:1
 

@@ -38,8 +38,8 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+#include "FanotifyPolling.h"
 #include "listmounts.h"
-#include "pollfanotify.h"
 #include "MountPolling.h"
 
 #define SKYLD_POLLMOUNT_STATUS_INITIAL 0

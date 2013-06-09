@@ -25,16 +25,35 @@
 #ifndef POLLFANOTIFY_H
 #define	POLLFANOTIFY_H
 
+#include <sys/fanotify.h>
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
+    /**
+     * @brief Scan task.
+     */
+    struct scanTask {
+        /**
+         * @brief fanotify file descriptor
+         */
+        int fd;
+        /**
+         * @brief fanotify metadata
+         */
+        struct fanotify_event_metadata metadata;
+    };
+    
+    
     typedef void (*skyld_pollfanotifycallbackptr)(const int fd,
             const void *buf, int len);
 
     void skyld_displayfanotify(const int fd, const void *buf, int len);
-    int skyld_pollfanotifystart(skyld_pollfanotifycallbackptr cbptr);
+    int skyld_pollfanotifystart(int nThread);
     int skyld_pollfanotifystop();
+    int skyld_fanotifywriteresponse(const int fd, 
+            const struct fanotify_response response);
     int skyld_pollfanotifymarkmount(const char *mount);
     int skyld_pollfanotifyunmarkmount(const char *mount);
 

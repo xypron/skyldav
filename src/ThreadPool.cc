@@ -156,16 +156,16 @@ void * ThreadPool::worker(void *threadPool) {
 ThreadPool::~ThreadPool() {
     int n;
     struct timespec interval = {
-      0,
-      1000000
+        0,
+        1000000
     };
 
     pthread_mutex_lock(&mutexWorker);
     status = STOPPING;
     pthread_mutex_unlock(&mutexWorker);
-    pthread_cond_signal(&cond);
 
     for (;;) {
+        pthread_cond_signal(&cond);
         nanosleep(&interval, NULL);
         pthread_mutex_lock(&mutexThread);
         n = nThreads;

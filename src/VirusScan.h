@@ -30,10 +30,11 @@ extern "C" {
 #define SKYLD_SCANOK 0
 #define SKYLD_SCANERROR -1
 #define SKYLD_SCANVIRUS 1
-    
-    int skyld_scaninit();
-    int skyld_scan(const int fd);
-    int skyld_scanfinalize();
+
+    int scaninit();
+    void* scanFile(void *workitem);
+    int scan(const int fd);
+    int scanfinalize();
 #ifdef	__cplusplus
 }
 #endif

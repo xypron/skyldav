@@ -24,7 +24,9 @@
 #include <sys/capability.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <iostream>
 #include <signal.h>
+#include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,11 +35,12 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "conf.h"
+#include "FanotifyPolling.h"
 #include "MountPolling.h"
-#include "pollfanotify.h"
 #include "skyldav.h"
 #include "StringSet.h"
-#include "virusscan.h"
+#include "ThreadPool.h"
+#include "VirusScan.h"
 
 /**
  * @brief File systems which shall not be scanned.
@@ -48,9 +51,13 @@ static StringSet nomarkfs;
  */
 static StringSet nomarkmnt;
 /**
- * File systems for local drives.
+ * @brief File systems for local drives.
  */
 static StringSet localfs;
+/**
+ * @brief Number of threads for virus scanning
+ */
+static int nThread = 4;
 
 /**
  * @brief Callback function for reading configuration file.
@@ -60,12 +67,18 @@ static StringSet localfs;
  */
 static int confcb(const char *key, const char *value) {
     int ret = 0;
+
     if (!strcmp(key, "NOMARK_FS")) {
         nomarkfs.add(value);
     } else if (!strcmp(key, "NOMARK_MNT")) {
         nomarkmnt.add(value);
     } else if (!strcmp(key, "LOCAL_FS")) {
         localfs.add(value);
+    } else if (!strcmp(key, "THREADS")) {
+        std::stringstream ss(value);
+        if ((ss >> nThread).fail()) {
+            ret = 1;
+        }
     } else {
         ret = 1;
     }
@@ -244,6 +257,12 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
+    // Check number of threads
+    if (nThread < 2) {
+        fprintf(stderr, "At least two threads should be used for scanning.\n");
+        return EXIT_FAILURE;
+    }
+
     // Check authorization.
     authcheck();
 
@@ -252,7 +271,7 @@ int main(int argc, char *argv[]) {
         daemonize();
         daemonized = 1;
     }
-
+    
     // Open syslog.
     setlogmask(LOG_UPTO(LOG_NOTICE));
     openlog("Skyld AV", 0, LOG_USER);
@@ -260,7 +279,7 @@ int main(int argc, char *argv[]) {
     syslog(LOG_NOTICE, "Starting on access scanning.");
 
     printf("Loading database\n");
-    ret = skyld_scaninit();
+    ret = scaninit();
     if (ret != SKYLD_SCANOK) {
         syslog(LOG_ERR, "Loading database failed.");
         return EXIT_FAILURE;
@@ -285,7 +304,7 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    ret = skyld_pollfanotifystart(*skyld_displayfanotify);
+    ret = skyld_pollfanotifystart(nThread);
     if (ret != 0) {
         fprintf(stderr, "Failure starting fanotify listener.\n");
         syslog(LOG_ERR, "Failure starting fanotify listener.");
@@ -312,7 +331,8 @@ int main(int argc, char *argv[]) {
 
     ret = skyld_pollfanotifystop();
 
-    ret = skyld_scanfinalize();
+    ret = scanfinalize();
+    
     syslog(LOG_NOTICE, "On access scanning stopped.");
     closelog();
     printf("done\n");

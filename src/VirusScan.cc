@@ -24,7 +24,8 @@
 #include <limits.h>
 #include <stdio.h>
 #include <syslog.h>
-#include "virusscan.h"
+#include "unistd.h"
+#include "VirusScan.h"
 
 /**
  * @brief Reference to virus scan engine.
@@ -52,12 +53,13 @@ static void log_virus_found(const int fd, const char *virname) {
 /**
  * @brief Initializes virus scan engine.
  *
+ * @param nThread number of threads
  * @return success
  */
-int skyld_scaninit() {
+int scaninit() {
     int ret;
     unsigned int sigs;
-
+    
     ret = cl_init(CL_INIT_DEFAULT);
     if (ret != CL_SUCCESS) {
         printf("cl_init() error: %s\n", cl_strerror(ret));
@@ -91,7 +93,7 @@ int skyld_scaninit() {
  *
  * @return success
  */
-int skyld_scan(const int fd) {
+int scan(const int fd) {
     int success = SKYLD_SCANOK;
     int ret;
     const char *virname;
@@ -120,7 +122,7 @@ int skyld_scan(const int fd) {
  *
  * @return success
  */
-int skyld_scanfinalize() {
+int scanfinalize() {
     int ret;
     ret = cl_engine_free(engine);
     if (ret != CL_SUCCESS) {
