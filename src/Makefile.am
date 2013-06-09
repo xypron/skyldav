@@ -7,6 +7,7 @@ library_include_HEADERS = \
   MountPolling.h \
   pollfanotify.h \
   StringSet.h \
+  ThreadPool.h \
   virusscan.h
 
 lib_LTLIBRARIES = libskyldav.la
@@ -17,6 +18,7 @@ libskyldav_la_SOURCES = \
   MountPolling.cc \
   pollfanotify.c \
   StringSet.cc \
+  ThreadPool.cc \
   virusscan.c
 
 libskyldav_la_LDFLAGS = -version-info 1:0:1
