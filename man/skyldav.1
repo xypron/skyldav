@@ -10,15 +10,31 @@ skyldav \- Skyld AV on access virus scanner
 .SH DESCRIPTION
 .PP
 Skyld AV provides on access virus scanning for Linux.
+.PP
+Running the program requires the CAP_SYS_ADMIN capability.
+.PP
+The fanotify API is used to control file access. This requires a kernel compiled with
+
+.in +4n
+.sf
+ CONFIG_FANOTIFY=y
+ CONFIG_FANOTIFY_ACCESS_PERMISSIONS=y
+.fi
+.in
+
+Kernel version 3.8.0 or newer is recommended.
 .TP
 .B \-c \fBconfigfile\fR
-path to configuration file
+Specify the path to the configuration file.
 .TP
 .B \-d
-daemonize
+Daemonize; run the progam as a background program.
 .TP
 .B \-h
-help
+Print this usage information.
+.TP
+.B \-v
+Print the program version and licensing information.
 .SH AUTHOR
 Heinrich Schuchardt <xypron.glpk@gmx.de>
 .SH FILES

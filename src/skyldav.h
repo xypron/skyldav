@@ -37,9 +37,24 @@ extern "C" {
             "  -c <configfile>  path to config file\n"
             "  -d               daemonize\n"
             "  -h               help\n\n"
+            "  -v               version\n\n"
             "Licensed under the Apache License, Version 2.0.\n"
             "Report errors to\n"
-            "Heinrich Schuchardt <xypron.glpk@gmx.de>";
+            "Heinrich Schuchardt <xypron.glpk@gmx.de>\n";
+
+    const char *VERSION_TEXT =
+            "On access virus scanner.\n\n"
+            "Copyright 2013 Heinrich Schuchardt <xypron.glpk@gmx.de>\n\n"
+            "Licensed under the Apache License, Version 2.0 (the\n"
+            "\"License\"); you may not use this file except in compliance\n"
+            "with the License. You may obtain a copy of the License at\n\n"
+            "    http://www.apache.org/licenses/LICENSE-2.0\n\n"
+            "Unless required by applicable law or agreed to in writing,\n"
+            "software distributed under the License is distributed on an\n"
+            "\"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,\n"
+            "either express or implied. See the License for the specific\n"
+            "language governing permissions and limitations under the\n"
+            "License.\n";
 
     const char *PID_FILE = "/var/run/skyldav/skyldav.pid";
     
