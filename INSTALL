@@ -3,7 +3,7 @@ Building from git repository
 
 Install build dependencies. For Debian use the following command
 sudo apt-get install git autoconf-archive libclamav-dev libmount-dev \
-  libcap-dev
+  libcap-dev pkg-config
 
 # Clone repository
 git clone https://github.com/xypron/skyldav.git skyldav

@@ -65,12 +65,6 @@ public:
     using std::set<std::string *, StringComperator>::iterator;
     void print();
     virtual ~StringSet();
-private:
-    /**
-     * @brief Set of pointers to strings.
-     */
-//    typedef std::set<std::string *, StringComperator> _StringSetInternal;
-//    _StringSetInternal strings;
 };
 
 #endif	/* STRINGSET_H */

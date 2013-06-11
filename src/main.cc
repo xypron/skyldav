@@ -262,6 +262,7 @@ int main(int argc, char *argv[]) {
     printf("Loading database\n");
     ret = skyld_scaninit();
     if (ret != SKYLD_SCANOK) {
+        fprintf(stderr, "Loading database failed.\n");
         syslog(LOG_ERR, "Loading database failed.");
         return EXIT_FAILURE;
     }
