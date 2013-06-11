@@ -36,7 +36,7 @@ extern "C" {
             "On access virus scanner.\n\n"
             "  -c <configfile>  path to config file\n"
             "  -d               daemonize\n"
-            "  -h               help\n\n"
+            "  -h               help\n"
             "  -v               version\n\n"
             "Licensed under the Apache License, Version 2.0.\n"
             "Report errors to\n"
