@@ -36,9 +36,7 @@
 #include <unistd.h>
 #include "conf.h"
 #include "FanotifyPolling.h"
-=======
 #include "config.h"
->>>>>>> 4c1387a1bb20cb74f19fe57aa5c9a19f86b24f24
 #include "MountPolling.h"
 #include "skyldav.h"
 #include "StringSet.h"
