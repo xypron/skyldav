@@ -41,7 +41,6 @@
 #include "skyldav.h"
 #include "StringSet.h"
 #include "ThreadPool.h"
-#include "VirusScan.h"
 
 /**
  * @brief File systems which shall not be scanned.
@@ -297,14 +296,6 @@ int main(int argc, char *argv[]) {
 
     syslog(LOG_NOTICE, "Starting on access scanning.");
 
-    printf("Loading database\n");
-    ret = scaninit();
-    if (ret != SKYLD_SCANOK) {
-        fprintf(stderr, "Loading database failed.\n");
-        syslog(LOG_ERR, "Loading database failed.");
-        return EXIT_FAILURE;
-    }
-
     // Block signals.
     sigemptyset(&blockset);
     sigaddset(&blockset, SIGUSR1);
@@ -346,18 +337,11 @@ int main(int argc, char *argv[]) {
             getchar();
         }
     }
-
-    MountPolling::stop();
-
-    ret = skyld_pollfanotifystop();
-
-    ret = scanfinalize();
     
+    MountPolling::stop();
+    ret = skyld_pollfanotifystop();
     syslog(LOG_NOTICE, "On access scanning stopped.");
     closelog();
     printf("done\n");
-    if (ret != SKYLD_SCANOK) {
-        return EXIT_FAILURE;
-    }
     return EXIT_SUCCESS;
 }

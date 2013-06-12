@@ -44,8 +44,7 @@ extern "C" {
          */
         struct fanotify_event_metadata metadata;
     };
-    
-    
+       
     typedef void (*skyld_pollfanotifycallbackptr)(const int fd,
             const void *buf, int len);
 

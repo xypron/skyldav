@@ -72,18 +72,9 @@ pthread_mutex_t mutex_response;
 static ThreadPool *tp;
 
 /**
- * @brief Handles signal.
- * 
- * @param sig signal number
- * @param info signal information
- * @param context userlevel context (a pointer ucntext_t casted to void *)
+ * @brief Virus scanner.
  */
-static void hdl(int sig, siginfo_t *info, void * context) {
-    pid_t pid = getpid();
-    if (pid == info->si_pid) {
-        status = SKYLD_POLLFANOTIFY_STATUS_STOPPING;
-    }
-}
+static VirusScan *virusScan;
 
 /**
  * @brief Thread listening to fanotify events.
@@ -100,19 +91,10 @@ static void *run(void *cbptr) {
      * number of file descriptors
      */
     nfds_t nfds = 1;
-    /**
-     * signal masks
-     */
-    sigset_t emptyset;
-    sigset_t blockset;
     /*
      * number of structures with nonzero revents fields, 0 = timeout
      */
     int ret;
-    /**
-     * action to take when signal occurs
-     */
-    struct sigaction act;
     /**
      * Properties of event file descriptors.
      */
@@ -131,44 +113,24 @@ static void *run(void *cbptr) {
      */
     char buf[SKYLD_POLLFANOTIFY_BUFLEN];
 
-    // Thread shall not exit before SIGUSR1 occurs
     status = SKYLD_POLLFANOTIFY_STATUS_INITIAL;
-
-    // Block signals.
-    sigemptyset(&blockset);
-    sigaddset(&blockset, SIGINT);
-    sigaddset(&blockset, SIGTERM);
-    sigaddset(&blockset, SIGUSR1);
-    ret = pthread_sigmask(SIG_BLOCK, &blockset, NULL);
-    if (ret != 0) {
-        fprintf(stderr, "Failure to set signal mask: %s\n", strerror(ret));
-        status = SKYLD_POLLFANOTIFY_STATUS_FAILURE;
-        return NULL;
-    }
-
-    // Set handler for SIGUSR1.
-    act.sa_sigaction = hdl;
-    sigemptyset(&act.sa_mask);
-    act.sa_flags = SA_SIGINFO | SA_NODEFER;
-    if (sigaction(SIGUSR1, &act, NULL)) {
-        fprintf(stderr, "Failure to set signal handler.\n");
-        status = SKYLD_POLLFANOTIFY_STATUS_FAILURE;
-        return NULL;
-    }
-
+    
     fd = fanotify_init(flags, event_f_flags);
     if (fd == -1) {
         perror("fanotify_init");
         status = SKYLD_POLLFANOTIFY_STATUS_FAILURE;
         return NULL;
     }
+    
     fds.fd = fd;
     fds.events = POLLIN | POLLERR;
     fds.revents = 0;
-    sigemptyset(&emptyset);
+    
     status = SKYLD_POLLFANOTIFY_STATUS_RUNNING;
+    // Continue while the status is not changed.
     while (status == SKYLD_POLLFANOTIFY_STATUS_RUNNING) {
-        ret = ppoll(&fds, nfds, NULL, &emptyset);
+        // Poll for 10 ms. Then recheck status.
+        ret = poll(&fds, nfds, 1000);
         if (ret > 0) {
             if (fds.revents & POLLIN) {
                 for (;;) {
@@ -194,7 +156,7 @@ static void *run(void *cbptr) {
             fds.revents = 0;
         } else if (ret < 0) {
             if (errno != EINTR) {
-                perror("ppoll failed");
+                perror("poll failed");
                 syslog(LOG_CRIT, "Polling fanotiy failed.");
                 syslog(LOG_INFO, "Fanotiy thread stopped.");
                 close(fd);
@@ -235,7 +197,8 @@ void* scanFile(void *workitem) {
                 // For directories always allow.
             } else if (!S_ISREG(statbuf.st_mode)) {
                 response.response = FAN_ALLOW;
-            } else if (scan(task->metadata.fd) == SKYLD_SCANOK) {
+            } else if (virusScan->scan(task->metadata.fd) 
+                    == VirusScan::SCANOK) {
                 response.response = FAN_ALLOW;
             } else {
                 response.response = FAN_DENY;
@@ -309,6 +272,15 @@ int skyld_pollfanotifystart(int nThread) {
 
     if (status == SKYLD_POLLFANOTIFY_STATUS_RUNNING) {
         fprintf(stderr, "Polling already running\n");
+        return EXIT_FAILURE;
+    }
+
+    printf("Loading database\n");
+    try {
+        virusScan = new VirusScan();
+    } catch (enum VirusScan::Status e) {
+        fprintf(stderr, "Loading database failed.\n");
+        syslog(LOG_ERR, "Loading database failed.");
         return EXIT_FAILURE;
     }
 
@@ -403,11 +375,6 @@ int skyld_pollfanotifystop() {
         return EXIT_FAILURE;
     }
     status = SKYLD_POLLFANOTIFY_STATUS_STOPPING;
-    ret = pthread_kill(thread, SIGUSR1);
-    if (ret != 0) {
-        fprintf(stderr, "Failure to kill thread: %s\n", strerror(ret));
-        return EXIT_FAILURE;
-    }
     ret = (int) pthread_join(thread, &result);
     if (ret != 0) {
         fprintf(stderr, "Failure to join thread: %s\n", strerror(ret));
@@ -416,13 +383,21 @@ int skyld_pollfanotifystop() {
         fprintf(stderr, "Ending thread signals failure.\n");
         success = EXIT_FAILURE;
     }
+
+    // Delete thread pool.
+    delete tp;
+
     if (pthread_mutex_destroy(&mutex_response)) {
         fprintf(stderr, "Failure destroying mutex: %s\n", strerror(ret));
         success = EXIT_FAILURE;
     }
 
-    // Delete thread pool.
-    delete tp;
+    try {
+        delete virusScan;
+    } catch ( enum VirusScan::Status e ) {
+        fprintf(stderr, "Failure unloading virus scanner\n");
+        success = EXIT_FAILURE;
+    }
 
     return success;
 }

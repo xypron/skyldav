@@ -20,7 +20,6 @@
  * @file virusscan.c
  * @brief Scans files for viruses.
  */
-#include <clamav.h>
 #include <limits.h>
 #include <stdio.h>
 #include <syslog.h>
@@ -28,17 +27,12 @@
 #include "VirusScan.h"
 
 /**
- * @brief Reference to virus scan engine.
- */
-static struct cl_engine *engine;
-
-/**
  * @brief Writes log entry.
  *
  * @param fd file descriptor
  * @param virname name of virus
  */
-static void log_virus_found(const int fd, const char *virname) {
+void VirusScan::log_virus_found(const int fd, const char *virname) {
     int path_len;
     char path[PATH_MAX + 1];
     snprintf(path, sizeof (path), "/proc/self/fd/%d", fd);
@@ -52,23 +46,20 @@ static void log_virus_found(const int fd, const char *virname) {
 
 /**
  * @brief Initializes virus scan engine.
- *
- * @param nThread number of threads
- * @return success
  */
-int scaninit() {
+VirusScan::VirusScan() {
     int ret;
     unsigned int sigs;
     
     ret = cl_init(CL_INIT_DEFAULT);
     if (ret != CL_SUCCESS) {
         printf("cl_init() error: %s\n", cl_strerror(ret));
-        return SKYLD_SCANERROR;
+        throw SCANERROR;
     }
     engine = cl_engine_new();
     if (engine == NULL) {
         printf("Can't create new engine\n");
-        return SKYLD_SCANERROR;
+        throw SCANERROR;
     }
     // sigs must be zero before calling cl_load.
     sigs = 0;
@@ -76,16 +67,15 @@ int scaninit() {
     if (ret != CL_SUCCESS) {
         printf("cl_retdbdir error: %s\n", cl_strerror(ret));
         cl_engine_free(engine);
-        return SKYLD_SCANERROR;
+        throw SCANERROR;
     } else {
         printf("%u signatures loaded\n", sigs);
     }
     if ((ret = cl_engine_compile(engine)) != CL_SUCCESS) {
         printf("cl_engine_compile() error: %s\n", cl_strerror(ret));
         cl_engine_free(engine);
-        return SKYLD_SCANERROR;
+        throw SCANERROR;
     }
-    return SKYLD_SCANOK;
 }
 
 /**
@@ -93,40 +83,37 @@ int scaninit() {
  *
  * @return success
  */
-int scan(const int fd) {
-    int success = SKYLD_SCANOK;
+int VirusScan::scan(const int fd) {
+    int success = SCANOK;
     int ret;
     const char *virname;
 
     ret = cl_scandesc(fd, &virname, NULL, engine, CL_SCAN_STDOPT);
     switch (ret) {
         case CL_CLEAN:
-            success = SKYLD_SCANOK;
+            success = SCANOK;
             break;
         case CL_VIRUS:
             printf("Virus detected: %s\n", virname);
             log_virus_found(fd, virname);
-            success = SKYLD_SCANVIRUS;
+            success = SCANVIRUS;
             break;
         default:
             printf("Error: %s\n", cl_strerror(ret));
             syslog(LOG_CRIT, "Error: %s\n", cl_strerror(ret));
-            success = SKYLD_SCANOK;
+            success = SCANOK;
             break;
     }
     return success;
 }
 
 /**
- * @brief Finalizes the virus scan engine.
- *
- * @return success
+ * @brief Deletes the virus scanner.
  */
-int scanfinalize() {
+VirusScan::~VirusScan() {
     int ret;
     ret = cl_engine_free(engine);
-    if (ret != CL_SUCCESS) {
-        return SKYLD_SCANERROR;
+    if (ret != 0) {
+        throw SCANERROR;
     }
-    return SKYLD_SCANOK;
 }

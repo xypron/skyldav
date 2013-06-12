@@ -164,15 +164,13 @@ ThreadPool::~ThreadPool() {
     status = STOPPING;
     pthread_mutex_unlock(&mutexWorker);
 
-    for (;;) {
+    do {
         pthread_cond_signal(&cond);
         nanosleep(&interval, NULL);
         pthread_mutex_lock(&mutexThread);
         n = nThreads;
         pthread_mutex_unlock(&mutexThread);
-        if (n == 0)
-            break;
-    }
+    } while (n > 0);
 
     pthread_cond_destroy(&cond);
     pthread_mutex_destroy(&mutexWorkItem);

@@ -23,18 +23,43 @@
 #ifndef VIRUSSCAN_H
 #define	VIRUSSCAN_H
 
+#include <clamav.h>
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-#define SKYLD_SCANOK 0
-#define SKYLD_SCANERROR -1
-#define SKYLD_SCANVIRUS 1
+    class VirusScan {
+    public:
 
-    int scaninit();
-    void* scanFile(void *workitem);
-    int scan(const int fd);
-    int scanfinalize();
+        /**
+         * @brief Status of virus scanning.
+         */
+        enum Status {
+            /**
+             * @brief OK.
+             */
+            SCANOK = 0,
+            /**
+             * @brief An error occured.
+             */
+            SCANERROR = -1,
+            /**
+             * @brief A virus was found.
+             */
+            SCANVIRUS = 1
+        };
+
+        VirusScan();
+        int scan(const int fd);
+        ~VirusScan();
+    private:
+        void log_virus_found(const int fd, const char *virname);
+        /**
+         * @brief Reference to virus scan engine.
+         */
+        struct cl_engine *engine;
+    };
 #ifdef	__cplusplus
 }
 #endif
