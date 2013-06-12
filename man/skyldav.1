@@ -1,0 +1,44 @@
+.TH skyldav 3 "June 11th, 2013" "version 0.1" "Skyld AV overview"
+.SH NAME
+skyldav \- Skyld AV on access virus scanner
+.SH SYNOPSIS
+.B skyldav
+.RB [ \-c
+.IR configfile ]
+.RB [ \-d ]
+.RB [ \-h ]
+.SH DESCRIPTION
+.PP
+Skyld AV provides on access virus scanning for Linux.
+.PP
+Running the program requires the CAP_SYS_ADMIN capability.
+.PP
+The fanotify API is used to control file access. This requires a kernel compiled with
+
+.in +4n
+.sf
+ CONFIG_FANOTIFY=y
+ CONFIG_FANOTIFY_ACCESS_PERMISSIONS=y
+.fi
+.in
+
+Kernel version 3.8.0 or newer is recommended.
+.TP
+.B \-c \fBconfigfile\fR
+Specify the path to the configuration file.
+.TP
+.B \-d
+Daemonize; run the progam as a background program.
+.TP
+.B \-h
+Print this usage information.
+.TP
+.B \-v
+Print the program version and licensing information.
+.SH AUTHOR
+Heinrich Schuchardt <xypron.glpk@gmx.de>
+.SH FILES
+The location of the configuration file defaults to '/etc/skyldav.conf'.
+.SH SEE ALSO
+Further documentation and examples can be found in the documentation
+path, which defaults to /usr/local/share/doc/skyldav

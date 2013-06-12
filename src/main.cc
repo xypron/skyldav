@@ -36,6 +36,9 @@
 #include <unistd.h>
 #include "conf.h"
 #include "FanotifyPolling.h"
+=======
+#include "config.h"
+>>>>>>> 4c1387a1bb20cb74f19fe57aa5c9a19f86b24f24
 #include "MountPolling.h"
 #include "skyldav.h"
 #include "StringSet.h"
@@ -124,9 +127,18 @@ static void pidfile() {
  * @brief Prints help message and exits.
  */
 static void help() {
-    printf("%s\n", HELP_TEXT);
+    printf("%s", HELP_TEXT);
     exit(EXIT_FAILURE);
 }
+
+/**
+ * @brief Shows version information and exits.
+ */
+static void version() {
+    printf("Skyld AV, version %s\n", VERSION);
+    printf("%s", VERSION_TEXT);
+    exit(EXIT_FAILURE);
+    }
 
 /**
  * @brief Check if the process has a capability.
@@ -232,25 +244,34 @@ int main(int argc, char *argv[]) {
     // Analyze command line options.
     for (i = 1; i < argc; i++) {
         opt = argv[i];
-        opt++;
-        if (*argv[i] == '-') {
-            switch (*opt) {
-                case 'c':
-                    i++;
-                    if (i < argc) {
-                        cfile = argv[i];
-                    } else {
-                        help();
-                    }
-                    break;
-                case 'd':
-                    shalldaemonize = 1;
-                    break;
-                default:
+        if(*opt == '-') {
+            opt++;
+        } else {
+          help();
+        }
+        if(*opt == '-') {
+            opt++;
+        }
+        switch (*opt) {
+            case 'c':
+                i++;
+                if (i < argc) {
+                    cfile = argv[i];
+                } else {
                     help();
-            }
+                }
+                break;
+            case 'd':
+                shalldaemonize = 1;
+                break;
+            case 'v':
+                version();;
+                break;
+            default:
+                help();
         }
     }
+
 
     // Parse configuration file
     if (conf_parse(cfile, confcb)) {
@@ -281,6 +302,7 @@ int main(int argc, char *argv[]) {
     printf("Loading database\n");
     ret = scaninit();
     if (ret != SKYLD_SCANOK) {
+        fprintf(stderr, "Loading database failed.\n");
         syslog(LOG_ERR, "Loading database failed.");
         return EXIT_FAILURE;
     }

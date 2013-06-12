@@ -120,6 +120,7 @@ int conf_parse(char *filename, conf_cb cb) {
 
     file = fopen(filename, "r");
     if (file == NULL) {
+        fprintf(stderr, "file '%s' not found\n", filename);
         return 1;
     }
 
