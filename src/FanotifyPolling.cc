@@ -243,14 +243,14 @@ void skyld_displayfanotify(const int fd, const void *buf, int len) {
             continue;
         }
 
-        ret = fstat(task->metadata.fd, &statbuf);
+        ret = fstat(metadata->fd, &statbuf);
         if (ret == -1) {
             fprintf(stderr, "Failure read status: %s\n", strerror(errno));
             syslog(LOG_CRIT, "Failure read status: %s", strerror(errno));
         } else {
-            response.fd = task->metadata.fd;
+            response.fd = metadata->fd;
             pid = getpid();
-            if (pid == task->metadata.pid) {
+            if (pid == metadata->pid) {
                 // For same process always allow.
                 response.response = FAN_ALLOW;
                 ret = skyld_fanotifywriteresponse(fd, response);
