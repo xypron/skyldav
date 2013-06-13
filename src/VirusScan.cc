@@ -17,7 +17,7 @@
  */
 
 /**
- * @file virusscan.c
+ * @file VirusScan.cc
  * @brief Scans files for viruses.
  */
 #include <limits.h>

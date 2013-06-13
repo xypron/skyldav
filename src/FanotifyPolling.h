@@ -1,5 +1,5 @@
 /* 
- * File:   pollfanotify.h
+ * File:   FanotifyPolling.h
  * 
  * Copyright 2012 Heinrich Schuchardt <xypron.glpk@gmx.de>
  *
@@ -18,7 +18,7 @@
  */
 
 /**
- * @file pollfanotify.h
+ * @file FanotifyPolling.h
  * @brief Poll fanotify events.
  */
 
@@ -34,7 +34,7 @@ extern "C" {
     /**
      * @brief Scan task.
      */
-    struct scanTask {
+    struct ScanTask {
         /**
          * @brief fanotify file descriptor
          */

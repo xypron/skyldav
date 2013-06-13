@@ -1,5 +1,5 @@
 /* 
- * File:   pollfanotify.c
+ * File:   FanotifyPolling.cc
  * 
  * Copyright 2012 Heinrich Schuchardt <xypron.glpk@gmx.de>
  *
@@ -18,7 +18,7 @@
  */
 
 /**
- * @file pollfanotify.c
+ * @file FanotifyPolling.cc
  * @brief Poll fanotify events.
  */
 #include <errno.h>
@@ -114,18 +114,18 @@ static void *run(void *cbptr) {
     char buf[SKYLD_POLLFANOTIFY_BUFLEN];
 
     status = SKYLD_POLLFANOTIFY_STATUS_INITIAL;
-    
+
     fd = fanotify_init(flags, event_f_flags);
     if (fd == -1) {
         perror("fanotify_init");
         status = SKYLD_POLLFANOTIFY_STATUS_FAILURE;
         return NULL;
     }
-    
+
     fds.fd = fd;
     fds.events = POLLIN | POLLERR;
     fds.revents = 0;
-    
+
     status = SKYLD_POLLFANOTIFY_STATUS_RUNNING;
     // Continue while the status is not changed.
     while (status == SKYLD_POLLFANOTIFY_STATUS_RUNNING) {
@@ -176,7 +176,7 @@ static void *run(void *cbptr) {
  */
 void* scanFile(void *workitem) {
     int ret;
-    struct scanTask *task = (struct scanTask *) workitem;
+    struct ScanTask *task = (struct ScanTask *) workitem;
     struct fanotify_response response;
     pid_t pid;
     char path[PATH_MAX];
@@ -197,7 +197,7 @@ void* scanFile(void *workitem) {
                 // For directories always allow.
             } else if (!S_ISREG(statbuf.st_mode)) {
                 response.response = FAN_ALLOW;
-            } else if (virusScan->scan(task->metadata.fd) 
+            } else if (virusScan->scan(task->metadata.fd)
                     == VirusScan::SCANOK) {
                 response.response = FAN_ALLOW;
             } else {
@@ -231,7 +231,7 @@ void skyld_displayfanotify(const int fd, const void *buf, int len) {
             (const struct fanotify_event_metadata *) buf;
     int ret;
     struct fanotify_response response;
-    struct scanTask *task;
+    struct ScanTask *task;
 
     while (FAN_EVENT_OK(metadata, len)) {
         if (metadata->fd == FAN_NOFD) {
@@ -241,188 +241,207 @@ void skyld_displayfanotify(const int fd, const void *buf, int len) {
             continue;
         }
 
-        task = (struct scanTask *) malloc(sizeof (struct scanTask));
-        if (task == NULL) {
-            fprintf(stderr, "Out of memory\n");
-            response.fd = metadata->fd;
-            response.response = FAN_ALLOW;
-            ret = skyld_fanotifywriteresponse(fd, response);
-            close(metadata->fd);
+        ret = fstat(task->metadata.fd, &statbuf);
+        if (ret == -1) {
+            fprintf(stderr, "Failure read status: %s\n", strerror(errno));
+            syslog(LOG_CRIT, "Failure read status: %s", strerror(errno));
         } else {
-            task->metadata = *metadata;
-            task->fd = fd;
-            tp->add((void *) task);
+            response.fd = task->metadata.fd;
+            pid = getpid();
+            if (pid == task->metadata.pid) {
+                // For same process always allow.
+                response.response = FAN_ALLOW;
+                ret = skyld_fanotifywriteresponse(fd, response);
+                close(metadata->fd);
+            } else if (!S_ISREG(statbuf.st_mode)) {
+                // For directories always allow.
+                response.response = FAN_ALLOW;
+                ret = skyld_fanotifywriteresponse(fd, response);
+                close(metadata->fd);
+            } else {
+                task = (struct ScanTask *) malloc(sizeof (struct ScanTask));
+                if (task == NULL) {
+                    fprintf(stderr, "Out of memory\n");
+                    response.fd = metadata->fd;
+                    response.response = FAN_ALLOW;
+                    ret = skyld_fanotifywriteresponse(fd, response);
+                    close(metadata->fd);
+                } else {
+                    task->metadata = *metadata;
+                    task->fd = fd;
+                    tp->add((void *) task);
+                }
+            }
+            fflush(stdout);
+            metadata = FAN_EVENT_NEXT(metadata, len);
         }
-        fflush(stdout);
-        metadata = FAN_EVENT_NEXT(metadata, len);
-    }
-    return;
-}
-
-/**
- * @brief Starts polling fanotify events.
- * @param cbptr callback function
- * @return success
- */
-int skyld_pollfanotifystart(int nThread) {
-    pthread_attr_t attr;
-    int ret;
-    struct timespec waiting_time_rem;
-    struct timespec waiting_time_req;
-
-    if (status == SKYLD_POLLFANOTIFY_STATUS_RUNNING) {
-        fprintf(stderr, "Polling already running\n");
-        return EXIT_FAILURE;
+        return;
     }
 
-    printf("Loading database\n");
-    try {
-        virusScan = new VirusScan();
-    } catch (enum VirusScan::Status e) {
-        fprintf(stderr, "Loading database failed.\n");
-        syslog(LOG_ERR, "Loading database failed.");
-        return EXIT_FAILURE;
+    /**
+     * @brief Starts polling fanotify events.
+     * @param cbptr callback function
+     * @return success
+     */
+    int skyld_pollfanotifystart(int nThread) {
+        pthread_attr_t attr;
+        int ret;
+        struct timespec waiting_time_rem;
+        struct timespec waiting_time_req;
+
+        if (status == SKYLD_POLLFANOTIFY_STATUS_RUNNING) {
+            fprintf(stderr, "Polling already running\n");
+            return EXIT_FAILURE;
+        }
+
+        printf("Loading database\n");
+        try {
+            virusScan = new VirusScan();
+        } catch (enum VirusScan::Status e) {
+            fprintf(stderr, "Loading database failed.\n");
+            syslog(LOG_ERR, "Loading database failed.");
+            return EXIT_FAILURE;
+        }
+
+        ret = pthread_mutex_init(&mutex_response, NULL);
+        if (ret != 0) {
+            fprintf(stderr, "Failure to set intialize mutex: %s\n",
+                    strerror(ret));
+            return EXIT_FAILURE;
+        }
+
+        tp = new ThreadPool(nThread, scanFile);
+
+        ret = pthread_attr_init(&attr);
+        if (ret != 0) {
+            fprintf(stderr, "Failure to set thread attributes: %s\n",
+                    strerror(ret));
+            return EXIT_FAILURE;
+        }
+        ret = pthread_create(&thread, &attr, run, (void *) &skyld_displayfanotify);
+        if (ret != 0) {
+            fprintf(stderr, "Failure to create thread: %s\n", strerror(ret));
+            return EXIT_FAILURE;
+        }
+        waiting_time_req.tv_sec = 0;
+        waiting_time_req.tv_nsec = 100;
+        while (status == SKYLD_POLLFANOTIFY_STATUS_INITIAL) {
+            nanosleep(&waiting_time_req, &waiting_time_rem);
+        }
+        if (status == SKYLD_POLLFANOTIFY_STATUS_FAILURE) {
+            return EXIT_FAILURE;
+        }
+        return EXIT_SUCCESS;
+
     }
 
-    ret = pthread_mutex_init(&mutex_response, NULL);
-    if (ret != 0) {
-        fprintf(stderr, "Failure to set intialize mutex: %s\n",
-                strerror(ret));
-        return EXIT_FAILURE;
+    /**
+     * @brief Marks a mount for polling fanotify events.
+     * 
+     * @param mount
+     * @return success
+     */
+    int skyld_pollfanotifymarkmount(const char *mount) {
+        unsigned int flags = FAN_MARK_ADD | FAN_MARK_MOUNT;
+        uint64_t mask = FAN_OPEN_PERM | FAN_CLOSE_WRITE;
+        int dfd = AT_FDCWD;
+        int ret;
+
+        ret = fanotify_mark(fd, flags, mask, dfd, mount);
+        if (ret != 0) {
+            fprintf(stderr, "Failure to set mark on '%s': %i - %s\n",
+                    mount, errno, strerror(errno));
+            return EXIT_FAILURE;
+        }
+        syslog(LOG_NOTICE, "Now watching: %s\n", mount);
+        return EXIT_SUCCESS;
     }
 
-    tp = new ThreadPool(nThread, scanFile);
+    /**
+     * @brief Removes a mount from polling fanotify events.
+     * 
+     * @param mount
+     * @return success
+     */
+    int skyld_pollfanotifyunmarkmount(const char *mount) {
+        unsigned int flags = FAN_MARK_REMOVE | FAN_MARK_MOUNT;
+        uint64_t mask = FAN_OPEN_PERM | FAN_CLOSE_WRITE;
+        int dfd = AT_FDCWD;
+        int ret;
 
-    ret = pthread_attr_init(&attr);
-    if (ret != 0) {
-        fprintf(stderr, "Failure to set thread attributes: %s\n",
-                strerror(ret));
-        return EXIT_FAILURE;
-    }
-    ret = pthread_create(&thread, &attr, run, (void *) &skyld_displayfanotify);
-    if (ret != 0) {
-        fprintf(stderr, "Failure to create thread: %s\n", strerror(ret));
-        return EXIT_FAILURE;
-    }
-    waiting_time_req.tv_sec = 0;
-    waiting_time_req.tv_nsec = 100;
-    while (status == SKYLD_POLLFANOTIFY_STATUS_INITIAL) {
-        nanosleep(&waiting_time_req, &waiting_time_rem);
-    }
-    if (status == SKYLD_POLLFANOTIFY_STATUS_FAILURE) {
-        return EXIT_FAILURE;
-    }
-    return EXIT_SUCCESS;
-
-}
-
-/**
- * @brief Marks a mount for polling fanotify events.
- * 
- * @param mount
- * @return success
- */
-int skyld_pollfanotifymarkmount(const char *mount) {
-    unsigned int flags = FAN_MARK_ADD | FAN_MARK_MOUNT;
-    uint64_t mask = FAN_OPEN_PERM | FAN_CLOSE_WRITE;
-    int dfd = AT_FDCWD;
-    int ret;
-
-    ret = fanotify_mark(fd, flags, mask, dfd, mount);
-    if (ret != 0) {
-        fprintf(stderr, "Failure to set mark on '%s': %i - %s\n",
-                mount, errno, strerror(errno));
-        return EXIT_FAILURE;
-    }
-    syslog(LOG_NOTICE, "Now watching: %s\n", mount);
-    return EXIT_SUCCESS;
-}
-
-/**
- * @brief Removes a mount from polling fanotify events.
- * 
- * @param mount
- * @return success
- */
-int skyld_pollfanotifyunmarkmount(const char *mount) {
-    unsigned int flags = FAN_MARK_REMOVE | FAN_MARK_MOUNT;
-    uint64_t mask = FAN_OPEN_PERM | FAN_CLOSE_WRITE;
-    int dfd = AT_FDCWD;
-    int ret;
-
-    ret = fanotify_mark(fd, flags, mask, dfd, mount);
-    if (ret != 0 && errno != ENOENT) {
-        fprintf(stderr, "Failure to remove mark from '%s': %i - %s\n",
-                mount, errno, strerror(errno));
-        return EXIT_FAILURE;
-    }
-    syslog(LOG_NOTICE, "Stopped watching: %s\n", mount);
-    return EXIT_SUCCESS;
-}
-
-/**
- * @brief Stops polling fanotify events.
- * 
- * @return success
- */
-int skyld_pollfanotifystop() {
-    void *result;
-    int ret;
-    int success = EXIT_SUCCESS;
-
-    if (status != SKYLD_POLLFANOTIFY_STATUS_RUNNING) {
-        fprintf(stderr, "Polling not started.\n");
-        return EXIT_FAILURE;
-    }
-    status = SKYLD_POLLFANOTIFY_STATUS_STOPPING;
-    ret = (int) pthread_join(thread, &result);
-    if (ret != 0) {
-        fprintf(stderr, "Failure to join thread: %s\n", strerror(ret));
-        success = EXIT_FAILURE;
-    } else if (status != SKYLD_POLLFANOTIFY_STATUS_SUCCESS) {
-        fprintf(stderr, "Ending thread signals failure.\n");
-        success = EXIT_FAILURE;
+        ret = fanotify_mark(fd, flags, mask, dfd, mount);
+        if (ret != 0 && errno != ENOENT) {
+            fprintf(stderr, "Failure to remove mark from '%s': %i - %s\n",
+                    mount, errno, strerror(errno));
+            return EXIT_FAILURE;
+        }
+        syslog(LOG_NOTICE, "Stopped watching: %s\n", mount);
+        return EXIT_SUCCESS;
     }
 
-    // Delete thread pool.
-    delete tp;
+    /**
+     * @brief Stops polling fanotify events.
+     * 
+     * @return success
+     */
+    int skyld_pollfanotifystop() {
+        void *result;
+        int ret;
+        int success = EXIT_SUCCESS;
 
-    if (pthread_mutex_destroy(&mutex_response)) {
-        fprintf(stderr, "Failure destroying mutex: %s\n", strerror(ret));
-        success = EXIT_FAILURE;
+        if (status != SKYLD_POLLFANOTIFY_STATUS_RUNNING) {
+            fprintf(stderr, "Polling not started.\n");
+            return EXIT_FAILURE;
+        }
+        status = SKYLD_POLLFANOTIFY_STATUS_STOPPING;
+        ret = (int) pthread_join(thread, &result);
+        if (ret != 0) {
+            fprintf(stderr, "Failure to join thread: %s\n", strerror(ret));
+            success = EXIT_FAILURE;
+        } else if (status != SKYLD_POLLFANOTIFY_STATUS_SUCCESS) {
+            fprintf(stderr, "Ending thread signals failure.\n");
+            success = EXIT_FAILURE;
+        }
+
+        // Delete thread pool.
+        delete tp;
+
+        if (pthread_mutex_destroy(&mutex_response)) {
+            fprintf(stderr, "Failure destroying mutex: %s\n", strerror(ret));
+            success = EXIT_FAILURE;
+        }
+
+        try {
+            delete virusScan;
+        } catch (enum VirusScan::Status e) {
+            fprintf(stderr, "Failure unloading virus scanner\n");
+            success = EXIT_FAILURE;
+        }
+
+        return success;
     }
 
-    try {
-        delete virusScan;
-    } catch ( enum VirusScan::Status e ) {
-        fprintf(stderr, "Failure unloading virus scanner\n");
-        success = EXIT_FAILURE;
+    /**
+     * @brief Writes fanotify response
+     * @param fd fanotify file descriptor
+     * @param response response
+     * @return success = 0
+     */
+    int skyld_fanotifywriteresponse(const int fd,
+            const struct fanotify_response response) {
+        int ret = 0;
+
+        pthread_mutex_lock(&mutex_response);
+        ret = write(fd, &response, sizeof (struct fanotify_response));
+        if (ret == -1) {
+            fprintf(stderr, "Failure to write response: %s\n",
+                    strerror(errno));
+            syslog(LOG_CRIT, "Failure to write response: %s",
+                    strerror(errno));
+            ret = 1;
+        } else {
+            ret = 0;
+        }
+        pthread_mutex_unlock(&mutex_response);
+        return ret;
     }
-
-    return success;
-}
-
-/**
- * @brief Writes fanotify response
- * @param fd fanotify file descriptor
- * @param response response
- * @return success = 0
- */
-int skyld_fanotifywriteresponse(const int fd,
-        const struct fanotify_response response) {
-    int ret = 0;
-
-    pthread_mutex_lock(&mutex_response);
-    ret = write(fd, &response, sizeof (struct fanotify_response));
-    if (ret == -1) {
-        fprintf(stderr, "Failure to write response: %s\n",
-                strerror(errno));
-        syslog(LOG_CRIT, "Failure to write response: %s",
-                strerror(errno));
-        ret = 1;
-    } else {
-        ret = 0;
-    }
-    pthread_mutex_unlock(&mutex_response);
-    return ret;
-}

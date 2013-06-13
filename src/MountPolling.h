@@ -52,8 +52,17 @@ extern "C" {
         ~MountPolling();
     private:
         void callback();
+        /**
+         * @brief Mounts
+         */
         StringSet *mounts;
+        /**
+         * @brief File systems that shall not be tracked.
+         */
         StringSet *nomarkfs;
+        /**
+         * @brief Mount points that shall not be tracked.
+         */
         StringSet *nomarkmnt;
         static void *run(void *);
         /**

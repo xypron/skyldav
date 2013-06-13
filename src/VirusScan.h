@@ -17,7 +17,7 @@
  */
 
 /**
- * @file virusscan.h
+ * @file VirusScan.h
  * @brief Scans files for viruses.
  */
 #ifndef VIRUSSCAN_H
@@ -29,6 +29,10 @@
 extern "C" {
 #endif
 
+    /**
+     * @brief Scans files for viruses.
+     */
+    
     class VirusScan {
     public:
 

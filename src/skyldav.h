@@ -19,7 +19,7 @@
 
 /**
  * @file skyldav.h
- * @brief Set of strings.
+ * @brief On access virus scanner.
  */
 
 #ifndef SYKLDAV_H
