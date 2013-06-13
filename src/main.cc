@@ -240,6 +240,13 @@ int main(int argc, char *argv[]) {
     // mount polling
     MountPolling *mp;
 
+    // Set the number of threads to the number of available CPUs.
+    nThread = sysconf( _SC_NPROCESSORS_ONLN );
+	if (nThread < 1) {
+	  // Use at least one thread.
+	  nThread = 1;
+	}
+
     // Analyze command line options.
     for (i = 1; i < argc; i++) {
         opt = argv[i];
@@ -271,15 +278,15 @@ int main(int argc, char *argv[]) {
         }
     }
 
-
-    // Parse configuration file
+    // Parse configuration file.
     if (conf_parse(cfile, confcb)) {
         return EXIT_FAILURE;
     }
 
-    // Check number of threads
-    if (nThread < 2) {
-        fprintf(stderr, "At least two threads should be used for scanning.\n");
+    // Check number of threads.
+    if (nThread < 1) {
+        fprintf(stderr, "At least one thread is needed for scanning.\n");
+        syslog(LOG_ERR, "At least one thread is needed for scanning.\n");
         return EXIT_FAILURE;
     }
 
