@@ -32,7 +32,6 @@
 #include <poll.h>
 #include <pthread.h>
 #include <stdio.h>
-#include <signal.h>
 #include <string.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -42,40 +41,10 @@
 #include "listmounts.h"
 #include "MountPolling.h"
 
-#define SKYLD_POLLMOUNT_STATUS_INITIAL 0
-#define SKYLD_POLLMOUNT_STATUS_RUNNING 1
-#define SKYLD_POLLMOUNT_STATUS_STOPPING 2
-#define SKYLD_POLLMOUNT_STATUS_FAILURE 3
-#define SKYLD_POLLMOUNT_STATUS_SUCCESS 4
-
-StringSet *MountPolling::mounts = NULL;
-StringSet *MountPolling::nomarkfs = NULL;
-StringSet *MountPolling::nomarkmnt = NULL;
-
-
-/**
- * @brief Status of thread.
- */
-static volatile sig_atomic_t status = SKYLD_POLLMOUNT_STATUS_INITIAL;
-
 /**
  * @brief thread.
  */
 static pthread_t thread;
-
-/**
- * @brief Handles signal.
- * 
- * @param sig signal number
- * @param info signal information
- * @param context userlevel context (a pointer ucntext_t casted to void *)
- */
-static void hdl(int sig, siginfo_t *info, void * context) {
-    pid_t pid = getpid();
-    if (pid == info->si_pid) {
-        status = SKYLD_POLLMOUNT_STATUS_STOPPING;
-    }
-}
 
 /**
  * @brief Thread listening to mount events.
@@ -83,7 +52,8 @@ static void hdl(int sig, siginfo_t *info, void * context) {
  * @param ccbptr pointer to callback routine
  * @return pointer to int indicating success
  */
-static void *run(void *cbptr) {
+void * MountPolling::run(void *obj) {
+    MountPolling *mp = (MountPolling *) obj;
     /*
      * file descriptor
      */
@@ -96,80 +66,42 @@ static void *run(void *cbptr) {
      * number of file descriptors
      */
     nfds_t nfds = 1;
-    /**
-     * signal masks
-     */
-    sigset_t emptyset;
-    sigset_t blockset;
     /*
      * number of structures with nonzero revents fields, 0 = timeout
      */
     int ret;
-    /**
-     * action to take when signal occurs
-     */
-    struct sigaction act;
-    /**
-     * Pointer to callback function.
-     */
-    MountPolling::callbackptr cb = (MountPolling::callbackptr) cbptr;
 
-    status = SKYLD_POLLMOUNT_STATUS_INITIAL;
-
-    // Block signals.
-    sigemptyset(&blockset);
-    sigaddset(&blockset, SIGINT);
-    sigaddset(&blockset, SIGTERM);
-    sigaddset(&blockset, SIGUSR1);
-    ret = pthread_sigmask(SIG_BLOCK, &blockset, NULL);
-    if (ret != 0) {
-        fprintf(stderr, "Failure to set signal mask: %s\n", strerror(ret));
-        status = SKYLD_POLLMOUNT_STATUS_FAILURE;
-        return NULL;
-    }
-
-    // Set handler for SIGUSR1.
-    act.sa_sigaction = hdl;
-    sigemptyset(&act.sa_mask);
-    act.sa_flags = SA_SIGINFO | SA_NODEFER;
-    if (sigaction(SIGUSR1, &act, NULL)) {
-        fprintf(stderr, "Failure to set signal handler.\n");
-        status = SKYLD_POLLMOUNT_STATUS_FAILURE;
-        return NULL;
-    }
+    mp->status = INITIAL;
 
     // Open file /proc/mounts.
     mfd = open("/proc/mounts", O_RDONLY, 0);
     if (mfd < 0) {
         perror("open(/proc/mounts)");
-        status = SKYLD_POLLMOUNT_STATUS_FAILURE;
+        mp->status = FAILURE;
         return NULL;
     }
     fds.fd = mfd;
     fds.events = POLLERR | POLLPRI;
     fds.revents = 0;
-    sigemptyset(&emptyset);
-    status = SKYLD_POLLMOUNT_STATUS_RUNNING;
-    while (status == SKYLD_POLLMOUNT_STATUS_RUNNING) {
-        ret = ppoll(&fds, nfds, NULL, &emptyset);
+    mp->status = RUNNING;
+    while (mp->status == RUNNING) {
+        ret = poll(&fds, nfds, 1);
         if (ret > 0) {
             if (fds.revents & POLLERR) {
-                if (cb) {
-                    (*cb)();
-                }
+                mp->callback();
             }
             fds.revents = 0;
         } else if (ret < 0) {
             if (errno != EINTR) {
                 perror("ppoll failed");
                 close(mfd);
-                status = SKYLD_POLLMOUNT_STATUS_FAILURE;
+                mp->status = FAILURE;
                 return NULL;
             }
         }
     }
     close(mfd);
-    status = SKYLD_POLLMOUNT_STATUS_SUCCESS;
+    mp->status = SUCCESS;
     return NULL;
 }
 
@@ -216,31 +148,26 @@ void MountPolling::callback() {
     listmountfinalize();
 }
 
-void MountPolling::init(StringSet *nomarkfs, StringSet * nomarkmnt) {
-    MountPolling::nomarkfs = nomarkfs;
-    MountPolling::nomarkmnt = nomarkmnt;
-}
-
 /**
- * @brief Starts polling of /proc/mounts.
+ * Creates new mount polling object.
  * 
- * @return on success return 0
+ * @param nomarkfs
+ * @param nomarkmnt
  */
-int MountPolling::start() {
+MountPolling::MountPolling(StringSet *nomarkfs, StringSet * nomarkmnt) {
     pthread_attr_t attr;
     int ret;
     struct timespec waiting_time_rem;
     struct timespec waiting_time_req;
 
-    if (status == SKYLD_POLLMOUNT_STATUS_RUNNING) {
-        fprintf(stderr, "Polling already running\n");
-        return EXIT_FAILURE;
-    }
-    status = SKYLD_POLLMOUNT_STATUS_INITIAL;
+    MountPolling::nomarkfs = nomarkfs;
+    MountPolling::nomarkmnt = nomarkmnt;
+
+    status = INITIAL;
 
     MountPolling::mounts = new StringSet();
     if (MountPolling::mounts == NULL) {
-        return EXIT_FAILURE;
+        throw FAILURE;
     }
 
     MountPolling::callback();
@@ -249,40 +176,39 @@ int MountPolling::start() {
     if (ret != 0) {
         fprintf(stderr, "Failure to set thread attributes: %s\n",
                 strerror(ret));
-        return EXIT_FAILURE;
+        throw FAILURE;
     }
-    ret = pthread_create(&thread, &attr, run, (void *) MountPolling::callback);
+    ret = pthread_create(&thread, &attr, run, (void *) this);
     if (ret != 0) {
         fprintf(stderr, "Failure to create thread: %s\n", strerror(ret));
-        return EXIT_FAILURE;
+        throw FAILURE;
     }
     waiting_time_req.tv_sec = 0;
     waiting_time_req.tv_nsec = 100;
-    while (status == SKYLD_POLLMOUNT_STATUS_INITIAL) {
+    while (status == INITIAL) {
         nanosleep(&waiting_time_req, &waiting_time_rem);
     }
-    if (status == SKYLD_POLLMOUNT_STATUS_FAILURE) {
-        return EXIT_FAILURE;
+    if (status == FAILURE) {
+        throw FAILURE;
     }
-    return EXIT_SUCCESS;
 }
 
 /**
- * @brief Stop polling of /proc/mounts.
- * 
- * @return on success return 0.
+ * @brief Deletes mount polling object.
  */
-int MountPolling::stop() {
+MountPolling::~MountPolling() {
     void *result;
     int ret;
     StringSet::iterator pos;
     std::string *str;
 
-    if (status != SKYLD_POLLMOUNT_STATUS_RUNNING) {
+    if (status != RUNNING) {
         fprintf(stderr, "Polling not started.\n");
-        return EXIT_FAILURE;
+        throw FAILURE;
     }
-    status = SKYLD_POLLMOUNT_STATUS_STOPPING;
+
+    // Ask polling thread to stop.
+    status = STOPPING;
 
     // Unmark all mounts.
     if (mounts != NULL) {
@@ -294,19 +220,14 @@ int MountPolling::stop() {
         MountPolling::mounts = NULL;
     }
 
-    ret = pthread_kill(thread, SIGUSR1);
-    if (ret != 0) {
-        fprintf(stderr, "Failure to kill thread: %s\n", strerror(ret));
-        return EXIT_FAILURE;
-    }
+    // Wait for thread to stop.
     ret = (int) pthread_join(thread, &result);
     if (ret != 0) {
         fprintf(stderr, "Failure to join thread: %s\n", strerror(ret));
-        return EXIT_FAILURE;
+        throw FAILURE;
     }
-    if (status != SKYLD_POLLMOUNT_STATUS_SUCCESS) {
+    if (status != SUCCESS) {
         fprintf(stderr, "Ending thread signals failure.\n");
-        return EXIT_FAILURE;
+        throw FAILURE;
     }
-    return EXIT_SUCCESS;
 }

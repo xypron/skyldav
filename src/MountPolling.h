@@ -23,6 +23,7 @@
 #ifndef POLLMOUNTS_H
 #define	POLLMOUNTS_H
 
+#include <signal.h>
 #include "StringSet.h"
 
 #ifdef	__cplusplus
@@ -34,32 +35,31 @@ extern "C" {
      */
     class MountPolling {
     public:
+
+        enum Status {
+            INITIAL = 0,
+            RUNNING = 1,
+            STOPPING = 2,
+            FAILURE = 3,
+            SUCCESS = 4
+        };
+
         /**
          * Pointer to callback function for polling mounts.
          */
         typedef void (*callbackptr)();
-        /**
-         * Initializes polling of mounts.
-         * @param nomarkfs file systems that shall not be watched
-         * @param nomarkmnt mounts that shall not be watched
-         */
-        static void init(StringSet *nomarkfs, StringSet *nomarkmnt);
-        /**
-         * Starts polling of mounts.
-         */
-        static int start();
-        /**
-         * Stops polling of mounts.
-         */
-        static int stop();
-        /**
-         * Callback function called when mount event occurs.
-         */
-        static void callback();
+        MountPolling(StringSet *nomarkfs, StringSet *nomarkmnt);
+        ~MountPolling();
     private:
-        static StringSet *mounts;
-        static StringSet *nomarkfs;
-        static StringSet *nomarkmnt;
+        void callback();
+        StringSet *mounts;
+        StringSet *nomarkfs;
+        StringSet *nomarkmnt;
+        static void *run(void *);
+        /**
+         * @brief Status of thread.
+         */
+        sig_atomic_t status;
     };
 
 

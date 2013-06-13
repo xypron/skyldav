@@ -237,6 +237,8 @@ int main(int argc, char *argv[]) {
     char *opt;
     // configuration file
     char *cfile = (char *) CONF_FILE;
+    // mount polling
+    MountPolling *mp;
 
     // Analyze command line options.
     for (i = 1; i < argc; i++) {
@@ -322,9 +324,12 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    MountPolling::init(&nomarkfs, &nomarkmnt);
-    MountPolling::start();
-
+    try{
+        mp = new MountPolling(&nomarkfs, &nomarkmnt);
+    } catch (MountPolling::Status e) {
+        exit(EXIT_FAILURE);
+    }
+    
     if (ret != 0) {
         fprintf(stderr, "Failure setting mark.\n");
         syslog(LOG_ERR, "Failure setting mark.");
@@ -337,8 +342,13 @@ int main(int argc, char *argv[]) {
             getchar();
         }
     }
-    
-    MountPolling::stop();
+
+    try {
+        delete mp;
+    } catch (MountPolling::Status e) {
+        exit(EXIT_FAILURE);
+    }
+
     ret = skyld_pollfanotifystop();
     syslog(LOG_NOTICE, "On access scanning stopped.");
     closelog();
