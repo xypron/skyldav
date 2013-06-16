@@ -43,4 +43,4 @@ sudo cp examples/defaults/skyldav /etc/defaults
 sudo cp examples/init.d/skyldav /etc/init.d
 
 # Update the run levels.
-update-rc.d skyldav defaults
+sudo update-rc.d skyldav defaults
