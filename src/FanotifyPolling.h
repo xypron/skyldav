@@ -36,6 +36,9 @@
 extern "C" {
 #endif
 
+    /**
+     * @brief Polls fanotify events.
+     */
     class FanotifyPolling {
     public:
 
