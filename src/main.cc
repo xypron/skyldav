@@ -35,12 +35,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "conf.h"
-#include "FanotifyPolling.h"
 #include "config.h"
-#include "MountPolling.h"
+#include "FanotifyPolling.h"
 #include "skyldav.h"
 #include "StringSet.h"
-#include "ThreadPool.h"
 
 /**
  * @brief File systems which shall not be scanned.
@@ -135,7 +133,7 @@ static void version() {
     printf("Skyld AV, version %s\n", VERSION);
     printf("%s", VERSION_TEXT);
     exit(EXIT_FAILURE);
-    }
+}
 
 /**
  * @brief Check if the process has a capability.
@@ -225,8 +223,6 @@ int main(int argc, char *argv[]) {
     int daemonized = 0;
     // shall run as daemon
     int shalldaemonize = 0;
-    // return value
-    int ret;
     // action to take when signal occurs
     struct sigaction act;
     // signal mask
@@ -237,25 +233,25 @@ int main(int argc, char *argv[]) {
     char *opt;
     // configuration file
     char *cfile = (char *) CONF_FILE;
-    // mount polling
-    MountPolling *mp;
+    // Fanotify polling object
+    FanotifyPolling *fp;
 
     // Set the number of threads to the number of available CPUs.
-    nThread = sysconf( _SC_NPROCESSORS_ONLN );
-	if (nThread < 1) {
-	  // Use at least one thread.
-	  nThread = 1;
-	}
+    nThread = sysconf(_SC_NPROCESSORS_ONLN);
+    if (nThread < 1) {
+        // Use at least one thread.
+        nThread = 1;
+    }
 
     // Analyze command line options.
     for (i = 1; i < argc; i++) {
         opt = argv[i];
-        if(*opt == '-') {
+        if (*opt == '-') {
             opt++;
         } else {
-          help();
+            help();
         }
-        if(*opt == '-') {
+        if (*opt == '-') {
             opt++;
         }
         switch (*opt) {
@@ -271,7 +267,8 @@ int main(int argc, char *argv[]) {
                 shalldaemonize = 1;
                 break;
             case 'v':
-                version();;
+                version();
+                ;
                 break;
             default:
                 help();
@@ -298,7 +295,7 @@ int main(int argc, char *argv[]) {
         daemonize();
         daemonized = 1;
     }
-    
+
     // Open syslog.
     setlogmask(LOG_UPTO(LOG_NOTICE));
     openlog("Skyld AV", 0, LOG_USER);
@@ -324,39 +321,26 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    ret = skyld_pollfanotifystart(nThread);
-    if (ret != 0) {
+    try {
+        fp = new FanotifyPolling(nThread, &nomarkfs, &nomarkmnt);
+    } catch (FanotifyPolling::Status e) {
         fprintf(stderr, "Failure starting fanotify listener.\n");
         syslog(LOG_ERR, "Failure starting fanotify listener.");
         return EXIT_FAILURE;
     }
 
-    try{
-        mp = new MountPolling(&nomarkfs, &nomarkmnt);
-    } catch (MountPolling::Status e) {
-        exit(EXIT_FAILURE);
-    }
-    
-    if (ret != 0) {
-        fprintf(stderr, "Failure setting mark.\n");
-        syslog(LOG_ERR, "Failure setting mark.");
+    syslog(LOG_NOTICE, "On access scanning started.");
+    if (daemonized) {
+        pause();
     } else {
-        syslog(LOG_NOTICE, "On access scanning started.");
-        if (daemonized) {
-            pause();
-        } else {
-            printf("Press any key to terminate\n");
-            getchar();
-        }
+        printf("Press any key to terminate\n");
+        getchar();
     }
 
     try {
-        delete mp;
-    } catch (MountPolling::Status e) {
-        exit(EXIT_FAILURE);
+        delete fp;
+    } catch (FanotifyPolling::Status e) {
     }
-
-    ret = skyld_pollfanotifystop();
     syslog(LOG_NOTICE, "On access scanning stopped.");
     closelog();
     printf("done\n");

@@ -48,9 +48,13 @@ extern "C" {
          * Pointer to callback function for polling mounts.
          */
         typedef void (*callbackptr)();
-        MountPolling(StringSet *nomarkfs, StringSet *nomarkmnt);
+        MountPolling(int ffd, StringSet *nomarkfs, StringSet *nomarkmnt);
         ~MountPolling();
     private:
+        /**
+         * @brief fanotify file descriptor
+         */
+        int fd;
         void callback();
         /**
          * @brief Mounts

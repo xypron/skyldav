@@ -132,13 +132,13 @@ void MountPolling::callback() {
     for (pos = cbmounts->begin(); pos != cbmounts->end(); pos++) {
         if (0 == MountPolling::mounts->count(*pos)) {
             str = *pos;
-            skyld_pollfanotifymarkmount(str->c_str());
+            FanotifyPolling::markMount(fd, str->c_str());
         }
     }
     for (pos = mounts->begin(); pos != mounts->end(); pos++) {
         if (0 == cbmounts->count(*pos)) {
             str = *pos;
-            skyld_pollfanotifyunmarkmount(str->c_str());
+            FanotifyPolling::unmarkMount(fd, str->c_str());
         }
     }
 
@@ -154,19 +154,21 @@ void MountPolling::callback() {
  * @param nomarkfs
  * @param nomarkmnt
  */
-MountPolling::MountPolling(StringSet *nomarkfs, StringSet * nomarkmnt) {
+MountPolling::MountPolling(int ffd, 
+        StringSet *nomarkfs, StringSet * nomarkmnt) {
     pthread_attr_t attr;
     int ret;
     struct timespec waiting_time_rem;
     struct timespec waiting_time_req;
 
-    MountPolling::nomarkfs = nomarkfs;
-    MountPolling::nomarkmnt = nomarkmnt;
+    fd = ffd;
+    this->nomarkfs = nomarkfs;
+    this->nomarkmnt = nomarkmnt;
 
     status = INITIAL;
 
-    MountPolling::mounts = new StringSet();
-    if (MountPolling::mounts == NULL) {
+    this->mounts = new StringSet();
+    if (this->mounts == NULL) {
         throw FAILURE;
     }
 
@@ -214,7 +216,7 @@ MountPolling::~MountPolling() {
     if (mounts != NULL) {
         for (pos = mounts->begin(); pos != mounts->end(); pos++) {
             str = *pos;
-            skyld_pollfanotifyunmarkmount(str->c_str());
+            FanotifyPolling::unmarkMount(fd, str->c_str());
         }
         delete(MountPolling::mounts);
         MountPolling::mounts = NULL;

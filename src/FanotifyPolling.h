@@ -26,35 +26,86 @@
 #define	POLLFANOTIFY_H
 
 #include <sys/fanotify.h>
+#include <pthread.h>
+#include "MountPolling.h"
+#include "StringSet.h"
+#include "ThreadPool.h"
+#include "VirusScan.h"
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-    /**
-     * @brief Scan task.
-     */
-    struct ScanTask {
+    class FanotifyPolling {
+    public:
+
+        enum Status {
+            INITIAL = 0,
+            RUNNING = 1,
+            STOPPING = 2,
+            FAILURE = 3,
+            SUCCESS = 4
+        };
+
+        FanotifyPolling(int nThread,
+                StringSet *nomarkfs, StringSet *nomarkmnt);
+        ~FanotifyPolling();
+        static int markMount(int fd, const char *mount);
+        static int unmarkMount(int fd, const char *mount);
+    private:
         /**
-         * @brief fanotify file descriptor
+         * @brief Fanotify file descriptor.
          */
         int fd;
         /**
-         * @brief fanotify metadata
+         * @brief Worker thread.
          */
-        struct fanotify_event_metadata metadata;
-    };
-       
-    typedef void (*skyld_pollfanotifycallbackptr)(const int fd,
-            const void *buf, int len);
+        pthread_t thread;
+        /**
+         * @brief Mount polling object.
+         */
+        MountPolling *mp;
+        /**
+         * @brief Thread pool for scanning tasks.
+         */
+        ThreadPool *tp;
+        /**
+         * @brief Mutex for fanotify response.
+         */
+        pthread_mutex_t mutex_response;
+        /**
+         * @brief Status of fanotify polling object.
+         */
+        enum Status status;
+        /**
+         * Virus scanner.
+         */
+        VirusScan *virusScan;
 
-    void skyld_displayfanotify(const int fd, const void *buf, int len);
-    int skyld_pollfanotifystart(int nThread);
-    int skyld_pollfanotifystop();
-    int skyld_fanotifywriteresponse(const int fd, 
-            const struct fanotify_response response);
-    int skyld_pollfanotifymarkmount(const char *mount);
-    int skyld_pollfanotifyunmarkmount(const char *mount);
+        /**
+         * @brief Scan task.
+         */
+        struct ScanTask {
+            /**
+             * @brief fanotify polling object
+             */
+            FanotifyPolling *fp;
+            /**
+             * @brief fanotify metadata
+             */
+            struct fanotify_event_metadata metadata;
+        };
+
+        typedef void (*skyld_pollfanotifycallbackptr)(const int fd,
+                const void *buf, int len);
+
+        static void *run(void *);
+        static void *scanFile(void *workitem);
+        void analyze(const void *buf, int len);
+        int writeResponse(const struct fanotify_response response);
+        int fanotifyOpen();
+        int fanotifyClose();
+    };
 
 #ifdef	__cplusplus
 }
