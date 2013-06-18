@@ -23,20 +23,30 @@ AC_PROG_LN_S
 dnl Configure macros
 AC_CONFIG_MACRO_DIR([m4])
 
+dnl Load pkg.m4
+PKG_PROG_PKG_CONFIG
+
 dnl Create config.h
 AC_CONFIG_HEADERS([config.h])
+
+AC_ARG_VAR([SKYLDAVLOGFILE],
+  [logfile, default is '/run/skyldav/log'])
+
+if test [x$SKYLDAVLOGFILE] = [x]; then
+  SKYLDAVLOGFILE="/run/skyldav/log"
+fi
+AC_DEFINE_UNQUOTED([LOGFILE], "${SKYLDAVLOGFILE}", [Skyld AV log file])
 
 dnl Set compiler flags
 dnl add large file support on 32bit systems
 CPPFLAGS="-D_FILE_OFFSET_BITS=64 $CPPFLAGS"
-dnl add src/ to include path
-CPPFLAGS="-I`cd $srcdir && pwd`/src $CPPFLAGS"
-dnl add package specific include paths
-CPPFLAGS="`pkg-config --cflags libclamav` $CPPFLAGS"
-dnl Set linker flags
-LDFLAGS="-lcap -lmount $LDFLAGS"
-dnl add package specific libraries
-LDFLAGS="`pkg-config --libs libclamav` $LDFLAGS"
+dnl add src/skyldav to include path
+CPPFLAGS="-I. $CPPFLAGS"
+
+PKG_CHECK_MODULES([NOTIFY], [gtk+-2.0 >= 2.20.1 libnotify >= 0.5.0])
+NOTIFY_LIBS="-lcanberra $NOTIFY_LIBS"
+PKG_CHECK_MODULES([SKYLDAV], [libclamav >= 0.97.8])
+SKYLDAV_LIBS="-lcap -lmount $SKYLDAV_LIBS"
 
 dnl Thread support
 AX_PTHREAD(have_pthread=yes,have_pthread=no)
@@ -49,6 +59,8 @@ LDFLAGS="$PTHREAD_LIBS $LDFLAGS"
 
 AC_MSG_NOTICE([CPPFLAGS = $CPPFLAGS])
 AC_MSG_NOTICE([LDFLAGS  = $LDFLAGS])
+AC_MSG_NOTICE([NOTIFY_LIBS = $NOTIFY_LIBS])
+AC_MSG_NOTICE([SKYLDAV_LIBS = $SKYLDAV_LIBS])
 
 dnl Check includes
 AC_CHECK_HEADER([pthread.h],
@@ -64,6 +76,8 @@ AC_CONFIG_FILES([
   Makefile
   man/Makefile
   src/Makefile
+  src/notify/Makefile
+  src/skyldav/Makefile
   test/Makefile
   ])
 
