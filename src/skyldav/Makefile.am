@@ -5,6 +5,7 @@ library_includedir=$(includedir)/skyldav
 library_include_HEADERS = \
   conf.h \
   listmounts.h \
+  Messaging.h \
   MountPolling.h \
   FanotifyPolling.h \
   StringSet.h \
@@ -16,6 +17,7 @@ lib_LTLIBRARIES = libskyldav.la
 libskyldav_la_SOURCES = \
   conf.c \
   listmounts.c \
+  Messaging.cc \
   MountPolling.cc \
   FanotifyPolling.cc \
   StringSet.cc \

@@ -37,6 +37,7 @@
 #include "conf.h"
 #include "config.h"
 #include "FanotifyPolling.h"
+#include "Messaging.h"
 #include "skyldav.h"
 #include "StringSet.h"
 
@@ -235,6 +236,8 @@ int main(int argc, char *argv[]) {
     char *cfile = (char *) CONF_FILE;
     // Fanotify polling object
     FanotifyPolling *fp;
+    // Messaging object
+    Messaging *ml;
 
     // Set the number of threads to the number of available CPUs.
     nThread = sysconf(_SC_NPROCESSORS_ONLN);
@@ -295,12 +298,12 @@ int main(int argc, char *argv[]) {
         daemonize();
         daemonized = 1;
     }
-
-    // Open syslog.
-    setlogmask(LOG_UPTO(LOG_NOTICE));
-    openlog("Skyld AV", 0, LOG_USER);
+    
+    ml = new Messaging();
 
     syslog(LOG_NOTICE, "Starting on access scanning.");
+    
+    ml->message(Messaging::INFORMATION, "Starting on access scanning.");
 
     // Block signals.
     sigemptyset(&blockset);
@@ -342,7 +345,8 @@ int main(int argc, char *argv[]) {
     } catch (FanotifyPolling::Status e) {
     }
     syslog(LOG_NOTICE, "On access scanning stopped.");
-    closelog();
+    ml->message(Messaging::INFORMATION, "On access scanning stopped.");
+    delete ml;
     printf("done\n");
     return EXIT_SUCCESS;
 }

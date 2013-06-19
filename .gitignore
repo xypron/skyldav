@@ -10,7 +10,6 @@
 *.lai
 *.la
 *.a
-/src/skyldav
 /doc/doxygen/
 /Makefile
 /src/Makefile
