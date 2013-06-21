@@ -238,6 +238,8 @@ int main(int argc, char *argv[]) {
     FanotifyPolling *fp;
     // Messaging object
     Messaging *ml;
+    // Message level
+    int messageLevel = Messaging::INFORMATION;
 
     // Set the number of threads to the number of available CPUs.
     nThread = sysconf(_SC_NPROCESSORS_ONLN);
@@ -269,6 +271,18 @@ int main(int argc, char *argv[]) {
             case 'd':
                 shalldaemonize = 1;
                 break;
+            case 'm':
+                i++;
+                if (i < argc) {
+                    std::istringstream(argv[i]) >> messageLevel;
+                } else {
+                    help();
+                }
+                if (messageLevel > Messaging::ERROR
+                        || messageLevel < Messaging::DEBUG) {
+                    help();
+                }
+                break;
             case 'v':
                 version();
                 ;
@@ -285,8 +299,8 @@ int main(int argc, char *argv[]) {
 
     // Check number of threads.
     if (nThread < 1) {
-        fprintf(stderr, "At least one thread is needed for scanning.\n");
-        syslog(LOG_ERR, "At least one thread is needed for scanning.\n");
+        fprintf(stderr,
+                "At least one thread is needed for scanning.\n");
         return EXIT_FAILURE;
     }
 
@@ -298,18 +312,17 @@ int main(int argc, char *argv[]) {
         daemonize();
         daemonized = 1;
     }
-    
-    ml = new Messaging();
 
-    syslog(LOG_NOTICE, "Starting on access scanning.");
-    
-    ml->message(Messaging::INFORMATION, "Starting on access scanning.");
+    ml = new Messaging();
+    ml->setLevel((Messaging::Level) messageLevel);
+
+    ml->message(Messaging::DEBUG, "Starting on access scanning.");
 
     // Block signals.
     sigemptyset(&blockset);
     sigaddset(&blockset, SIGUSR1);
-    if (sigprocmask(SIG_BLOCK, &blockset, NULL) == -1) {
-        perror("pthread_sigmask");
+    if (sigprocmask(0 * SIG_BLOCK, &blockset, NULL) == -1) {
+        ml->error("main, pthread_sigmask");
         return EXIT_FAILURE;
     }
 
@@ -320,19 +333,18 @@ int main(int argc, char *argv[]) {
     if (sigaction(SIGTERM, &act, NULL)
             || sigaction(SIGINT, &act, NULL)
             || sigaction(SIGUSR1, &act, NULL)) {
-        perror("sigaction");
+        ml->error("main, sigaction");
         return EXIT_FAILURE;
     }
 
     try {
         fp = new FanotifyPolling(nThread, &nomarkfs, &nomarkmnt);
     } catch (FanotifyPolling::Status e) {
-        fprintf(stderr, "Failure starting fanotify listener.\n");
-        syslog(LOG_ERR, "Failure starting fanotify listener.");
+        ml->message(Messaging::ERROR, "Failure starting fanotify listener.");
         return EXIT_FAILURE;
     }
 
-    syslog(LOG_NOTICE, "On access scanning started.");
+    ml->message(Messaging::INFORMATION, "On access scanning started.");
     if (daemonized) {
         pause();
     } else {
@@ -344,7 +356,6 @@ int main(int argc, char *argv[]) {
         delete fp;
     } catch (FanotifyPolling::Status e) {
     }
-    syslog(LOG_NOTICE, "On access scanning stopped.");
     ml->message(Messaging::INFORMATION, "On access scanning stopped.");
     delete ml;
     printf("done\n");

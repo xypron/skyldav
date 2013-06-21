@@ -22,9 +22,11 @@
  * @brief Send messages.
  */
 
+#include <errno.h>
 #include <iostream>
 #include <malloc.h>
 #include <libgen.h>
+#include <sstream>
 #include <string>
 #include <string.h>
 #include <sys/stat.h>
@@ -52,7 +54,13 @@ Messaging::Messaging() {
     logfs.open(LOGFILE, std::fstream::out | std::fstream::app);
 }
 
-void Messaging::message(enum Level level, char *message) {
+void Messaging::error(const std::string label) {
+    std::stringstream text;
+    text << label << ": " << strerror(errno);
+    message(ERROR, text.str());
+}
+
+void Messaging::message(const enum Level level, const std::string message) {
     std::string type;
     if (level < messageLevel) {
         return;
@@ -60,18 +68,22 @@ void Messaging::message(enum Level level, char *message) {
     switch (level) {
         case ERROR:
             type = "E";
-            syslog(LOG_ERR, "%s", message);
+            syslog(LOG_ERR, "%s", message.c_str());
+            std::cerr << message << std::endl;
             break;
         case WARNING:
             type = "W";
-            syslog(LOG_WARNING, "%s", message);
+            syslog(LOG_WARNING, "%s", message.c_str());
+            std::cerr << message << std::endl;
             break;
         case INFORMATION:
             type = "I";
-            syslog(LOG_NOTICE, "%s", message);
+            syslog(LOG_NOTICE, "%s", message.c_str());
+            std::cout << message << std::endl;
             break;
         case DEBUG:
             type = "D";
+            std::cout << message << std::endl;
             break;
         default:
             type = " ";
@@ -81,7 +93,7 @@ void Messaging::message(enum Level level, char *message) {
     logfs << type << message << std::endl;
 }
 
-void Messaging::setLevel(enum Level level) {
+void Messaging::setLevel(const enum Level level) {
     messageLevel = level;
 }
 

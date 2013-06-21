@@ -23,6 +23,7 @@
  */
 
 #include <fstream>
+#include <string>
 #include <syslog.h>
 
 #ifndef MESSAGING_H
@@ -38,8 +39,9 @@ public:
     };
     
     Messaging();
-    void setLevel(enum Level);
-    void message(enum Level, char *);
+    void setLevel(const enum Level);
+    void error(const std::string);
+    void message(const enum Level, const std::string);
     ~Messaging();
 private:
     std::fstream logfs;
