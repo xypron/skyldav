@@ -10,31 +10,67 @@
 #include <stdlib.h>
 #include <signal.h>
 #include "config.h"
+#include "notify.h"
 
 #define RUNNING  1
 #define STOPPING 2
 
 volatile sig_atomic_t status;
 
-void sigint_handler(int sig) {
+static void sigint_handler(int sig) {
     write(0, "\nSTOPPING\n", 10);
     status = STOPPING;
     }
 
+/**
+ * @brief Prints help message and exits.
+ */
+static void help() {
+    printf("%s", HELP_TEXT);
+    exit(EXIT_FAILURE);
+}
+
+/**
+ * @brief Shows version information and exits.
+ */
+static void version() {
+    printf("Skyld AV, version %s\n", VERSION);
+    printf("%s", VERSION_TEXT);
+    exit(EXIT_SUCCESS);
+}
+
 int main(int argc, char **argv)
 {
+    int i;
+    char *opt;
     NotifyNotification *n;
     char filename[] = "/run/skyldav/log";
     char application[] = "Skyld AV";
     char title[] = "Skyld AV";
-   
     char body[2048];
-
     char *msg;
-
     FILE *file;
-
     struct sigaction sa;
+    
+    // Analyze command line options.
+    for (i = 1; i < argc; i++) {
+        opt = argv[i];
+        if (*opt == '-') {
+            opt++;
+        } else {
+            help();
+        }
+        if (*opt == '-') {
+            opt++;
+        }
+        switch (*opt) {
+            case 'v':
+                version();
+                break;
+            default:
+                help();
+        }
+    }    
 
     printf("Skyld AV notifier %s\n", VERSION);
     printf("Exit with CTRL+C\n");

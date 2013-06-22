@@ -1,0 +1,81 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          skyldav
+# Required-Start:    $syslog $local_fs $remote_fs
+# Required-Stop:     $syslog $local_fs $remote_fs
+# Should-Start:
+# Should-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Skyld AV on access virus scanning
+### END INIT INFO
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/bin/skyldav
+NAME=skyldav
+PIDFILE=/var/run/skyldav/$NAME.pid
+DESC="Skyld AV on access virus scanning"
+ENABLED=true
+
+unset TMPDIR
+
+test -x $DAEMON || exit 0
+
+if [ -r /etc/default/skyldav ]; then
+  . /etc/default/skyldav
+fi
+
+. /lib/lsb/init-functions
+
+test -f /etc/default/rcS && . /etc/default/rcS
+
+if [ -f /etc/default/skyldav ] ; then
+  . /etc/default/skyldav
+fi
+
+if [ "$ENABLED" != "true" ] ; then
+  echo "Skyld AV is disabled."
+  exit 1
+fi
+
+case "$1" in
+  start)
+	log_begin_msg "Starting $DESC: $NAME"
+	mkdir -p `dirname "$PIDFILE"`
+	start-stop-daemon --start --quiet --pidfile "$PIDFILE" --exec $DAEMON -- -d && success=1
+	log_end_msg $?
+	;;
+  stop)
+	log_begin_msg "Stopping $DESC: $NAME"
+	start-stop-daemon --stop --quiet --retry 5 --pidfile $PIDFILE --name $NAME && success=1
+	log_end_msg $?
+	;;
+  reload|force-reload|restart)
+	log_begin_msg "Restarting $DESC: $NAME"
+	if start-stop-daemon --stop --quiet --retry 5 --pidfile $PIDFILE --name $NAME; then
+		start-stop-daemon --start --quiet --pidfile "$PIDFILE" --exec $DAEMON -- -d && success=1
+	fi
+	log_end_msg $?
+	;;
+  status)
+	echo -n "Status of $DESC: "
+	if [ ! -r "$PIDFILE" ]; then
+		echo "$NAME is not running."
+		exit 3
+	fi
+	if read pid < "$PIDFILE" && ps -p "$pid" > /dev/null 2>&1; then
+		echo "$NAME is running."
+		exit 0
+	else
+		echo "$NAME is not running but $PIDFILE exists."
+		exit 1
+	fi
+	;;
+  *)
+	N=/etc/init.d/${0##*/}
+	echo "Usage: $N {start|stop|restart|force-reload|status}" >&2
+	exit 1
+	;;
+esac
+
+exit 0

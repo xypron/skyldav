@@ -1,0 +1,49 @@
+Source: skyldav
+Section: utils
+Priority: extra
+Maintainer: Heinrich Schuchardt <xypron.glpk@gmx.de>
+Build-Depends:
+ debhelper (>= 9.0.0),
+ autotools-dev,
+ pkg-config,
+ doxygen,
+ libcanberra-dev,
+ libcap-dev,
+ libclamav-dev,
+ libgtk2.0-dev,
+ libmount-dev,
+ libnotify-dev
+Standards-Version: 3.9.4.0
+Vcs-Git: git://github.com/xypron/skyldav.git
+Vcs-browser: https://github.com/xypron/skyldav
+Homepage: http://xypron.github.io/skyldav/
+
+Package: skyldav
+Architecture: any
+Depends:
+ libcanberra0,
+ libcap2,
+ libclamav6,
+ libgtk2.0-0,
+ libmount1,
+ libnotify4
+Suggests:
+Description: Skyld AV
+ "Skyld" AV provides on access virus scanning for Linux.
+ .
+ The fanotify API is used to control file access. This requires a kernel compiled
+ with
+ .
+ CONFIG_FANOTIFY=y
+ CONFIG_FANOTIFY_ACCESS_PERMISSIONS=y
+ .
+ On Debian and Fedora you can check the configuration with
+ .
+ grep CONFIG_FANOTIFY /boot/config-$(uname -r)
+ .
+ Kernel version 3.8.0 or newer is recommended. You can check the version you
+ are using with
+ .
+ uname -a
+ .
+ ClamAV is used for scanning.

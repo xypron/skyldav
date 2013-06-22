@@ -11,6 +11,13 @@ clean-local:
 install-data-local:
 	mkdir -p $(DESTDIR)$(docdir)/examples/
 	cp -rf $(srcdir)/examples/* $(DESTDIR)$(docdir)/examples/
+	mkdir -p $(DESTDIR)$(sysconfdir)
+	test -e $(DESTDIR)$(sysconfdir)/skyldav.conf || \
+	cp examples/etc/skyldav.conf $(DESTDIR)$(sysconfdir)
+	mkdir -p $(DESTDIR)$(datadir)/autostart/
+	test -e $(DESTDIR)$(datadir)/autostart/skyldavnotify.desktop || \
+	cp examples/usr/share/autostart/skyldavnotify.desktop \
+	$(DESTDIR)$(datadir)/autostart/
 
 dist-hook:
 	rm -rf $(distdir)/doc/doxygen

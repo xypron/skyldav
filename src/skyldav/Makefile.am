@@ -1,3 +1,7 @@
+libskyldav_la_LDFLAGS = \
+  -version-info 1:0:1 \
+  $(SKYLDAV_LIBS)
+
 libskyldav_la_CPPFLAGS = \
   $(SKYLDAV_CFLAGS)
 
@@ -24,12 +28,13 @@ libskyldav_la_SOURCES = \
   ThreadPool.cc \
   VirusScan.cc
 
-libskyldav_la_LDFLAGS = \
-  -version-info 1:0:1 \
-  $(SKYLDAV_LIBS)
-
 bin_PROGRAMS = \
   skyldav
 
+skyldav_LDFLAGS = \
+  $(SKYLDAV_LIBS)
 skyldav_LDADD = libskyldav.la
-skyldav_SOURCES = main.cc
+skyldav_SOURCES = skyldav.h main.cc
+
+check:
+	./skyldav --version

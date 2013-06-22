@@ -109,13 +109,17 @@ static void pidfile() {
     int len;
     const char *filename = PID_FILE;
     int fd;
+    int ret;
+    
     fd = open(filename, O_CREAT | O_TRUNC | O_WRONLY,
             S_IRUSR | S_IWUSR);
     if (fd == -1) {
         syslog(LOG_ERR, "Cannot create pid file '%s'.", filename);
     }
     len = snprintf(buffer, sizeof (buffer), "%d", (int) getpid());
-    write(fd, buffer, len);
+    ret = write(fd, buffer, len);
+        syslog(LOG_ERR, "Cannot write pid file '%s'.", filename);
+    if (ret == -1)
     close(fd);
 }
 
@@ -133,7 +137,7 @@ static void help() {
 static void version() {
     printf("Skyld AV, version %s\n", VERSION);
     printf("%s", VERSION_TEXT);
-    exit(EXIT_FAILURE);
+    exit(EXIT_SUCCESS);
 }
 
 /**
