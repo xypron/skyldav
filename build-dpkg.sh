@@ -2,13 +2,15 @@
 #
 # Builds Debian package.
 
+# Clean up
+rm -rf skyldav*
+
 # Make distribution file.
 ./autogen.sh
 ./configure
 make dist
 
 # Extract to build directory
-rm -rf skyldav*
 tar -xzf skyld*.tar.gz
 cd skyld*
 
