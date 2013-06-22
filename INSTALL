@@ -33,14 +33,18 @@ sudo make install
 
 # Copy configuration file.
 # You may want to edit this file.
-sudo cp examples/skyldav.conf /etc
+sudo cp examples/etc/skyldav.conf /etc
 
 # Copy the file controling if skyldav will run as a service.
 # You may want to edit this file.
-sudo cp examples/defaults/skyldav /etc/defaults
+sudo cp examples/etc/defaults/skyldav /etc/defaults
 
 # Copy file for automatic startup.
-sudo cp examples/init.d/skyldav /etc/init.d
+sudo cp examples/etc/init.d/skyldav /etc/init.d
 
 # Update the run levels.
 sudo update-rc.d skyldav defaults
+
+# Copy desktop starter for notification.
+sudo cp examples/usr/share/autostart/skyldavnotify.desktop /usr/share/autostart
+

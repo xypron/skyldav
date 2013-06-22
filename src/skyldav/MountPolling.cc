@@ -31,6 +31,7 @@
 #include <iostream>
 #include <poll.h>
 #include <pthread.h>
+#include <sstream>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -39,6 +40,7 @@
 #include <unistd.h>
 #include "FanotifyPolling.h"
 #include "listmounts.h"
+#include "Messaging.h"
 #include "MountPolling.h"
 
 /**
@@ -76,7 +78,11 @@ void * MountPolling::run(void *obj) {
     // Open file /proc/mounts.
     mfd = open("/proc/mounts", O_RDONLY, 0);
     if (mfd < 0) {
-        perror("open(/proc/mounts)");
+        std::stringstream msg;
+        msg << "Failure to open /proc/mounts: "
+                << strerror(errno);
+        Messaging::message(Messaging::ERROR, msg.str());
+
         mp->status = FAILURE;
         return NULL;
     }
@@ -93,7 +99,10 @@ void * MountPolling::run(void *obj) {
             fds.revents = 0;
         } else if (ret < 0) {
             if (errno != EINTR) {
-                perror("ppoll failed");
+                std::stringstream msg;
+                msg << "Failure to poll /proc/mounts: "
+                        << strerror(errno);
+                Messaging::message(Messaging::ERROR, msg.str());
                 close(mfd);
                 mp->status = FAILURE;
                 return NULL;
@@ -154,7 +163,7 @@ void MountPolling::callback() {
  * @param nomarkfs
  * @param nomarkmnt
  */
-MountPolling::MountPolling(int ffd, 
+MountPolling::MountPolling(int ffd,
         StringSet *nomarkfs, StringSet * nomarkmnt) {
     pthread_attr_t attr;
     int ret;
@@ -176,13 +185,16 @@ MountPolling::MountPolling(int ffd,
 
     ret = pthread_attr_init(&attr);
     if (ret != 0) {
-        fprintf(stderr, "Failure to set thread attributes: %s\n",
-                strerror(ret));
+        std::stringstream msg;
+        msg << "Failure to set thread attributes: " << strerror(ret);
+        Messaging::message(Messaging::ERROR, msg.str());
         throw FAILURE;
     }
     ret = pthread_create(&thread, &attr, run, (void *) this);
     if (ret != 0) {
-        fprintf(stderr, "Failure to create thread: %s\n", strerror(ret));
+        std::stringstream msg;
+        msg << "Failure to create thread: " << strerror(ret);
+        Messaging::message(Messaging::ERROR, msg.str());
         throw FAILURE;
     }
     waiting_time_req.tv_sec = 0;
@@ -205,7 +217,7 @@ MountPolling::~MountPolling() {
     std::string *str;
 
     if (status != RUNNING) {
-        fprintf(stderr, "Polling not started.\n");
+        Messaging::message(Messaging::ERROR, "Polling not started.\n");
         throw FAILURE;
     }
 
@@ -225,11 +237,14 @@ MountPolling::~MountPolling() {
     // Wait for thread to stop.
     ret = (int) pthread_join(thread, &result);
     if (ret != 0) {
-        fprintf(stderr, "Failure to join thread: %s\n", strerror(ret));
+        std::stringstream msg;
+        msg << "Failure to join thread: " << strerror(ret);
+        Messaging::message(Messaging::ERROR, msg.str());
         throw FAILURE;
     }
     if (status != SUCCESS) {
-        fprintf(stderr, "Ending thread signals failure.\n");
+        Messaging::message(Messaging::ERROR, 
+                "Ending thread signals failure.\n");
         throw FAILURE;
     }
 }

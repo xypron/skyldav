@@ -38,14 +38,18 @@ public:
         ERROR = 4
     };
     
-    Messaging();
-    void setLevel(const enum Level);
-    void error(const std::string);
-    void message(const enum Level, const std::string);
-    ~Messaging();
+    static void setLevel(const enum Level);
+    static void error(const std::string);
+    static void message(const enum Level, const std::string);
+    static void teardown();
 private:
+    static Messaging *singleton;
     std::fstream logfs;
     enum Level messageLevel;
+
+    Messaging();
+    ~Messaging();
+    static Messaging *getSingleton();
 };
 
 #endif	/* MESSAGING_H */

@@ -27,6 +27,7 @@
 #include <malloc.h>
 #include <poll.h>
 #include <signal.h>
+#include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,6 +37,7 @@
 #include <syslog.h>
 #include <unistd.h>
 #include "FanotifyPolling.h"
+#include "Messaging.h"
 
 #define SKYLD_POLLFANOTIFY_BUFLEN 4096
 
@@ -96,9 +98,12 @@ void *FanotifyPolling::run(void *obj) {
                         if (errno & (EINTR | EAGAIN | ETXTBSY | EWOULDBLOCK)) {
                             break;
                         }
-                        perror("reading failed");
-                        syslog(LOG_CRIT, "Reading from fanotiy failed.");
-                        syslog(LOG_INFO, "Fanotiy thread stopped.");
+                        std::stringstream msg;
+                        msg << "Reading from fanotify failed: "
+                                << strerror(errno);
+                        Messaging::message(Messaging::ERROR, msg.str());
+                        Messaging::message(Messaging::WARNING,
+                                "Fanotiy thread stopped.");
                         fp->status = FAILURE;
                         return NULL;
                     }
@@ -107,15 +112,18 @@ void *FanotifyPolling::run(void *obj) {
             fds.revents = 0;
         } else if (ret < 0) {
             if (errno != EINTR) {
-                perror("poll failed");
-                syslog(LOG_CRIT, "Polling fanotiy failed.");
-                syslog(LOG_INFO, "Fanotiy thread stopped.");
+                std::stringstream msg;
+                msg << "Poll failed: "
+                        << strerror(errno);
+                Messaging::message(Messaging::ERROR, msg.str());
+                Messaging::message(Messaging::WARNING,
+                        "Fanotiy thread stopped.");
                 fp->status = FAILURE;
                 return NULL;
             }
         }
     }
-    syslog(LOG_INFO, "Fanotiy thread stopped.");
+    Messaging::message(Messaging::DEBUG, "Fanotiy thread stopped.");
     fp->status = SUCCESS;
     return NULL;
 }
@@ -135,8 +143,10 @@ void* FanotifyPolling::scanFile(void *workitem) {
     if (task->metadata.mask & FAN_ALL_PERM_EVENTS) {
         ret = fstat(task->metadata.fd, &statbuf);
         if (ret == -1) {
-            fprintf(stderr, "scanFile: Failure read status: %s\n", strerror(errno));
-            syslog(LOG_CRIT, "scanFile: Failure read status: %s", strerror(errno));
+            std::stringstream msg;
+            msg << "scanFile: failure to read file status: "
+                    << strerror(errno);
+            Messaging::message(Messaging::ERROR, msg.str());
         } else {
             response.fd = task->metadata.fd;
             // For same process always allow.
@@ -158,6 +168,9 @@ void* FanotifyPolling::scanFile(void *workitem) {
                     if (path_len > 0) {
                         path[path_len] = '\0';
                         printf("File %s\n\n", path);
+                        std::stringstream msg;
+                        msg << "Access to file \"" << path << "\"denied.";
+                        Messaging::message(Messaging::WARNING, msg.str());
                     }
                 }
             }
@@ -186,8 +199,8 @@ void FanotifyPolling::analyze(const void *buf, int len) {
 
     while (FAN_EVENT_OK(metadata, len)) {
         if (metadata->fd == FAN_NOFD) {
-            printf("Received FAN_NOFD from fanotiy.");
-            syslog(LOG_CRIT, "Received FAN_NOFD from fanotiy.");
+            Messaging::message(Messaging::ERROR,
+                    "Received FAN_NOFD from fanotiy.");
             metadata = FAN_EVENT_NEXT(metadata, len);
             continue;
         }
@@ -203,10 +216,10 @@ void FanotifyPolling::analyze(const void *buf, int len) {
             // read file status
             ret = fstat(metadata->fd, &statbuf);
             if (ret == -1) {
-                fprintf(stderr, "analyze: Failure read status: %s\n",
-                        strerror(errno));
-                syslog(LOG_CRIT, "analyze: Failure read status: %s",
-                        strerror(errno));
+                std::stringstream msg;
+                msg << "scanFile: failure to read file status: "
+                        << strerror(errno);
+                Messaging::message(Messaging::ERROR, msg.str());
                 ret = writeResponse(response);
                 close(metadata->fd);
             } else if (!S_ISREG(statbuf.st_mode)) {
@@ -216,7 +229,7 @@ void FanotifyPolling::analyze(const void *buf, int len) {
             } else {
                 task = (struct ScanTask *) malloc(sizeof (struct ScanTask));
                 if (task == NULL) {
-                    fprintf(stderr, "Out of memory\n");
+                    Messaging::message(Messaging::ERROR, "Out of memory\n");
                     response.fd = metadata->fd;
                     response.response = FAN_ALLOW;
                     ret = writeResponse(response);
@@ -246,23 +259,23 @@ FanotifyPolling::FanotifyPolling(int nThread,
     struct timespec waiting_time_req;
 
     if (status == RUNNING) {
-        fprintf(stderr, "Polling already running\n");
-        syslog(LOG_ERR, "Polling already running.");
+        Messaging::message(Messaging::ERROR, "Polling already running\n");
+        return;
     }
 
-    printf("Loading database\n");
+    Messaging::message(Messaging::DEBUG, "Loading virus database\n");
     try {
         virusScan = new VirusScan();
     } catch (enum VirusScan::Status e) {
-        fprintf(stderr, "Loading database failed.\n");
-        syslog(LOG_ERR, "Loading database failed.");
+        Messaging::message(Messaging::ERROR, "Loading database failed.\n");
         throw FAILURE;
     }
 
     ret = pthread_mutex_init(&mutex_response, NULL);
     if (ret != 0) {
-        fprintf(stderr, "Failure to set intialize mutex: %s\n",
-                strerror(ret));
+        std::stringstream msg;
+        msg << "Failure to intialize mutex: " << strerror(ret);
+        Messaging::message(Messaging::ERROR, msg.str());
         throw FAILURE;
     }
 
@@ -274,7 +287,9 @@ FanotifyPolling::FanotifyPolling(int nThread,
 
     ret = pthread_create(&thread, NULL, run, (void *) this);
     if (ret != 0) {
-        fprintf(stderr, "Failure to create thread: %s\n", strerror(ret));
+        std::stringstream msg;
+        msg << "Failure to create thread: " << strerror(ret);
+        Messaging::message(Messaging::ERROR, msg.str());
         throw FAILURE;
     }
     waiting_time_req.tv_sec = 0;
@@ -304,7 +319,7 @@ FanotifyPolling::~FanotifyPolling() {
     enum Status success = SUCCESS;
 
     if (status != RUNNING) {
-        fprintf(stderr, "Polling not started.\n");
+        Messaging::message(Messaging::ERROR, "Polling not started.\n");
         throw FAILURE;
     }
 
@@ -321,10 +336,13 @@ FanotifyPolling::~FanotifyPolling() {
     status = STOPPING;
     ret = (int) pthread_join(thread, &result);
     if (ret != 0) {
-        fprintf(stderr, "Failure to join thread: %s\n", strerror(ret));
+        std::stringstream msg;
+        msg << "Failure to joing thread: " << strerror(ret);
+        Messaging::message(Messaging::ERROR, msg.str());
         success = FAILURE;
     } else if (status != SUCCESS) {
-        fprintf(stderr, "Ending thread signals failure.\n");
+        Messaging::message(Messaging::ERROR,
+                "Ending thread signals failure.\n");
         success = FAILURE;
     }
 
@@ -336,7 +354,9 @@ FanotifyPolling::~FanotifyPolling() {
 
     // Destroy the mutex.
     if (pthread_mutex_destroy(&mutex_response)) {
-        fprintf(stderr, "Failure destroying mutex: %s\n", strerror(ret));
+        std::stringstream msg;
+        msg << "Failure destroying thread: " << strerror(ret);
+        Messaging::message(Messaging::ERROR, msg.str());
         success = FAILURE;
     }
 
@@ -344,7 +364,8 @@ FanotifyPolling::~FanotifyPolling() {
     try {
         delete virusScan;
     } catch (enum VirusScan::Status e) {
-        fprintf(stderr, "Failure unloading virus scanner\n");
+        Messaging::message(Messaging::ERROR,
+                "Failure unloading virus scanner\n");
         success = FAILURE;
     }
     if (success != SUCCESS) {
@@ -394,8 +415,9 @@ int FanotifyPolling::fanotifyOpen() {
 
     fd = fanotify_init(flags, event_f_flags);
     if (fd == -1) {
-        perror("fanotifyOpen");
-        syslog(LOG_CRIT, "fanotifyOpen: %s", strerror(errno));
+        std::stringstream msg;
+        msg << "fanotifyOpen: " << strerror(errno);
+        Messaging::message(Messaging::ERROR, msg.str());
         status = FAILURE;
         return -1;
     } else {
@@ -412,8 +434,9 @@ int FanotifyPolling::fanotifyClose() {
     int ret = close(fd);
     if (ret == -1) {
         status = FAILURE;
-        perror("fanotifyClose");
-        syslog(LOG_CRIT, "fanotifyClose: %s", strerror(errno));
+        std::stringstream msg;
+        msg << "fanotifyClose: " << strerror(errno);
+        Messaging::message(Messaging::ERROR, msg.str());
         return -1;
     } else {
         return 0;
@@ -434,11 +457,14 @@ int FanotifyPolling::markMount(int fd, const char *mount) {
 
     ret = fanotify_mark(fd, flags, mask, dfd, mount);
     if (ret != 0) {
-        fprintf(stderr, "Failure to set mark on '%s': %i - %s\n",
-                mount, errno, strerror(errno));
+        std::stringstream msg;
+        msg << "Failure to set mark on '" << mount << "': " << strerror(errno);
+        Messaging::message(Messaging::ERROR, msg.str());
         return EXIT_FAILURE;
     }
-    syslog(LOG_NOTICE, "Now watching: %s\n", mount);
+    std::stringstream msg;
+    msg << "Now watching: " << mount;
+    Messaging::message(Messaging::DEBUG, msg.str());
     return EXIT_SUCCESS;
 }
 
@@ -456,11 +482,15 @@ int FanotifyPolling::unmarkMount(int fd, const char *mount) {
 
     ret = fanotify_mark(fd, flags, mask, dfd, mount);
     if (ret != 0 && errno != ENOENT) {
-        fprintf(stderr, "Failure to remove mark from '%s': %i - %s\n",
-                mount, errno, strerror(errno));
+        std::stringstream msg;
+        msg << "Failure to remove mark from '"
+                << mount << "': " << strerror(errno);
+        Messaging::message(Messaging::ERROR, msg.str());
         return EXIT_FAILURE;
     }
-    syslog(LOG_NOTICE, "Stopped watching: %s\n", mount);
+    std::stringstream msg;
+    msg << "Stopped watching: " << mount;
+    Messaging::message(Messaging::DEBUG, msg.str());
     return EXIT_SUCCESS;
 }
 

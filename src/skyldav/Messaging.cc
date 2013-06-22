@@ -34,6 +34,8 @@
 #include "config.h"
 #include "Messaging.h"
 
+Messaging *Messaging::singleton = NULL;
+
 Messaging::Messaging() {
     char *path;
     char *filename;
@@ -62,7 +64,8 @@ void Messaging::error(const std::string label) {
 
 void Messaging::message(const enum Level level, const std::string message) {
     std::string type;
-    if (level < messageLevel) {
+    getSingleton();
+    if (level < singleton->messageLevel) {
         return;
     }
     switch (level) {
@@ -84,17 +87,30 @@ void Messaging::message(const enum Level level, const std::string message) {
         case DEBUG:
             type = "D";
             std::cout << message << std::endl;
-            break;
+            return;
         default:
             type = " ";
+            std::cout << message << std::endl;
             break;
     }
     
-    logfs << type << message << std::endl;
+    singleton->logfs << type << message << std::endl;
 }
 
 void Messaging::setLevel(const enum Level level) {
-    messageLevel = level;
+    getSingleton();
+    singleton->messageLevel = level;
+}
+
+Messaging *Messaging::getSingleton() {
+    if (singleton == NULL) {
+        singleton = new Messaging();
+    }
+    return singleton;
+}
+
+void Messaging::teardown() {
+    delete singleton;
 }
 
 Messaging::~Messaging() {

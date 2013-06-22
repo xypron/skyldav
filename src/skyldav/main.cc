@@ -236,8 +236,6 @@ int main(int argc, char *argv[]) {
     char *cfile = (char *) CONF_FILE;
     // Fanotify polling object
     FanotifyPolling *fp;
-    // Messaging object
-    Messaging *ml;
     // Message level
     int messageLevel = Messaging::INFORMATION;
 
@@ -313,16 +311,15 @@ int main(int argc, char *argv[]) {
         daemonized = 1;
     }
 
-    ml = new Messaging();
-    ml->setLevel((Messaging::Level) messageLevel);
+    Messaging::setLevel((Messaging::Level) messageLevel);
 
-    ml->message(Messaging::DEBUG, "Starting on access scanning.");
+    Messaging::message(Messaging::DEBUG, "Starting on access scanning.");
 
     // Block signals.
     sigemptyset(&blockset);
     sigaddset(&blockset, SIGUSR1);
     if (sigprocmask(0 * SIG_BLOCK, &blockset, NULL) == -1) {
-        ml->error("main, pthread_sigmask");
+        Messaging::error("main, pthread_sigmask");
         return EXIT_FAILURE;
     }
 
@@ -333,18 +330,19 @@ int main(int argc, char *argv[]) {
     if (sigaction(SIGTERM, &act, NULL)
             || sigaction(SIGINT, &act, NULL)
             || sigaction(SIGUSR1, &act, NULL)) {
-        ml->error("main, sigaction");
+        Messaging::error("main, sigaction");
         return EXIT_FAILURE;
     }
 
     try {
         fp = new FanotifyPolling(nThread, &nomarkfs, &nomarkmnt);
     } catch (FanotifyPolling::Status e) {
-        ml->message(Messaging::ERROR, "Failure starting fanotify listener.");
+        Messaging::message(Messaging::ERROR,
+                "Failure starting fanotify listener.");
         return EXIT_FAILURE;
     }
 
-    ml->message(Messaging::INFORMATION, "On access scanning started.");
+    Messaging::message(Messaging::INFORMATION, "On access scanning started.");
     if (daemonized) {
         pause();
     } else {
@@ -356,8 +354,8 @@ int main(int argc, char *argv[]) {
         delete fp;
     } catch (FanotifyPolling::Status e) {
     }
-    ml->message(Messaging::INFORMATION, "On access scanning stopped.");
-    delete ml;
+    Messaging::message(Messaging::INFORMATION, "On access scanning stopped.");
+    Messaging::teardown();
     printf("done\n");
     return EXIT_SUCCESS;
 }

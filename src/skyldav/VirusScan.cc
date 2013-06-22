@@ -1,7 +1,7 @@
 /* 
  * File:   virusscan.c
  * 
- * Copyright 2012 Heinrich Schuchardt <xypron.glpk@gmx.de>
+ * Copyright 2013 Heinrich Schuchardt <xypron.glpk@gmx.de>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,12 @@
  * @brief Scans files for viruses.
  */
 #include <limits.h>
+#include <sstream>
 #include <stdio.h>
 #include <syslog.h>
 #include "unistd.h"
 #include "VirusScan.h"
+#include "Messaging.h"
 
 /**
  * @brief Writes log entry.
@@ -35,13 +37,16 @@
 void VirusScan::log_virus_found(const int fd, const char *virname) {
     int path_len;
     char path[PATH_MAX + 1];
+    std::stringstream msg;
+
     snprintf(path, sizeof (path), "/proc/self/fd/%d", fd);
     path_len = readlink(path, path, sizeof (path) - 1);
     if (path_len < 0) {
         path_len = 0;
     }
     path[path_len] = '\0';
-    syslog(LOG_CRIT, "Virus \"%s\" detected in file \"%s\".", virname, path);
+    msg << "Virus \"" << virname << "\" detected in file \"" << path << "\".";
+    Messaging::message(Messaging::ERROR, msg.str());
 }
 
 /**
@@ -50,29 +55,38 @@ void VirusScan::log_virus_found(const int fd, const char *virname) {
 VirusScan::VirusScan() {
     int ret;
     unsigned int sigs;
-    
+
     ret = cl_init(CL_INIT_DEFAULT);
     if (ret != CL_SUCCESS) {
-        printf("cl_init() error: %s\n", cl_strerror(ret));
+        std::stringstream msg;
+        msg << "cl_init() error: " << cl_strerror(ret);
+        Messaging::message(Messaging::ERROR, msg.str());
         throw SCANERROR;
     }
     engine = cl_engine_new();
     if (engine == NULL) {
-        printf("Can't create new engine\n");
+        Messaging::message(Messaging::ERROR,
+                "Can't create new viurs scan engine.");
         throw SCANERROR;
     }
     // sigs must be zero before calling cl_load.
     sigs = 0;
     ret = cl_load(cl_retdbdir(), engine, &sigs, CL_DB_STDOPT);
     if (ret != CL_SUCCESS) {
-        printf("cl_retdbdir error: %s\n", cl_strerror(ret));
+        std::stringstream msg;
+        msg << "cl_retdbdir() error: " << cl_strerror(ret);
+        Messaging::message(Messaging::ERROR, msg.str());
         cl_engine_free(engine);
         throw SCANERROR;
     } else {
-        printf("%u signatures loaded\n", sigs);
+        std::stringstream msg;
+        msg << sigs << "  signatures loaded\n";
+        Messaging::message(Messaging::DEBUG, msg.str());
     }
     if ((ret = cl_engine_compile(engine)) != CL_SUCCESS) {
-        printf("cl_engine_compile() error: %s\n", cl_strerror(ret));
+        std::stringstream msg;
+        msg << "cl_engine_compile() error: " << cl_strerror(ret);
+        Messaging::message(Messaging::ERROR, msg.str());
         cl_engine_free(engine);
         throw SCANERROR;
     }
@@ -94,13 +108,13 @@ int VirusScan::scan(const int fd) {
             success = SCANOK;
             break;
         case CL_VIRUS:
-            printf("Virus detected: %s\n", virname);
             log_virus_found(fd, virname);
             success = SCANVIRUS;
             break;
         default:
-            printf("Error: %s\n", cl_strerror(ret));
-            syslog(LOG_CRIT, "Error: %s\n", cl_strerror(ret));
+            std::stringstream msg;
+            msg << "cl_scandesc() error: " << cl_strerror(ret);
+            Messaging::message(Messaging::ERROR, msg.str());
             success = SCANOK;
             break;
     }
@@ -114,6 +128,9 @@ VirusScan::~VirusScan() {
     int ret;
     ret = cl_engine_free(engine);
     if (ret != 0) {
+        std::stringstream msg;
+        msg << "cl_engine_free() error: " << cl_strerror(ret);
+        Messaging::message(Messaging::ERROR, msg.str());
         throw SCANERROR;
     }
 }
