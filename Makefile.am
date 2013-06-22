@@ -2,7 +2,7 @@ SUBDIRS = man src test
 
 ACLOCAL_AMFLAGS = -I m4
 
-EXTRA_DIST = doc examples m4 w32 w64 \
+EXTRA_DIST = doc examples m4 \
   autogen.sh Doxyfile doxyheader.html
 
 clean-local:
