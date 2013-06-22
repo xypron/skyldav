@@ -14,10 +14,10 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="skyldavwhite.svg"
-   inkscape:export-filename="\\192.168.123.5\zfsdt\workspace\skyldav\examples\usr\share\skyldav\skyldav100.png"
-   inkscape:export-xdpi="48.650002"
-   inkscape:export-ydpi="48.650002">
+   sodipodi:docname="skyldav.svg"
+   inkscape:export-filename="\\192.168.123.5\zfsdt\workspace\skyldav\examples\usr\share\skyldav\icons\skyldav256.png"
+   inkscape:export-xdpi="124.54"
+   inkscape:export-ydpi="124.54">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -27,9 +27,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.3243242"
-     inkscape:cx="92.5"
-     inkscape:cy="7.5000023"
+     inkscape:zoom="1.6621621"
+     inkscape:cx="124.29194"
+     inkscape:cy="-23.593294"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -54,13 +54,6 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
-    <rect
-       style="fill:#000000;fill-opacity:1;stroke:none"
-       id="rect3887"
-       width="45"
-       height="45"
-       x="70"
-       y="1022.3622" />
     <path
        sodipodi:type="arc"
        style="fill:#ffffff;fill-opacity:1;stroke:none"
@@ -73,7 +66,7 @@
        transform="matrix(0.32141217,-0.32141217,0.37498088,0.37498088,-188.34815,948.59645)" />
     <path
        sodipodi:type="arc"
-       style="fill:#ff0000;fill-opacity:1;stroke:none"
+       style="fill:#0066ff;fill-opacity:1;stroke:none"
        id="path3761"
        sodipodi:cx="175.44586"
        sodipodi:cy="941.64978"
@@ -93,7 +86,7 @@
        transform="matrix(0.32141217,0.32141217,-0.37498088,0.37498088,188.76573,764.01403)" />
     <path
        sodipodi:type="arc"
-       style="fill:#00ff00;fill-opacity:1;stroke:none"
+       style="fill:#0066ff;fill-opacity:1;stroke:none"
        id="path3761-4"
        sodipodi:cx="175.44586"
        sodipodi:cy="941.64978"
@@ -113,7 +106,7 @@
        transform="matrix(-0.32141217,0.32141217,-0.37498088,-0.37498088,373.34815,1141.1279)" />
     <path
        sodipodi:type="arc"
-       style="fill:#ffff00;fill-opacity:1;stroke:none"
+       style="fill:#0066ff;fill-opacity:1;stroke:none"
        id="path3761-8"
        sodipodi:cx="175.44586"
        sodipodi:cy="941.64978"
@@ -133,7 +126,7 @@
        transform="matrix(-0.32141217,-0.32141217,0.37498088,-0.37498088,-3.76573,1325.7103)" />
     <path
        sodipodi:type="arc"
-       style="fill:#0000ff;fill-opacity:1;stroke:none"
+       style="fill:#0066ff;fill-opacity:0.94117647;stroke:none"
        id="path3761-4-4"
        sodipodi:cx="175.44586"
        sodipodi:cy="941.64978"
