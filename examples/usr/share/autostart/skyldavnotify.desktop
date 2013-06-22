@@ -1,0 +1,16 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Skyld AV Notification
+Name[de]=Skyld AV Benachrichtigung
+GenericName=Skyld AV Notification
+GenericName[de]=Skyld AV Benachrichtigung
+Comment=Notification for Skyld AV on access virus scanning
+Comment[de]=Benachrichtigungen für den Skyld AV 0nline-Virenscanner
+Exec=skyldavnotify
+Icon=dialog-error
+Terminal=false
+Categories=System;
+StartupNotify=false
+X-KDE-autostart-phase=1
+X-KDE-StartupNotify=false
