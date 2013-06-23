@@ -1,4 +1,4 @@
-.TH SKYLDAV 1 "June 21st, 2013" "version 0.1" "Skyld AV overview"
+.TH SKYLDAV 1 "June 23th, 2013" "version 0.1" "Skyld AV overview"
 .SH NAME
 skyldav \- Skyld AV on access virus scanner
 .SH SYNOPSIS
@@ -7,6 +7,9 @@ skyldav \- Skyld AV on access virus scanner
 .IR configfile ]
 .RB [ \-d ]
 .RB [ \-h ]
+.RB [ \-m
+.IR msglvl ]
+.RB [ \-v ]
 .SH DESCRIPTION
 .PP
 Skyld AV provides on access virus scanning for Linux.
@@ -24,16 +27,16 @@ The fanotify API is used to control file access. This requires a kernel compiled
 
 Kernel version 3.8.0 or newer is recommended.
 .TP
-.B \-c \fBconfigfile\fR
+.BI \-c \ configfile
 Specify the path to the configuration file.
 .TP
 .B \-d
 Daemonize; run the progam as a background program.
 .TP
 .B \-h
-Print this usage information.
+Print usage information.
 .TP
-.B \-m <n>
+.BI \-m \ msglvl
 Set message level
 .br
 .B 1
@@ -53,7 +56,21 @@ Print the program version and licensing information.
 .SH AUTHOR
 Heinrich Schuchardt <xypron.glpk@gmx.de>
 .SH FILES
-The location of the configuration file defaults to '/etc/skyldav.conf'.
+The location of the configuration file defaults to
+.IR /etc/skyldav.conf .
+The file allows to set the following options:
+.TP
+.B NOMARK_FS
+File systems that shall not be marked for virus scan.
+.TP
+.B NOMARK_MNT
+Mounts that shall not be marked for virus scan.
+.TP
+.B THREADS
+Number of threads for file scanning, defaults to the number of available CPUs.
 .SH SEE ALSO
+.BR skyldavnotify (2)
+.PP
 Further documentation and examples can be found in the documentation
-path, which defaults to /usr/local/share/doc/skyldav
+path, which defaults to
+.IR /usr/share/doc/skyldav .
