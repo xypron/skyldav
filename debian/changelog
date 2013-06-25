@@ -1,8 +1,3 @@
-skyldav (0.2-1) unstable; urgency=low
-
-  * Release candidate. (Closes: #XXXXXX)
-
- -- Heinrich Schuchardt <xypron.glpk@gmx.de>  Wed, 26 Jun 2012 23:00:00 +0200
 skyldav (0.1-4) unstable; urgency=low
 
   * Initial release. (Closes: #XXXXXX)

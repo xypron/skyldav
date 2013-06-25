@@ -9,6 +9,6 @@ libtoolize --force --copy
 aclocal -I m4
 autoconf
 autoheader
-automake --add-missing
+automake --add-missing --force --copy
 
 echo "For installation instructions, please, refer to file INSTALL."

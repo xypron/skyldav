@@ -1,5 +1,5 @@
 libskyldav_la_LDFLAGS = \
-  -version-info 2:0:2 \
+  -version-info 1:0:1 \
   $(SKYLDAV_LIBS)
 
 libskyldav_la_CPPFLAGS = \

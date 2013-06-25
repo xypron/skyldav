@@ -1,7 +1,7 @@
 dnl Skyld AV
 
 dnl Initialization
-AC_INIT([skyldav], [0.2], [xypron.glpk@gmx.de])
+AC_INIT([skyldav], [0.1], [xypron.glpk@gmx.de])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 LT_INIT
 
