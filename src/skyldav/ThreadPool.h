@@ -53,7 +53,7 @@ private:
     pthread_mutex_t mutexThread;
     pthread_mutex_t mutexWorker;
     pthread_mutex_t mutexWorkItem;
-    int nThreads;
+    int thread_count;
     std::deque<void *> worklist;
     void* (*workRoutine) (void *);
 };

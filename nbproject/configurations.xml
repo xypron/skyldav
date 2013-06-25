@@ -5,6 +5,7 @@
       <df name="src">
         <df name="notify">
           <in>notify.cc</in>
+          <in>notify.h</in>
         </df>
         <df name="skyldav">
           <in>FanotifyPolling.cc</in>
@@ -86,6 +87,8 @@
         </ccTool>
       </folder>
       <item path="src/notify/notify.cc" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/notify/notify.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/skyldav/FanotifyPolling.cc" ex="false" tool="1" flavor2="0">
       </item>

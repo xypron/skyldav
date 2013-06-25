@@ -33,6 +33,7 @@
 ThreadPool::ThreadPool(int nThreads, void* (*workRoutine) (void *)) {
     int i;
 
+    thread_count = 0;
     status = RUNNING;
     this->workRoutine = workRoutine;
     pthread_mutex_init(&mutexThread, NULL);
@@ -71,7 +72,7 @@ int ThreadPool::createThread() {
         ret = 1;
     } else {
         pthread_mutex_lock(&mutexThread);
-        nThreads++;
+        thread_count++;
         pthread_mutex_unlock(&mutexThread);
         ret = 0;
     }
@@ -85,7 +86,7 @@ int ThreadPool::createThread() {
  */
 void ThreadPool::exitThread(void *retval) {
     pthread_mutex_lock(&mutexThread);
-    nThreads--;
+    thread_count--;
     pthread_mutex_unlock(&mutexThread);
     pthread_cond_signal(&cond);
     pthread_exit(retval);
@@ -168,7 +169,7 @@ ThreadPool::~ThreadPool() {
         pthread_cond_signal(&cond);
         nanosleep(&interval, NULL);
         pthread_mutex_lock(&mutexThread);
-        n = nThreads;
+        n = thread_count;
         pthread_mutex_unlock(&mutexThread);
     } while (n > 0);
 
