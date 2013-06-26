@@ -39,6 +39,9 @@ Messaging *Messaging::singleton = NULL;
 Messaging::Messaging() {
     char *path;
     char *filename;
+    mode_t mask;
+
+    // Filter debug messages by default.
     messageLevel = INFORMATION;
     logfs.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
@@ -46,14 +49,23 @@ Messaging::Messaging() {
     setlogmask(LOG_UPTO(LOG_NOTICE));
     openlog("Skyld AV", 0, LOG_USER);
 
+    // Set umask = 022;
+    mask = umask(S_IWGRP | S_IWOTH);
+
     // Create directory for logfile.
     filename = strdup(LOGFILE);
     path = dirname(filename);
     mkdir(path, 0755);
     free(filename);
-    
+
     // Open logfile for append.
     logfs.open(LOGFILE, std::fstream::out | std::fstream::app);
+    if (-1 == chmod(LOGFILE, 0644)) {
+        message(ERROR, "Failure to set mask for logfile.");
+    }
+
+    // Reset umask.
+    umask(mask);
 }
 
 void Messaging::error(const std::string label) {
@@ -93,7 +105,7 @@ void Messaging::message(const enum Level level, const std::string message) {
             std::cout << message << std::endl;
             break;
     }
-    
+
     singleton->logfs << type << message << std::endl;
 }
 
