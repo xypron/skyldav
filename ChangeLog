@@ -1,2 +1,4 @@
+Version 0.2
+	Set mask for log file to 0644.
 Version 0.1
 	Initial version.
