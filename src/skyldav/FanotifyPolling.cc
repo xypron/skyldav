@@ -278,7 +278,10 @@ FanotifyPolling::FanotifyPolling(int nThread,
 
     tp = new ThreadPool(nThread, scanFile);
 
-    fanotifyOpen();
+    ret = fanotifyOpen();
+    if (ret != 0) {
+        throw FAILURE;
+    }
 
     ret = pthread_create(&thread, NULL, run, (void *) this);
     if (ret != 0) {
