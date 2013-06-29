@@ -258,10 +258,7 @@ FanotifyPolling::FanotifyPolling(int nThread,
     struct timespec waiting_time_rem;
     struct timespec waiting_time_req;
 
-    if (status == RUNNING) {
-        Messaging::message(Messaging::ERROR, "Polling already running\n");
-        return;
-    }
+    status = INITIAL;
 
     Messaging::message(Messaging::DEBUG, "Loading virus database\n");
     try {
@@ -280,8 +277,6 @@ FanotifyPolling::FanotifyPolling(int nThread,
     }
 
     tp = new ThreadPool(nThread, scanFile);
-
-    status = INITIAL;
 
     fanotifyOpen();
 
