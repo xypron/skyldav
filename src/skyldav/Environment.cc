@@ -24,8 +24,35 @@
 #include "Environment.h"
 
 Environment::Environment() {
+    nomarkfs = new StringSet();
+    nomarkmnt = new StringSet();
+    localfs = new StringSet();
+    nThreads = 4;
+}
+
+StringSet *Environment::getNoMarkFileSystems() {
+    return nomarkfs;
+}
+
+StringSet *Environment::getNoMarkMounts() {
+    return nomarkmnt;
+}
+
+StringSet *Environment::getLocalFileSystems() {
+    return localfs;
+}
+
+int Environment::getNumberOfThreads() {
+    return nThreads;
+}
+
+void Environment::setNumberOfThreads(int n) {
+    nThreads = n;
 }
 
 Environment::~Environment() {
+    delete localfs;
+    delete nomarkmnt;
+    delete localfs;
 }
 

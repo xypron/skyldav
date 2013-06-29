@@ -169,7 +169,7 @@ void* FanotifyPolling::scanFile(void *workitem) {
                         path[path_len] = '\0';
                         printf("File %s\n\n", path);
                         std::stringstream msg;
-                        msg << "Access to file \"" << path << "\"denied.";
+                        msg << "Access to file \"" << path << "\" denied.";
                         Messaging::message(Messaging::WARNING, msg.str());
                     }
                 }
@@ -249,14 +249,15 @@ void FanotifyPolling::analyze(const void *buf, int len) {
 
 /**
  * @brief Starts polling fanotify events.
- * @param cbptr callback function
+ * @param env environment
  * @return success
  */
-FanotifyPolling::FanotifyPolling(int nThread,
-        StringSet *nomarkfs, StringSet * nomarkmnt) {
+FanotifyPolling::FanotifyPolling(Environment *env) {
     int ret;
     struct timespec waiting_time_rem;
     struct timespec waiting_time_req;
+    
+    e = env;
 
     status = INITIAL;
 
@@ -276,7 +277,7 @@ FanotifyPolling::FanotifyPolling(int nThread,
         throw FAILURE;
     }
 
-    tp = new ThreadPool(nThread, scanFile);
+    tp = new ThreadPool(e->getNumberOfThreads(), scanFile);
 
     ret = fanotifyOpen();
     if (ret != 0) {
@@ -300,7 +301,7 @@ FanotifyPolling::FanotifyPolling(int nThread,
     }
 
     try {
-        mp = new MountPolling(fd, nomarkfs, nomarkmnt);
+        mp = new MountPolling(fd, e);
     } catch (MountPolling::Status e) {
         throw FAILURE;
     }

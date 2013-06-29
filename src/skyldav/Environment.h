@@ -24,12 +24,34 @@
 #ifndef ENVIRONMENT_H
 #define	ENVIRONMENT_H
 
+#include <StringSet.h>
+
 class Environment {
 public:
     Environment();
+    StringSet *getNoMarkFileSystems();
+    StringSet *getNoMarkMounts();
+    StringSet *getLocalFileSystems();
+    int getNumberOfThreads();
+    void setNumberOfThreads(int);
     virtual ~Environment();
 private:
-
+    /**
+     * @brief File systems which shall not be scanned.
+     */
+    StringSet *nomarkfs;
+    /**
+     * @brief Mounts that shall not be scanned.
+     */
+    StringSet *nomarkmnt;
+    /**
+     * @brief File systems for local drives.
+     */
+    StringSet *localfs;
+    /**
+     * @brief Number of threads for virus scanning
+     */
+    int nThreads;
 };
 
 #endif	/* ENVIRONMENT_H */

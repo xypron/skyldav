@@ -110,9 +110,10 @@ static void gettoken(FILE *file, char *token) {
  * Returns 0 if successful.
  * @param filename file name
  * @param cb callback function
+ * @prame info parameter passed to callback function
  * @return success
  */
-int conf_parse(char *filename, conf_cb cb) {
+int conf_parse(char *filename, conf_cb cb, void *info) {
     int ret = 0;
     FILE *file;
     char key[CONF_VALUE_MAX_LEN];
@@ -148,7 +149,7 @@ int conf_parse(char *filename, conf_cb cb) {
                 if (cb == NULL) {
                     printf("%s = %s\n", key, value);
                 } else {
-                    if (cb(key, value)) {
+                    if (cb(key, value, info)) {
                     printf("Invalid entry in '%s': %s = %s\n", 
                             filename, key, value);
                         ret = 1;

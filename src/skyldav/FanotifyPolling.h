@@ -27,6 +27,7 @@
 
 #include <sys/fanotify.h>
 #include <pthread.h>
+#include "Environment.h"
 #include "MountPolling.h"
 #include "StringSet.h"
 #include "ThreadPool.h"
@@ -50,12 +51,15 @@ extern "C" {
             SUCCESS = 4
         };
 
-        FanotifyPolling(int nThread,
-                StringSet *nomarkfs, StringSet *nomarkmnt);
+        FanotifyPolling(Environment *);
         ~FanotifyPolling();
         static int markMount(int fd, const char *mount);
         static int unmarkMount(int fd, const char *mount);
     private:
+        /**
+         * @brief Environment
+         */
+        Environment *e;
         /**
          * @brief Fanotify file descriptor.
          */

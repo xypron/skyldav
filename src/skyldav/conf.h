@@ -31,9 +31,9 @@ extern "C" {
 
 #define CONF_VALUE_MAX_LEN 512
     
-    typedef int (*conf_cb)(const char *key, const char *value);
+    typedef int (*conf_cb)(const char *key, const char *value, void *info);
     
-    int conf_parse(char *filename, conf_cb cb);
+    int conf_parse(char *filename, conf_cb cb, void *info);
 
 #ifdef	__cplusplus
 }

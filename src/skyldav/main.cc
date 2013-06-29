@@ -36,27 +36,11 @@
 #include <unistd.h>
 #include "conf.h"
 #include "config.h"
+#include "Environment.h"
 #include "FanotifyPolling.h"
 #include "Messaging.h"
 #include "skyldav.h"
 #include "StringSet.h"
-
-/**
- * @brief File systems which shall not be scanned.
- */
-static StringSet nomarkfs;
-/**
- * @brief Mounts that shall not be scanned.
- */
-static StringSet nomarkmnt;
-/**
- * @brief File systems for local drives.
- */
-static StringSet localfs;
-/**
- * @brief Number of threads for virus scanning
- */
-static int nThread = 4;
 
 /**
  * @brief Callback function for reading configuration file.
@@ -64,21 +48,28 @@ static int nThread = 4;
  * @param value parameter value
  * @return success
  */
-static int confcb(const char *key, const char *value) {
+static int confcb(const char *key, const char *value, void *info) {
+    Environment *e = (Environment *) info;
     int ret = 0;
+    int nThread;
+
+    if (e == NULL) {
+        throw 0;
+    }
 
     if (!strcmp(key, "NOMARK_FS")) {
-        nomarkfs.add(value);
+        e->getNoMarkFileSystems()->add(value);
     } else if (!strcmp(key, "NOMARK_MNT")) {
-        nomarkmnt.add(value);
+        e->getNoMarkMounts()->add(value);
     } else if (!strcmp(key, "LOCAL_FS")) {
-        localfs.add(value);
+        e->getLocalFileSystems()->add(value);
     } else if (!strcmp(key, "THREADS")) {
         std::stringstream ss(value);
         ss >> nThread;
         if (ss.fail()) {
             ret = 1;
         }
+        e->setNumberOfThreads(nThread);
     } else {
         ret = 1;
     }
@@ -111,7 +102,7 @@ static void pidfile() {
     const char *filename = PID_FILE;
     int fd;
     int ret;
-    
+
     fd = open(filename, O_CREAT | O_TRUNC | O_WRONLY,
             S_IRUSR | S_IWUSR);
     if (fd == -1) {
@@ -119,9 +110,9 @@ static void pidfile() {
     }
     len = snprintf(buffer, sizeof (buffer), "%d", (int) getpid());
     ret = write(fd, buffer, len);
-        syslog(LOG_ERR, "Cannot write pid file '%s'.", filename);
+    syslog(LOG_ERR, "Cannot write pid file '%s'.", filename);
     if (ret == -1)
-    close(fd);
+        close(fd);
 }
 
 /**
@@ -171,11 +162,12 @@ static int capable(cap_value_t cap) {
 /**
  * @brief Checks authorization.
  */
-static void authcheck() {
+static void authcheck(Environment *e) {
     if (!capable(CAP_SYS_ADMIN)) {
         fprintf(stderr,
                 "Missing capability CAP_SYS_ADMIN.\n"
                 "Call the program as root.\n");
+        delete e;
         exit(EXIT_FAILURE);
     }
 }
@@ -183,7 +175,7 @@ static void authcheck() {
 /**
  * @brief Daemonizes.
  */
-static void daemonize() {
+static void daemonize(Environment *e) {
     pid_t pid;
 
     // Check if this process is already a daemon.
@@ -193,15 +185,18 @@ static void daemonize() {
     pid = fork();
     if (pid == -1) {
         perror("Cannot fork");
+        delete e;
         exit(EXIT_FAILURE);
     }
     if (pid != 0) {
         // Exit calling process.
+        delete e;
         exit(EXIT_SUCCESS);
     }
     // Change working directory.
     if (chdir("/") == -1) {
         perror("Cannot change directory");
+        delete e;
         exit(EXIT_FAILURE);
     }
     // Set the user file creation mask to zero.
@@ -212,16 +207,14 @@ static void daemonize() {
     }
     // Redirect standard files
     if (NULL == freopen("/dev/null", "r", stdin)) {
-        perror("Cannot redirect stdin to /dev/null");
+        perror("Cannot redirect /dev/null to stdin");
     };
-    if (NULL == freopen("/dev/null", "r", stdout)) {
+    if (NULL == freopen("/dev/null", "w", stdout)) {
         perror("Cannot redirect stdout to /dev/null");
     };
-    if (NULL == freopen("/dev/null", "r", stderr)) {
+    if (NULL == freopen("/dev/null", "w", stderr)) {
         perror("Cannot redirect stderr to /dev/null");
     };
-    freopen("/dev/null", "w", stdout);
-    freopen("/dev/null", "w", stderr);
     pidfile();
 }
 
@@ -233,6 +226,8 @@ static void daemonize() {
  * @return success
  */
 int main(int argc, char *argv[]) {
+    // environment
+    Environment *e;
     // running as daemon
     int daemonized = 0;
     // shall run as daemon
@@ -251,6 +246,10 @@ int main(int argc, char *argv[]) {
     FanotifyPolling *fp;
     // Message level
     int messageLevel = Messaging::INFORMATION;
+    // Number of threads
+    int nThread;
+
+    e = new Environment();
 
     // Set the number of threads to the number of available CPUs.
     nThread = sysconf(_SC_NPROCESSORS_ONLN);
@@ -258,6 +257,7 @@ int main(int argc, char *argv[]) {
         // Use at least one thread.
         nThread = 1;
     }
+    e->setNumberOfThreads(nThread);
 
     // Analyze command line options.
     for (i = 1; i < argc; i++) {
@@ -304,7 +304,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Parse configuration file.
-    if (conf_parse(cfile, confcb)) {
+    if (conf_parse(cfile, confcb, (void *) e)) {
         return EXIT_FAILURE;
     }
 
@@ -316,11 +316,11 @@ int main(int argc, char *argv[]) {
     }
 
     // Check authorization.
-    authcheck();
+    authcheck(e);
 
     // Daemonize if requested.
     if (shalldaemonize) {
-        daemonize();
+        daemonize(e);
         daemonized = 1;
     }
 
@@ -348,10 +348,11 @@ int main(int argc, char *argv[]) {
     }
 
     try {
-        fp = new FanotifyPolling(nThread, &nomarkfs, &nomarkmnt);
-    } catch (FanotifyPolling::Status e) {
+        fp = new FanotifyPolling(e);
+    } catch (FanotifyPolling::Status ex) {
         Messaging::message(Messaging::ERROR,
                 "Failure starting fanotify listener.");
+        delete e;
         return EXIT_FAILURE;
     }
 
@@ -369,6 +370,7 @@ int main(int argc, char *argv[]) {
     }
     Messaging::message(Messaging::INFORMATION, "On access scanning stopped.");
     Messaging::teardown();
+    delete e;
     printf("done\n");
     return EXIT_SUCCESS;
 }

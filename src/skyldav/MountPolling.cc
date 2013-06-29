@@ -38,6 +38,7 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+#include "Environment.h"
 #include "FanotifyPolling.h"
 #include "listmounts.h"
 #include "Messaging.h"
@@ -163,16 +164,15 @@ void MountPolling::callback() {
  * @param nomarkfs
  * @param nomarkmnt
  */
-MountPolling::MountPolling(int ffd,
-        StringSet *nomarkfs, StringSet * nomarkmnt) {
+MountPolling::MountPolling(int ffd, Environment *env) {
     pthread_attr_t attr;
     int ret;
     struct timespec waiting_time_rem;
     struct timespec waiting_time_req;
 
     fd = ffd;
-    this->nomarkfs = nomarkfs;
-    this->nomarkmnt = nomarkmnt;
+    this->nomarkfs = env->getNoMarkFileSystems();
+    this->nomarkmnt = env->getNoMarkMounts();
 
     status = INITIAL;
 
