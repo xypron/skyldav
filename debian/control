@@ -47,3 +47,37 @@ Description: Skyld AV
  uname -a
  .
  ClamAV is used for scanning.
+
+Package: skyldav-dbg
+Architecture: any
+Depends:
+ libcanberra0,
+ libcap2,
+ libclamav6,
+ libgtk2.0-0,
+ libmount1,
+ libnotify4,
+ freedesktop-sound-theme
+Suggests: clamav-freshclam
+Description: Skyld AV
+ "Skyld" AV provides on access virus scanning for Linux.
+ .
+ The fanotify API is used to control file access. This requires a kernel compiled
+ with
+ .
+ CONFIG_FANOTIFY=y
+ CONFIG_FANOTIFY_ACCESS_PERMISSIONS=y
+ .
+ On Debian and Fedora you can check the configuration with
+ .
+ grep CONFIG_FANOTIFY /boot/config-$(uname -r)
+ .
+ Kernel version 3.8.0 or newer is recommended. You can check the version you
+ are using with
+ .
+ uname -a
+ .
+ ClamAV is used for scanning.
+ .
+ This package provides the debug symbols for the skyldav application and. 
+ library.

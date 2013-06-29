@@ -1,3 +1,9 @@
+skyldav (0.2-1)
+
+  * Debug package added
+
+ -- Heinrich Schuchardt <xypron.glpk@gmx.de>  Tue, 29 Jun 2012 08:00:00 +0200
+
 skyldav (0.1-4) unstable; urgency=low
 
   * Initial release. (Closes: #XXXXXX)

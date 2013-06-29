@@ -10,3 +10,5 @@ export DH_OPTIONS
 %:
 	dh $@  --with autotools-dev --parallel
 
+override_dh_strip:
+    dh_strip --dbg-package=skyldav-dbg 
