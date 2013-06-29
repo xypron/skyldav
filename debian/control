@@ -51,13 +51,7 @@ Description: Skyld AV
 Package: skyldav-dbg
 Architecture: any
 Depends:
- libcanberra0,
- libcap2,
- libclamav6,
- libgtk2.0-0,
- libmount1,
- libnotify4,
- freedesktop-sound-theme
+ skyldav
 Suggests: clamav-freshclam
 Description: Skyld AV
  "Skyld" AV provides on access virus scanning for Linux.
