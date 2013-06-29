@@ -40,7 +40,7 @@ AC_DEFINE_UNQUOTED([LOGFILE], "${SKYLDAVLOGFILE}", [Skyld AV log file])
 dnl Set compiler flags
 dnl add large file support on 32bit systems
 CPPFLAGS="-D_FILE_OFFSET_BITS=64 $CPPFLAGS"
-dnl add src/skyldav to include path
+dnl adjust include path
 CPPFLAGS="-I. $CPPFLAGS"
 
 PKG_CHECK_MODULES([NOTIFY], [gtk+-2.0 >= 2.20.1 libnotify >= 0.5.0])
