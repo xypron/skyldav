@@ -18,6 +18,7 @@ Vcs-browser: https://github.com/xypron/skyldav
 Homepage: http://xypron.github.io/skyldav/
 
 Package: skyldav
+Section: utils
 Architecture: any
 Depends:
  libcanberra0,
@@ -29,7 +30,7 @@ Depends:
  freedesktop-sound-theme
 Suggests: clamav-freshclam
 Description: Skyld AV
- "Skyld" AV provides on access virus scanning for Linux.
+ "Skyld AV" provides on access virus scanning for Linux.
  .
  The fanotify API is used to control file access. This requires a kernel compiled
  with
@@ -50,11 +51,13 @@ Description: Skyld AV
 
 Package: skyldav-dbg
 Architecture: any
+Section: debug
+Architecture: any
 Depends:
- skyldav
-Suggests: clamav-freshclam
+ skyldav (= ${binary:Version}),
+ ${misc:Depends}
 Description: Skyld AV
- "Skyld" AV provides on access virus scanning for Linux.
+ "Skyld AV" provides on access virus scanning for Linux.
  .
  The fanotify API is used to control file access. This requires a kernel compiled
  with
@@ -73,5 +76,5 @@ Description: Skyld AV
  .
  ClamAV is used for scanning.
  .
- This package provides the debug symbols for the skyldav application and. 
+ This package provides the debug symbols for the skyldav application and 
  library.

@@ -6,9 +6,10 @@ export DH_VERBOSE=1
 # This has to be exported to make some magic below work.
 export DH_OPTIONS
 
-
 %:
 	dh $@  --with autotools-dev --parallel
 
+override_dh_auto_install:
+
 override_dh_strip:
-    dh_strip --dbg-package=skyldav-dbg 
+    dh_strip -pskyldav --dbg-package=skyldav-dbg 
