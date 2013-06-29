@@ -75,7 +75,8 @@ static int confcb(const char *key, const char *value) {
         localfs.add(value);
     } else if (!strcmp(key, "THREADS")) {
         std::stringstream ss(value);
-        if ((ss >> nThread).fail()) {
+        ss >> nThread;
+        if (ss.fail()) {
             ret = 1;
         }
     } else {
@@ -212,6 +213,12 @@ static void daemonize() {
     // Redirect standard files
     if (NULL == freopen("/dev/null", "r", stdin)) {
         perror("Cannot redirect stdin to /dev/null");
+    };
+    if (NULL == freopen("/dev/null", "r", stdout)) {
+        perror("Cannot redirect stdout to /dev/null");
+    };
+    if (NULL == freopen("/dev/null", "r", stderr)) {
+        perror("Cannot redirect stderr to /dev/null");
     };
     freopen("/dev/null", "w", stdout);
     freopen("/dev/null", "w", stderr);
