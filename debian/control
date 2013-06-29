@@ -52,7 +52,6 @@ Description: Skyld AV
 Package: skyldav-dbg
 Architecture: any
 Section: debug
-Architecture: any
 Depends:
  skyldav (= ${binary:Version}),
  ${misc:Depends}
