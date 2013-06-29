@@ -6,6 +6,7 @@ Build-Depends:
  debhelper (>= 9.0.0),
  autotools-dev,
  pkg-config,
+ libc6-dev,
  libcanberra-dev,
  libcap-dev,
  libclamav-dev,
@@ -21,6 +22,7 @@ Package: skyldav
 Section: utils
 Architecture: any
 Depends:
+ libc6,
  libcanberra0,
  libcap2,
  libclamav6,
@@ -52,10 +54,11 @@ Description: Skyld AV
 Package: skyldav-dbg
 Architecture: any
 Section: debug
+Priority: extra
 Depends:
- skyldav (= ${binary:Version}),
- ${misc:Depends}
-Description: Skyld AV
+    skyldav (= ${binary:Version}),
+    ${misc:Depends}
+Description: Debugging symbols for Skyld AV
  "Skyld AV" provides on access virus scanning for Linux.
  .
  The fanotify API is used to control file access. This requires a kernel compiled
@@ -75,5 +78,4 @@ Description: Skyld AV
  .
  ClamAV is used for scanning.
  .
- This package provides the debug symbols for the skyldav application and 
- library.
+ This package contains the debugging symbols for Skyld AV.

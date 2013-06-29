@@ -10,6 +10,7 @@ export DH_OPTIONS
 	dh $@  --with autotools-dev --parallel
 
 override_dh_auto_install:
+	dh_auto_install --destdir=debian/skyldav
 
 override_dh_strip:
-    dh_strip -pskyldav --dbg-package=skyldav-dbg 
+	dh_strip -pskyldav --dbg-package=skyldav-dbg

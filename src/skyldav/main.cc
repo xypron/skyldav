@@ -210,7 +210,9 @@ static void daemonize() {
         perror("Cannot create session");
     }
     // Redirect standard files
-    freopen("/dev/null", "r", stdin);
+    if (NULL == freopen("/dev/null", "r", stdin)) {
+        perror("Cannot redirect stdin to /dev/null");
+    };
     freopen("/dev/null", "w", stdout);
     freopen("/dev/null", "w", stderr);
     pidfile();
