@@ -22,10 +22,77 @@
  * @brief Cache for virus scanning results.
  */
 #include "ScanCache.h"
+#include <time.h>
 
 ScanCache::ScanCache() {
 }
 
+/**
+ * @brief Adds scan result to cache.
+ * @param stat File status as returned by fstat()
+ * @param response Response to be used for fanotify (FAN_ALLOW, FAN_DENY)
+ */
+void ScanCache::add(const struct stat *stat, const int response) {
+    ScanCache::iterator it;
+    ScanResult *scr = new ScanResult();
+    scr->dev = stat->st_dev;
+    scr->ino = stat->st_ino;
+    scr->mtime = stat->st_mtime;
+    scr->response = response;
+    gmtime(&(scr->age));
+
+    it = find(scr);
+    if (it != ScanCache::end()) {
+        erase(it);
+    }
+    if (!this->insert(scr).second) {
+        delete scr;
+    }
+}
+
+/**
+ * @brief Adds scan result to cache.
+ * @param stat file status as returned by fstat()
+ * @return response to be used for fanotify (FAN_ALLOW, FAN_DENY) or -1
+ */
+int ScanCache::get(const struct stat *stat) {
+    ScanCache::iterator it;
+    ScanResult *scr = new ScanResult();
+    scr->dev = stat->st_dev;
+    scr->ino = stat->st_ino;
+
+    it = find(scr);
+    delete scr;
+    if (it == ScanCache::end()) {
+        return -1;
+    }
+    scr = *it;
+    return scr->response;
+}
+
+/**
+ * @brief Adds scan result to cache.
+ * @param stat file status as returned by fstat()
+ */
+void ScanCache::remove(const struct stat *stat) {
+    ScanCache::iterator it;
+    ScanResult *scr = new ScanResult();
+    scr->dev = stat->st_dev;
+    scr->ino = stat->st_ino;
+
+    it = find(scr);
+    if (it != ScanCache::end()) {
+        delete *it;
+        erase(it);
+    }
+    delete scr;
+}
+
 ScanCache::~ScanCache() {
+    ScanCache::iterator pos;
+    for (pos = begin(); pos != end(); pos++) {
+        delete *pos;
+    }
+    this->clear();
 }
 
