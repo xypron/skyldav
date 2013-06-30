@@ -51,7 +51,7 @@ void Environment::setNumberOfThreads(int n) {
 }
 
 Environment::~Environment() {
-    delete localfs;
+    delete nomarkfs;
     delete nomarkmnt;
     delete localfs;
 }
