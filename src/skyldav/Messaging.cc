@@ -59,9 +59,13 @@ Messaging::Messaging() {
     free(filename);
 
     // Open logfile for append.
-    logfs.open(LOGFILE, std::fstream::out | std::fstream::app);
-    if (-1 == chmod(LOGFILE, 0644)) {
-        message(ERROR, "Failure to set mask for logfile.");
+    try {
+        logfs.open(LOGFILE, std::fstream::out | std::fstream::app);
+        if (-1 == chmod(LOGFILE, 0644)) {
+            std::cerr << "Failure to set mask for logfile." << std::endl;
+        }
+    } catch (class std::ios_base::failure ex) {
+        std::cerr << "Failure to open logfile." << std::endl;
     }
 
     // Reset umask.
@@ -76,6 +80,7 @@ void Messaging::error(const std::string label) {
 
 void Messaging::message(const enum Level level, const std::string message) {
     std::string type;
+
     getSingleton();
     if (level < singleton->messageLevel) {
         return;
@@ -105,8 +110,12 @@ void Messaging::message(const enum Level level, const std::string message) {
             std::cout << message << std::endl;
             break;
     }
+    try {
+        singleton->logfs << type << message << std::endl;
+    } catch (class std::ios_base::failure ex) {
+        std::cerr << "Failure to write to logfile." << std::endl;
+    }
 
-    singleton->logfs << type << message << std::endl;
 }
 
 void Messaging::setLevel(const enum Level level) {
@@ -127,6 +136,10 @@ void Messaging::teardown() {
 
 Messaging::~Messaging() {
     closelog();
-    logfs.close();
+    try {
+        logfs.close();
+    } catch (class std::ios_base::failure ex) {
+        std::cerr << "Failure to close logfile." << std::endl;
+    }
 }
 

@@ -24,8 +24,10 @@
 #include <stdlib.h>
 #include "ScanCache.h"
 #include "Environment.h"
+#include "Messaging.h"
 
-static void checkEqual(const int actual, const int expected, const char *lbl) {
+static void checkEqual(const unsigned int actual, const unsigned int expected,
+        const char *lbl) {
     if (actual != expected) {
         printf("%s: actual '%d', expected '%d'.\n", lbl, actual, expected);
         throw EXIT_FAILURE;
@@ -41,6 +43,7 @@ int main(int argc, char *argv[]) {
 
     stat = (struct stat *) malloc(sizeof (struct stat));
 
+    Messaging::setLevel(Messaging::DEBUG);
     e = new Environment();
     c = e->getScanCache();
 
@@ -49,7 +52,7 @@ int main(int argc, char *argv[]) {
         stat->st_ino = 100;
         stat->st_mtime = -1;
 
-        checkEqual(c->get(stat), -1, "Search in empty set");
+        checkEqual(c->get(stat), ScanCache::CACHE_MISS, "Search in empty set");
 
         c->add(stat, 1);
         checkEqual(c->get(stat), 1, "Search after insert");
@@ -59,31 +62,32 @@ int main(int argc, char *argv[]) {
 
         stat->st_dev = 12;
         stat->st_ino = 100;
-        checkEqual(c->get(stat), -1, "Search other dev");
+        checkEqual(c->get(stat), ScanCache::CACHE_MISS, "Search other dev");
 
         stat->st_dev = 14;
         stat->st_ino = 100;
-        checkEqual(c->get(stat), -1, "Search other dev");
+        checkEqual(c->get(stat), ScanCache::CACHE_MISS, "Search other dev");
 
         stat->st_dev = 13;
         stat->st_ino = 99;
-        checkEqual(c->get(stat), -1, "Search other inode");
+        checkEqual(c->get(stat), ScanCache::CACHE_MISS, "Search other inode");
 
         stat->st_dev = 13;
         stat->st_ino = 101;
-        checkEqual(c->get(stat), -1, "Search other inode");
+        checkEqual(c->get(stat), ScanCache::CACHE_MISS, "Search other inode");
 
         c->add(stat, 3);
         checkEqual(c->get(stat), 3, "Search after insert");
-        
+
         c->remove(stat);
-        checkEqual(c->get(stat), -1, "Search after remove");
-        
+        checkEqual(c->get(stat), ScanCache::CACHE_MISS, "Search after remove");
+
     } catch (int ex) {
         ret = ex;
     }
 
     delete e;
     free(stat);
+    Messaging::teardown();
     return ret;
 }
