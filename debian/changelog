@@ -1,6 +1,7 @@
 skyldav (0.2-6) unstable; urgency=low
 
   * Debug package added
+  * Cache for scan results implemented
 
  -- Heinrich Schuchardt <xypron.glpk@gmx.de>  Tue, 29 Jun 2012 08:00:00 +0200
 
