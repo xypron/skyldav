@@ -13,6 +13,7 @@ library_include_HEADERS = \
   Messaging.h \
   MountPolling.h \
   FanotifyPolling.h \
+  ScanCache.h \
   StringSet.h \
   ThreadPool.h \
   VirusScan.h
@@ -26,6 +27,7 @@ libskyldav_la_SOURCES = \
   Messaging.cc \
   MountPolling.cc \
   FanotifyPolling.cc \
+  ScanCache.cc \
   StringSet.cc \
   ThreadPool.cc \
   VirusScan.cc

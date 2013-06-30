@@ -92,7 +92,7 @@ void *FanotifyPolling::run(void *obj) {
                     ret = read(fp->fd, (void *) &buf,
                             SKYLD_POLLFANOTIFY_BUFLEN);
                     if (ret > 0) {
-                        fp->analyze(&buf, ret);
+                        fp->handleFanotifyEvents(&buf, ret);
                         break;
                     } else if (ret < 0) {
                         if (errno & (EINTR | EAGAIN | ETXTBSY | EWOULDBLOCK)) {
@@ -167,7 +167,6 @@ void* FanotifyPolling::scanFile(void *workitem) {
                     path_len = readlink(path, path, sizeof (path) - 1);
                     if (path_len > 0) {
                         path[path_len] = '\0';
-                        printf("File %s\n\n", path);
                         std::stringstream msg;
                         msg << "Access to file \"" << path << "\" denied.";
                         Messaging::message(Messaging::WARNING, msg.str());
@@ -186,62 +185,120 @@ void* FanotifyPolling::scanFile(void *workitem) {
 }
 
 /**
- * @brief Display fanotify event.
+ * @brief Handle fanotify events.
+ * 
+ * @param buf buffer with events
+ * @param len length of the buffer
  */
-void FanotifyPolling::analyze(const void *buf, int len) {
-    const struct fanotify_event_metadata *metadata =
-            (const struct fanotify_event_metadata *) buf;
+void FanotifyPolling::handleFanotifyEvent(
+        const struct fanotify_event_metadata *metadata) {
+
     int ret;
     pid_t pid;
     struct stat statbuf;
     struct fanotify_response response;
     struct ScanTask *task;
+    int tobeclosed = 1;
 
-    while (FAN_EVENT_OK(metadata, len)) {
-        if (metadata->fd == FAN_NOFD) {
-            Messaging::message(Messaging::ERROR,
-                    "Received FAN_NOFD from fanotiy.");
-            metadata = FAN_EVENT_NEXT(metadata, len);
-            continue;
+    ret = fstat(metadata->fd, &statbuf);
+    if (ret == -1) {
+        std::stringstream msg;
+        msg << "analyze: failure to read file status: "
+                << strerror(errno);
+        Messaging::message(Messaging::ERROR, msg.str());
+        ret = writeResponse(response);
+    } else {
+        if (metadata->mask & FAN_MODIFY) {
+            if (S_ISREG(statbuf.st_mode)) {
+                // It is a file. Do not receive further MODIFY events.
+                ret = fanotify_mark(fd, FAN_MARK_ADD
+                        | FAN_MARK_IGNORED_MASK
+                        | FAN_MARK_IGNORED_SURV_MODIFY, FAN_MODIFY,
+                        metadata->fd, NULL);
+                if (ret == -1) {
+                    perror("analyze: fanotify_mark");
+                }
+            }
+            if (metadata->fd >= 0) {
+                char path[PATH_MAX];
+                int path_len;
+                sprintf(path, "/proc/self/fd/%d", metadata->fd);
+                path_len = readlink(path, path, sizeof (path) - 1);
+                if (path_len > 0) {
+                    path[path_len] = '\0';
+                    printf("FAN_MODIFY %s\n", path);
+                }
+            }
         }
+        if (metadata->mask & FAN_OPEN_PERM) {
 
-        response.fd = metadata->fd;
-        response.response = FAN_ALLOW;
-        pid = getpid();
-        if (pid == metadata->pid) {
-            // For same process always allow.
-            ret = writeResponse(response);
-            close(metadata->fd);
-        } else {
-            // read file status
-            ret = fstat(metadata->fd, &statbuf);
-            if (ret == -1) {
-                std::stringstream msg;
-                msg << "scanFile: failure to read file status: "
-                        << strerror(errno);
-                Messaging::message(Messaging::ERROR, msg.str());
+            if (metadata->fd >= 0) {
+                char path[PATH_MAX];
+                int path_len;
+                sprintf(path, "/proc/self/fd/%d", metadata->fd);
+                path_len = readlink(path, path, sizeof (path) - 1);
+                if (path_len > 0) {
+                    path[path_len] = '\0';
+                    printf("FAN_OPEN_PERM %s\n", path);
+                }
+            }
+
+            response.fd = metadata->fd;
+            response.response = FAN_ALLOW;
+            pid = getpid();
+            if (pid == metadata->pid) {
+                // For same process always allow.
                 ret = writeResponse(response);
-                close(metadata->fd);
             } else if (!S_ISREG(statbuf.st_mode)) {
                 // For directories always allow.
                 ret = writeResponse(response);
-                close(metadata->fd);
             } else {
+                // It is a file.
+                ret = fanotify_mark(fd, FAN_MARK_REMOVE |
+                        FAN_MARK_IGNORED_MASK, FAN_MODIFY, metadata->fd,
+                        NULL);
+                if (ret == -1) {
+                    perror("analyze: fanotify_mark");
+                }
                 task = (struct ScanTask *) malloc(sizeof (struct ScanTask));
                 if (task == NULL) {
                     Messaging::message(Messaging::ERROR, "Out of memory\n");
                     response.fd = metadata->fd;
                     response.response = FAN_ALLOW;
                     ret = writeResponse(response);
-                    close(metadata->fd);
                 } else {
+                    tobeclosed = 0;
                     task->metadata = *metadata;
                     task->fp = this;
                     tp->add((void *) task);
                 }
             }
+        } // FAN_OPEN_PERM
+    } // ret = fstat
+    if (tobeclosed) {
+        close(metadata->fd);
+    }
+
+    fflush(stdout);
+}
+
+/**
+ * @brief Handle fanotify events.
+ * 
+ * @param buf buffer with events
+ * @param len length of the buffer
+ */
+void FanotifyPolling::handleFanotifyEvents(const void *buf, int len) {
+    const struct fanotify_event_metadata *metadata =
+            (const struct fanotify_event_metadata *) buf;
+
+    while (FAN_EVENT_OK(metadata, len)) {
+        if (metadata->fd == FAN_NOFD) {
+            Messaging::message(Messaging::ERROR,
+                    "Received FAN_NOFD from fanotiy.");
+        } else {
+            handleFanotifyEvent(metadata);
         }
-        fflush(stdout);
         metadata = FAN_EVENT_NEXT(metadata, len);
     }
     return;
@@ -252,11 +309,11 @@ void FanotifyPolling::analyze(const void *buf, int len) {
  * @param env environment
  * @return success
  */
-FanotifyPolling::FanotifyPolling(Environment *env) {
+FanotifyPolling::FanotifyPolling(Environment * env) {
     int ret;
     struct timespec waiting_time_rem;
     struct timespec waiting_time_req;
-    
+
     e = env;
 
     status = INITIAL;
@@ -374,7 +431,6 @@ FanotifyPolling::~FanotifyPolling() {
 
 /**
  * @brief Writes fanotify response
- * @param fd fanotify file descriptor
  * @param response response
  * @return success = 0
  */
@@ -450,7 +506,7 @@ int FanotifyPolling::fanotifyClose() {
  */
 int FanotifyPolling::markMount(int fd, const char *mount) {
     unsigned int flags = FAN_MARK_ADD | FAN_MARK_MOUNT;
-    uint64_t mask = FAN_OPEN_PERM | FAN_CLOSE_WRITE;
+    uint64_t mask = FAN_OPEN_PERM | FAN_MODIFY;
     int dfd = AT_FDCWD;
     int ret;
 
