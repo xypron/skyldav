@@ -43,6 +43,9 @@ CPPFLAGS="-D_FILE_OFFSET_BITS=64 $CPPFLAGS"
 dnl adjust include path
 CPPFLAGS="-I. $CPPFLAGS"
 
+dnl set linker flags
+LDFLAGS="-g $LDFLAGS"
+
 PKG_CHECK_MODULES([NOTIFY], [gtk+-2.0 >= 2.20.1 libnotify >= 0.5.0])
 AC_CHECK_HEADER([canberra.h], [],
   [AC_MSG_ERROR([canberra.h header not found])])
