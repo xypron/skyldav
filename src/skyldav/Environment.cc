@@ -27,6 +27,7 @@ Environment::Environment() {
     nomarkfs = new StringSet();
     nomarkmnt = new StringSet();
     localfs = new StringSet();
+    scache = new ScanCache();
     nThreads = 4;
 }
 
@@ -42,6 +43,10 @@ StringSet *Environment::getLocalFileSystems() {
     return localfs;
 }
 
+ScanCache *Environment::getScanCache() {
+    return scache;
+}
+
 int Environment::getNumberOfThreads() {
     return nThreads;
 }
@@ -54,5 +59,6 @@ Environment::~Environment() {
     delete nomarkfs;
     delete nomarkmnt;
     delete localfs;
+    delete scache;
 }
 

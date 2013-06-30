@@ -25,6 +25,7 @@
 #include <time.h>
 
 ScanCache::ScanCache() {
+    pthread_mutex_init(&mutex, NULL);
 }
 
 /**
@@ -41,6 +42,7 @@ void ScanCache::add(const struct stat *stat, const int response) {
     scr->response = response;
     gmtime(&(scr->age));
 
+    pthread_mutex_lock(&mutex);
     it = find(scr);
     if (it != ScanCache::end()) {
         erase(it);
@@ -48,6 +50,7 @@ void ScanCache::add(const struct stat *stat, const int response) {
     if (!this->insert(scr).second) {
         delete scr;
     }
+    pthread_mutex_unlock(&mutex);
 }
 
 /**
@@ -56,18 +59,24 @@ void ScanCache::add(const struct stat *stat, const int response) {
  * @return response to be used for fanotify (FAN_ALLOW, FAN_DENY) or -1
  */
 int ScanCache::get(const struct stat *stat) {
+    int ret;
     ScanCache::iterator it;
     ScanResult *scr = new ScanResult();
     scr->dev = stat->st_dev;
     scr->ino = stat->st_ino;
 
+    pthread_mutex_lock(&mutex);
     it = find(scr);
     delete scr;
     if (it == ScanCache::end()) {
-        return -1;
+        pthread_mutex_unlock(&mutex);
+        ret = -1;
+    } else {
+        scr = *it;
+        ret = scr->response;
     }
-    scr = *it;
-    return scr->response;
+    pthread_mutex_unlock(&mutex);
+    return ret;
 }
 
 /**
@@ -80,11 +89,13 @@ void ScanCache::remove(const struct stat *stat) {
     scr->dev = stat->st_dev;
     scr->ino = stat->st_ino;
 
+    pthread_mutex_lock(&mutex);
     it = find(scr);
     if (it != ScanCache::end()) {
         delete *it;
         erase(it);
     }
+    pthread_mutex_unlock(&mutex);
     delete scr;
 }
 
@@ -94,5 +105,6 @@ ScanCache::~ScanCache() {
         delete *pos;
     }
     this->clear();
+    pthread_mutex_destroy(&mutex);
 }
 

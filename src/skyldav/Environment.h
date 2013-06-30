@@ -24,7 +24,8 @@
 #ifndef ENVIRONMENT_H
 #define	ENVIRONMENT_H
 
-#include <StringSet.h>
+#include "ScanCache.h"
+#include "StringSet.h"
 
 class Environment {
 public:
@@ -32,6 +33,7 @@ public:
     StringSet *getNoMarkFileSystems();
     StringSet *getNoMarkMounts();
     StringSet *getLocalFileSystems();
+    ScanCache *getScanCache();
     int getNumberOfThreads();
     void setNumberOfThreads(int);
     virtual ~Environment();
@@ -49,9 +51,13 @@ private:
      */
     StringSet *localfs;
     /**
-     * @brief Number of threads for virus scanning
+     * @brief Number of threads for virus scanning.
      */
     int nThreads;
+    /**
+     * @brief Cache for scan results.
+     */
+    ScanCache *scache;
 };
 
 #endif	/* ENVIRONMENT_H */

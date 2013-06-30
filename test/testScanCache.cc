@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "ScanCache.h"
+#include "Environment.h"
 
 static void checkEqual(const int actual, const int expected, const char *lbl) {
     if (actual != expected) {
@@ -35,11 +36,13 @@ int main(int argc, char *argv[]) {
     int actual, expected;
     int ret = EXIT_SUCCESS;
     ScanCache *c;
+    Environment *e;
     struct stat *stat;
 
     stat = (struct stat *) malloc(sizeof (struct stat));
 
-    c = new ScanCache();
+    e = new Environment();
+    c = e->getScanCache();
 
     try {
         stat->st_dev = 13;
@@ -76,11 +79,11 @@ int main(int argc, char *argv[]) {
         c->remove(stat);
         checkEqual(c->get(stat), -1, "Search after remove");
         
-    } catch (int e) {
-        ret = e;
+    } catch (int ex) {
+        ret = ex;
     }
 
-    delete c;
+    delete e;
     free(stat);
     return ret;
 }

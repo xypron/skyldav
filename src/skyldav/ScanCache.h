@@ -24,6 +24,7 @@
 #ifndef SCANCACHE_H
 #define	SCANCACHE_H
 
+#include <pthread.h>
 #include <set>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -89,7 +90,10 @@ public:
     void remove(const struct stat *);
     virtual ~ScanCache();
 private:
-
+    /**
+     * @brief Mutex used when reading from or writing to the cache.
+     */
+    pthread_mutex_t mutex;
 };
 
 #endif	/* SCANCACHE_H */
