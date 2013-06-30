@@ -136,8 +136,6 @@ void* FanotifyPolling::scanFile(void *workitem) {
     struct ScanTask *task = (struct ScanTask *) workitem;
     struct fanotify_response response;
     pid_t pid;
-    char path[PATH_MAX];
-    int path_len;
     struct stat statbuf;
 
     if (task->metadata.mask & FAN_ALL_PERM_EVENTS) {
@@ -161,17 +159,6 @@ void* FanotifyPolling::scanFile(void *workitem) {
                 response.response = FAN_ALLOW;
             } else {
                 response.response = FAN_DENY;
-
-                if (task->metadata.fd >= 0) {
-                    sprintf(path, "/proc/self/fd/%d", task->metadata.fd);
-                    path_len = readlink(path, path, sizeof (path) - 1);
-                    if (path_len > 0) {
-                        path[path_len] = '\0';
-                        std::stringstream msg;
-                        msg << "Access to file \"" << path << "\" denied.";
-                        Messaging::message(Messaging::WARNING, msg.str());
-                    }
-                }
             }
             ret = task->fp->writeResponse(response, 1);
         }
@@ -428,6 +415,19 @@ int FanotifyPolling::writeResponse(const struct fanotify_response response,
         ret = fstat(response.fd, &statbuf);
         if (ret != -1) {
             e->getScanCache()->add(&statbuf, response.response);
+        }
+    }
+
+    if (response.response == FAN_DENY && response.fd >= FAN_NOFD) {
+        char path[PATH_MAX];
+        int path_len;
+        sprintf(path, "/proc/self/fd/%d", response.fd);
+        path_len = readlink(path, path, sizeof (path) - 1);
+        if (path_len > 0) {
+            path[path_len] = '\0';
+            std::stringstream msg;
+            msg << "Access to file \"" << path << "\" denied.";
+            Messaging::message(Messaging::WARNING, msg.str());
         }
     }
 
