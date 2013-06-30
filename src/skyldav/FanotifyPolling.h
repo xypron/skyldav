@@ -112,7 +112,7 @@ extern "C" {
         void handleFanotifyEvent(const struct fanotify_event_metadata *);
         
         
-        int writeResponse(const struct fanotify_response response);
+        int writeResponse(const struct fanotify_response, int);
         int fanotifyOpen();
         int fanotifyClose();
     };

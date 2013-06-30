@@ -27,7 +27,7 @@ Environment::Environment() {
     nomarkfs = new StringSet();
     nomarkmnt = new StringSet();
     localfs = new StringSet();
-    scache = new ScanCache();
+    scache = new ScanCache(this);
     nThreads = 4;
 }
 

@@ -21,10 +21,16 @@
  * @file ScanCache.h
  * @brief Cache for virus scanning results.
  */
-#include "ScanCache.h"
+#include <iostream>
+#include <sstream>
 #include <time.h>
+#include "Messaging.h"
+#include "ScanCache.h"
 
-ScanCache::ScanCache() {
+ScanCache::ScanCache(Environment *env) {
+    e = env;
+    hits = 0;
+    misses = 0;
     pthread_mutex_init(&mutex, NULL);
 }
 
@@ -33,7 +39,7 @@ ScanCache::ScanCache() {
  * @param stat File status as returned by fstat()
  * @param response Response to be used for fanotify (FAN_ALLOW, FAN_DENY)
  */
-void ScanCache::add(const struct stat *stat, const int response) {
+void ScanCache::add(const struct stat *stat, const unsigned int response) {
     ScanCache::iterator it;
     ScanResult *scr = new ScanResult();
     scr->dev = stat->st_dev;
@@ -56,7 +62,7 @@ void ScanCache::add(const struct stat *stat, const int response) {
 /**
  * @brief Adds scan result to cache.
  * @param stat file status as returned by fstat()
- * @return response to be used for fanotify (FAN_ALLOW, FAN_DENY) or -1
+ * @return response to be used for fanotify (FAN_ALLOW, FAN_DENY) or CACHE_MISS
  */
 int ScanCache::get(const struct stat *stat) {
     int ret;
@@ -70,10 +76,12 @@ int ScanCache::get(const struct stat *stat) {
     delete scr;
     if (it == ScanCache::end()) {
         pthread_mutex_unlock(&mutex);
-        ret = -1;
+        ret = CACHE_MISS;
+        misses++;
     } else {
         scr = *it;
         ret = scr->response;
+        hits++;
     }
     pthread_mutex_unlock(&mutex);
     return ret;
@@ -101,10 +109,13 @@ void ScanCache::remove(const struct stat *stat) {
 
 ScanCache::~ScanCache() {
     ScanCache::iterator pos;
+    std::stringstream msg;
     for (pos = begin(); pos != end(); pos++) {
         delete *pos;
     }
     this->clear();
     pthread_mutex_destroy(&mutex);
+    msg << "Cache hits " << hits << ", cache misses " << misses << ".";
+    Messaging::message(Messaging::DEBUG, msg.str());
 }
 

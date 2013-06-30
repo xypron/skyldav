@@ -173,7 +173,7 @@ void* FanotifyPolling::scanFile(void *workitem) {
                     }
                 }
             }
-            ret = task->fp->writeResponse(response);
+            ret = task->fp->writeResponse(response, 1);
         }
     }
     close(task->metadata.fd);
@@ -206,7 +206,7 @@ void FanotifyPolling::handleFanotifyEvent(
         msg << "analyze: failure to read file status: "
                 << strerror(errno);
         Messaging::message(Messaging::ERROR, msg.str());
-        ret = writeResponse(response);
+        ret = writeResponse(response, 0);
     } else {
         if (metadata->mask & FAN_MODIFY) {
             if (S_ISREG(statbuf.st_mode)) {
@@ -218,59 +218,40 @@ void FanotifyPolling::handleFanotifyEvent(
                 if (ret == -1) {
                     perror("analyze: fanotify_mark");
                 }
-            }
-            if (metadata->fd >= 0) {
-                char path[PATH_MAX];
-                int path_len;
-                sprintf(path, "/proc/self/fd/%d", metadata->fd);
-                path_len = readlink(path, path, sizeof (path) - 1);
-                if (path_len > 0) {
-                    path[path_len] = '\0';
-                    printf("FAN_MODIFY %s\n", path);
-                }
+                e->getScanCache()->remove(&statbuf);
             }
         }
         if (metadata->mask & FAN_OPEN_PERM) {
-
-            if (metadata->fd >= 0) {
-                char path[PATH_MAX];
-                int path_len;
-                sprintf(path, "/proc/self/fd/%d", metadata->fd);
-                path_len = readlink(path, path, sizeof (path) - 1);
-                if (path_len > 0) {
-                    path[path_len] = '\0';
-                    printf("FAN_OPEN_PERM %s\n", path);
-                }
-            }
-
             response.fd = metadata->fd;
             response.response = FAN_ALLOW;
             pid = getpid();
             if (pid == metadata->pid) {
                 // For same process always allow.
-                ret = writeResponse(response);
+                ret = writeResponse(response, 0);
             } else if (!S_ISREG(statbuf.st_mode)) {
                 // For directories always allow.
-                ret = writeResponse(response);
+                ret = writeResponse(response, 0);
             } else {
                 // It is a file.
                 ret = fanotify_mark(fd, FAN_MARK_REMOVE |
                         FAN_MARK_IGNORED_MASK, FAN_MODIFY, metadata->fd,
                         NULL);
-                if (ret == -1) {
-                    perror("analyze: fanotify_mark");
-                }
-                task = (struct ScanTask *) malloc(sizeof (struct ScanTask));
-                if (task == NULL) {
-                    Messaging::message(Messaging::ERROR, "Out of memory\n");
-                    response.fd = metadata->fd;
-                    response.response = FAN_ALLOW;
-                    ret = writeResponse(response);
+                response.response = e->getScanCache()->get(&statbuf);
+                if (response.response == ScanCache::CACHE_MISS) {
+                    task = (struct ScanTask *) malloc(sizeof (struct ScanTask));
+                    if (task == NULL) {
+                        Messaging::message(Messaging::ERROR, "Out of memory\n");
+                        response.fd = metadata->fd;
+                        response.response = FAN_ALLOW;
+                        ret = writeResponse(response, 0);
+                    } else {
+                        tobeclosed = 0;
+                        task->metadata = *metadata;
+                        task->fp = this;
+                        tp->add((void *) task);
+                    }
                 } else {
-                    tobeclosed = 0;
-                    task->metadata = *metadata;
-                    task->fp = this;
-                    tp->add((void *) task);
+                    ret = writeResponse(response, 0);
                 }
             }
         } // FAN_OPEN_PERM
@@ -432,15 +413,28 @@ FanotifyPolling::~FanotifyPolling() {
 /**
  * @brief Writes fanotify response
  * @param response response
+ * @param doBuffer if != 0 write to buffer
  * @return success = 0
  */
-int FanotifyPolling::writeResponse(const struct fanotify_response response) {
+int FanotifyPolling::writeResponse(const struct fanotify_response response,
+        int doBuffer) {
     int ret = 0;
+    struct stat statbuf;
 
     pthread_mutex_lock(&mutex_response);
+
+    if (doBuffer) {
+        // Add file to scan buffer.
+        ret = fstat(response.fd, &statbuf);
+        if (ret != -1) {
+            e->getScanCache()->add(&statbuf, response.response);
+        }
+    }
+
     ret = write(fd, &response, sizeof (struct fanotify_response));
     if (ret == -1 && errno != ENOENT) {
-        fprintf(stderr, "Failure to write response: %s\n",
+        fprintf(stderr, "Failure to write response %u: %s\n",
+                response.response,
                 strerror(errno));
         syslog(LOG_CRIT, "Failure to write response: %s",
                 strerror(errno));

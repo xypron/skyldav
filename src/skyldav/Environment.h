@@ -27,6 +27,8 @@
 #include "ScanCache.h"
 #include "StringSet.h"
 
+class ScanCache;
+
 class Environment {
 public:
     Environment();

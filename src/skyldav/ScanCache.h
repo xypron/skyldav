@@ -28,6 +28,9 @@
 #include <set>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include "Environment.h"
+
+class Environment;
 
 struct ScanResult {
 public:
@@ -46,7 +49,7 @@ public:
     /**
      * @brief Result of scan.
      */
-    int response; /* FAN_ALLOW or FAN_DENY */    
+    unsigned int response; /* FAN_ALLOW or FAN_DENY */    
     /**
      * @brief Time when this record entered the cache.
      */
@@ -84,8 +87,12 @@ public:
  */
 class ScanCache : std::set<ScanResult *, ScanResultComperator> {
 public:
-    ScanCache();
-    void add(const struct stat *, const int);
+    /**
+     * @brief No matching element found in cache.
+     */
+    static const unsigned int CACHE_MISS = 0xfffd;
+    ScanCache(Environment *);
+    void add(const struct stat *, const unsigned int);
     int get(const struct stat *);
     void remove(const struct stat *);
     virtual ~ScanCache();
@@ -94,6 +101,13 @@ private:
      * @brief Mutex used when reading from or writing to the cache.
      */
     pthread_mutex_t mutex;
+    /**
+     * @brief Environment.
+     */
+    Environment *e;
+    
+    unsigned long long misses;
+    unsigned long long hits;
 };
 
 #endif	/* SCANCACHE_H */
