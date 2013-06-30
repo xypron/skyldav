@@ -3,7 +3,7 @@
 # Builds Debian package.
 
 # Clean up
-git clean
+git clean -df
 
 # Make distribution files.
 ./autogen.sh
