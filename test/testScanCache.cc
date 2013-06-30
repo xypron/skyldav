@@ -62,19 +62,19 @@ int main(int argc, char *argv[]) {
 
         stat->st_dev = 12;
         stat->st_ino = 100;
-        checkEqual(c->get(stat), ScanCache::CACHE_MISS, "Search other dev");
+        checkEqual(c->get(stat), ScanCache::CACHE_MISS, "Search lower dev");
 
         stat->st_dev = 14;
         stat->st_ino = 100;
-        checkEqual(c->get(stat), ScanCache::CACHE_MISS, "Search other dev");
+        checkEqual(c->get(stat), ScanCache::CACHE_MISS, "Search higher dev");
 
         stat->st_dev = 13;
         stat->st_ino = 99;
-        checkEqual(c->get(stat), ScanCache::CACHE_MISS, "Search other inode");
+        checkEqual(c->get(stat), ScanCache::CACHE_MISS, "Search lower inode");
 
         stat->st_dev = 13;
         stat->st_ino = 101;
-        checkEqual(c->get(stat), ScanCache::CACHE_MISS, "Search other inode");
+        checkEqual(c->get(stat), ScanCache::CACHE_MISS, "Search higher inode");
 
         c->add(stat, 3);
         checkEqual(c->get(stat), 3, "Search after insert");
