@@ -1,4 +1,4 @@
-skyldav (0.2-6) unstable; urgency=low
+skyldav (0.2-7) unstable; urgency=low
 
   * Debug package added
   * Cache for scan results implemented

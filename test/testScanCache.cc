@@ -48,9 +48,10 @@ int main(int argc, char *argv[]) {
     c = e->getScanCache();
 
     try {
+        // Check basic insert, remove, get logic.
         stat->st_dev = 13;
         stat->st_ino = 100;
-        stat->st_mtime = -1;
+        stat->st_mtime = 1000;
 
         checkEqual(c->get(stat), ScanCache::CACHE_MISS, "Search in empty set");
 
@@ -82,6 +83,20 @@ int main(int argc, char *argv[]) {
         c->remove(stat);
         checkEqual(c->get(stat), ScanCache::CACHE_MISS, "Search after remove");
 
+        // Check that changes in time lead to deletion from cache.
+        stat->st_dev = 1;
+        stat->st_ino = 99;
+        stat->st_mtime = 100;
+        c->add(stat, 1);
+        checkEqual(c->get(stat), 1, "Search after insert");
+        stat->st_mtime = 101;
+        checkEqual(c->get(stat), ScanCache::CACHE_MISS,
+                "Search after time change (2)");
+        stat->st_mtime = 100;
+        checkEqual(c->get(stat), ScanCache::CACHE_MISS,
+                "Search time reset");
+        
+        
     } catch (int ex) {
         ret = ex;
     }

@@ -29,6 +29,7 @@
 
 ScanCache::ScanCache(Environment *env) {
     e = env;
+    s = new std::set<ScanResult *, ScanResultComperator>();
     hits = 0;
     misses = 0;
     pthread_mutex_init(&mutex, NULL);
@@ -40,7 +41,7 @@ ScanCache::ScanCache(Environment *env) {
  * @param response Response to be used for fanotify (FAN_ALLOW, FAN_DENY)
  */
 void ScanCache::add(const struct stat *stat, const unsigned int response) {
-    ScanCache::iterator it;
+    std::set<ScanResult *, ScanResultComperator>::iterator it;
     ScanResult *scr = new ScanResult();
     scr->dev = stat->st_dev;
     scr->ino = stat->st_ino;
@@ -49,11 +50,11 @@ void ScanCache::add(const struct stat *stat, const unsigned int response) {
     gmtime(&(scr->age));
 
     pthread_mutex_lock(&mutex);
-    it = find(scr);
-    if (it != ScanCache::end()) {
-        erase(it);
+    it = s->find(scr);
+    if (it != s->end()) {
+        s->erase(it);
     }
-    if (!this->insert(scr).second) {
+    if (!s->insert(scr).second) {
         delete scr;
     }
     pthread_mutex_unlock(&mutex);
@@ -66,22 +67,30 @@ void ScanCache::add(const struct stat *stat, const unsigned int response) {
  */
 int ScanCache::get(const struct stat *stat) {
     int ret;
-    ScanCache::iterator it;
+    std::set<ScanResult *, ScanResultComperator>::iterator it;
     ScanResult *scr = new ScanResult();
     scr->dev = stat->st_dev;
     scr->ino = stat->st_ino;
 
     pthread_mutex_lock(&mutex);
-    it = find(scr);
+    it = s->find(scr);
     delete scr;
-    if (it == ScanCache::end()) {
+    if (it == s->end()) {
         pthread_mutex_unlock(&mutex);
         ret = CACHE_MISS;
         misses++;
     } else {
         scr = *it;
-        ret = scr->response;
-        hits++;
+        // Check modification time.
+        if (scr->mtime == stat->st_mtime) {
+            ret = scr->response;
+            hits++;
+        } else {
+            delete *it;
+            s->erase(it);
+            ret = CACHE_MISS;
+            misses++;
+        }
     }
     pthread_mutex_unlock(&mutex);
     return ret;
@@ -92,30 +101,29 @@ int ScanCache::get(const struct stat *stat) {
  * @param stat file status as returned by fstat()
  */
 void ScanCache::remove(const struct stat *stat) {
-    ScanCache::iterator it;
+    std::set<ScanResult *, ScanResultComperator>::iterator it;
     ScanResult *scr = new ScanResult();
     scr->dev = stat->st_dev;
     scr->ino = stat->st_ino;
 
     pthread_mutex_lock(&mutex);
-    it = find(scr);
-    if (it != ScanCache::end()) {
+    it = s->find(scr);
+    if (it != s->end()) {
         delete *it;
-        erase(it);
+        s->erase(it);
     }
     pthread_mutex_unlock(&mutex);
     delete scr;
 }
 
 ScanCache::~ScanCache() {
-    ScanCache::iterator pos;
+    std::set<ScanResult *, ScanResultComperator>::iterator pos;
     std::stringstream msg;
-    for (pos = begin(); pos != end(); pos++) {
+    for (pos = s->begin(); pos != s->end(); pos++) {
         delete *pos;
     }
-    this->clear();
+    s->clear();
     pthread_mutex_destroy(&mutex);
     msg << "Cache hits " << hits << ", cache misses " << misses << ".";
     Messaging::message(Messaging::DEBUG, msg.str());
 }
-

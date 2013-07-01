@@ -88,7 +88,7 @@ public:
 /**
  * @brief cache for virus scanning results.
  */
-class ScanCache : std::set<ScanResult *, ScanResultComperator> {
+class ScanCache {
 public:
     /**
      * @brief No matching element found in cache.
@@ -100,6 +100,10 @@ public:
     void remove(const struct stat *);
     virtual ~ScanCache();
 private:
+    /**
+     * Cache data set.
+     */
+    std::set<ScanResult *, ScanResultComperator> *s;
     /**
      * @brief Mutex used when reading from or writing to the cache.
      */
