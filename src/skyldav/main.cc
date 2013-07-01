@@ -51,13 +51,21 @@
 static int confcb(const char *key, const char *value, void *info) {
     Environment *e = (Environment *) info;
     int ret = 0;
+    unsigned int cacheMaxSize;
     int nThread;
 
     if (e == NULL) {
         throw 0;
     }
 
-    if (!strcmp(key, "NOMARK_FS")) {
+    if (!strcmp(key, "CACHE_MAX_SIZE")) {
+        std::stringstream ss(value);
+        ss >> cacheMaxSize;
+        if (ss.fail()) {
+            ret = 1;
+        }
+        e->setCacheMaxSize(cacheMaxSize);
+    } else if (!strcmp(key, "NOMARK_FS")) {
         e->getNoMarkFileSystems()->add(value);
     } else if (!strcmp(key, "NOMARK_MNT")) {
         e->getNoMarkMounts()->add(value);

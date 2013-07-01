@@ -48,6 +48,10 @@ unsigned int Environment::getCacheMaxSize() {
     return cacheMaxSize;
 }
 
+void Environment::setCacheMaxSize(unsigned int size) {
+    cacheMaxSize = size;
+}
+
 ScanCache *Environment::getScanCache() {
     return scache;
 }

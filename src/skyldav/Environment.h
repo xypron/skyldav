@@ -42,6 +42,7 @@ public:
     StringSet *getNoMarkMounts();
     StringSet *getLocalFileSystems();
     unsigned int getCacheMaxSize();
+    void setCacheMaxSize(unsigned int);
     ScanCache *getScanCache();
     int getNumberOfThreads();
     void setNumberOfThreads(int);

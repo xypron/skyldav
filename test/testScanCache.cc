@@ -95,6 +95,35 @@ int main(int argc, char *argv[]) {
         stat->st_mtime = 100;
         checkEqual(c->get(stat), ScanCache::CACHE_MISS,
                 "Search time reset");
+
+        // Check that cache size is considered.
+        e->setCacheMaxSize(500);
+        stat->st_dev = 1;
+        stat->st_mtime = 100;
+
+        for (stat->st_ino = 1000; stat->st_ino > 0; stat->st_ino--) {
+            c->add(stat, 3);
+        }
+        for (stat->st_ino = 1; stat->st_ino <= 1000; stat->st_ino++) {
+            if (c->get(stat) == ScanCache::CACHE_MISS) {
+                break;
+            }
+        }
+        checkEqual(stat->st_ino, 501, "Cache size");
+
+        e->setCacheMaxSize(50);
+        stat->st_dev = 2;
+        stat->st_mtime = 100;
+
+        for (stat->st_ino = 100; stat->st_ino > 0; stat->st_ino--) {
+            c->add(stat, 3);
+        }
+        for (stat->st_ino = 1; stat->st_ino <= 100; stat->st_ino++) {
+            if (c->get(stat) == ScanCache::CACHE_MISS) {
+                break;
+            }
+        }
+        checkEqual(stat->st_ino, 51, "Cache resize");
         
         
     } catch (int ex) {

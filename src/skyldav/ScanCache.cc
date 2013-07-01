@@ -47,7 +47,6 @@ void ScanCache::add(const struct stat *stat, const unsigned int response) {
     std::pair < std::set<ScanResult *, ScanResultComperator>::iterator, bool> pair;
 
     ScanResult *scr = new ScanResult();
-    ScanResult *oldLeft;
     scr->dev = stat->st_dev;
     scr->ino = stat->st_ino;
     scr->mtime = stat->st_mtime;
@@ -62,17 +61,19 @@ void ScanCache::add(const struct stat *stat, const unsigned int response) {
         (*it)->right->left = (*it)->left;
         delete *it;
         s->erase(it);
-    } else if (s->size() > e->getCacheMaxSize()) {
-        // Cache size too big. Get last element.
-        it = s->find(root.left);
-        if (it != s->end()) {
-            // Remove from linked list and delete.
-            (*it)->left->right = (*it)->right;
-            (*it)->right->left = (*it)->left;
-            delete *it;
-            s->erase(it);
+    } else while (s->size() >= e->getCacheMaxSize()) {
+            // Cache size too big. Get last element.
+            it = s->find(root.left);
+            if (it != s->end()) {
+                // Remove from linked list and delete.
+                (*it)->left->right = (*it)->right;
+                (*it)->right->left = (*it)->left;
+                delete *it;
+                s->erase(it);
+            } else {
+                break;
+            }
         }
-    }
     pair = s->insert(scr);
     if (pair.second) {
         // Successful insertion. Introduce leftmost in linked list.
@@ -159,11 +160,12 @@ void ScanCache::remove(const struct stat *stat) {
 ScanCache::~ScanCache() {
     std::set<ScanResult *, ScanResultComperator>::iterator pos;
     std::stringstream msg;
+    msg << "Cache size " << s->size() <<
+            ", cache hits " << hits << ", cache misses " << misses << ".";
     for (pos = s->begin(); pos != s->end(); pos++) {
         delete *pos;
     }
     s->clear();
     pthread_mutex_destroy(&mutex);
-    msg << "Cache hits " << hits << ", cache misses " << misses << ".";
-    Messaging::message(Messaging::DEBUG, msg.str());
+    Messaging::message(Messaging::INFORMATION, msg.str());
 }
