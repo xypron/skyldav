@@ -198,7 +198,6 @@ static void daemonize(Environment *e) {
     }
     if (pid != 0) {
         // Exit calling process.
-        delete e;
         exit(EXIT_SUCCESS);
     }
     // Change working directory.
@@ -207,8 +206,8 @@ static void daemonize(Environment *e) {
         delete e;
         exit(EXIT_FAILURE);
     }
-    // Set the user file creation mask to zero.
-    umask(0);
+    // Set the user file creation mask.
+    umask(022);
     // Set new session ID
     if (setsid() == -1) {
         perror("Cannot create session");
