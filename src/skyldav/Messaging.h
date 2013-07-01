@@ -29,6 +29,9 @@
 #ifndef MESSAGING_H
 #define	MESSAGING_H
 
+/**
+ * @brief Outputs messages to system and application log and to the console.
+ */
 class Messaging {
 public:
     enum Level{

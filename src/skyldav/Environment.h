@@ -29,6 +29,11 @@
 
 class ScanCache;
 
+/**
+ * @brief The environment holds variables that are shared by instances of
+ * multiple classes.
+ */
+
 class Environment {
 public:
     Environment();

@@ -32,6 +32,9 @@
 
 class Environment;
 
+/**
+ * @brief Result of scanning a file for viruses.
+ */
 struct ScanResult {
 public:
     /**
