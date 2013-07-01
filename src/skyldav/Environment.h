@@ -24,6 +24,7 @@
 #ifndef ENVIRONMENT_H
 #define	ENVIRONMENT_H
 
+#include <set>
 #include "ScanCache.h"
 #include "StringSet.h"
 
@@ -40,7 +41,7 @@ public:
     StringSet *getNoMarkFileSystems();
     StringSet *getNoMarkMounts();
     StringSet *getLocalFileSystems();
-    int getCacheMaxSize();
+    unsigned int getCacheMaxSize();
     ScanCache *getScanCache();
     int getNumberOfThreads();
     void setNumberOfThreads(int);
@@ -69,7 +70,7 @@ private:
     /**
      * @brief Maximum cache size.
      */
-    int cacheMaxSize;
+    unsigned int cacheMaxSize;
 };
 
 #endif	/* ENVIRONMENT_H */

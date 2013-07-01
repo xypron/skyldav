@@ -44,7 +44,7 @@ StringSet *Environment::getLocalFileSystems() {
     return localfs;
 }
 
-int Environment::getCacheMaxSize() {
+unsigned int Environment::getCacheMaxSize() {
     return cacheMaxSize;
 }
 

@@ -58,22 +58,23 @@ void ScanCache::add(const struct stat *stat, const unsigned int response) {
     it = s->find(scr);
     if (it != s->end()) {
         // Old matching entry found. Remove from linked list and delete.
-        *it->left->right = *it->right;
-        *it->right->left = *it->left;
+        (*it)->left->right = (*it)->right;
+        (*it)->right->left = (*it)->left;
         delete *it;
         s->erase(it);
     } else if (s->size() > e->getCacheMaxSize()) {
         // Cache size too big. Get last element.
-        *it = s->end();
-        it--;
-        // Remove from linked list and delete.
-        *it->left->right = *it->right;
-        *it->right->left = *it->left;
-        delete *it;
-        s->erase(it);
+        it = s->find(root.left);
+        if (it != s->end()) {
+            // Remove from linked list and delete.
+            (*it)->left->right = (*it)->right;
+            (*it)->right->left = (*it)->left;
+            delete *it;
+            s->erase(it);
+        }
     }
     pair = s->insert(scr);
-    if (s->insert(scr).second) {
+    if (pair.second) {
         // Successful insertion. Introduce leftmost in linked list.
         root.right->left = scr;
         scr->right = root.right;
@@ -120,8 +121,8 @@ int ScanCache::get(const struct stat *stat) {
             hits++;
         } else {
             // Remove outdated element from linked list and delete it.
-            *it->left->right = *it->right;
-            *it->right->left = *it->left;
+            (*it)->left->right = (*it)->right;
+            (*it)->right->left = (*it)->left;
             delete *it;
             s->erase(it);
             ret = CACHE_MISS;
@@ -146,8 +147,8 @@ void ScanCache::remove(const struct stat *stat) {
     it = s->find(scr);
     if (it != s->end()) {
         // Remove from linked list and delete.
-        *it->left->right = *it->right;
-        *it->right->left = *it->left;
+        (*it)->left->right = (*it)->right;
+        (*it)->right->left = (*it)->left;
         delete *it;
         s->erase(it);
     }
