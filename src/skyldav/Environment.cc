@@ -29,6 +29,7 @@ Environment::Environment() {
     localfs = new StringSet();
     scache = new ScanCache(this);
     nThreads = 4;
+    cacheMaxSize = 10000;
 }
 
 StringSet *Environment::getNoMarkFileSystems() {
@@ -41,6 +42,10 @@ StringSet *Environment::getNoMarkMounts() {
 
 StringSet *Environment::getLocalFileSystems() {
     return localfs;
+}
+
+int Environment::getCacheMaxSize() {
+    return cacheMaxSize;
 }
 
 ScanCache *Environment::getScanCache() {

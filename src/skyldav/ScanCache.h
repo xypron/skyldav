@@ -57,6 +57,14 @@ public:
      * @brief Time when this record entered the cache.
      */
     time_t age;
+    /**
+     * @brief Left neighbour in double linked list.
+     */
+    ScanResult *left;
+    /**
+     * @brief Right neighbour in double linked list.
+     */
+    ScanResult *right;
 };
 
 /**
@@ -112,9 +120,18 @@ private:
      * @brief Environment.
      */
     Environment *e;
-    
+    /**
+     * @brief Number of cache misses.
+     */
     unsigned long long misses;
+    /**
+     * @brief Number of cache hits.
+     */
     unsigned long long hits;
+    /**
+     * @brief Root for double linked list.
+     */
+    ScanResult root;
 };
 
 #endif	/* SCANCACHE_H */

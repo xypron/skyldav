@@ -32,6 +32,8 @@ ScanCache::ScanCache(Environment *env) {
     s = new std::set<ScanResult *, ScanResultComperator>();
     hits = 0;
     misses = 0;
+    root.left = &root;
+    root.right = &root;
     pthread_mutex_init(&mutex, NULL);
 }
 
@@ -42,7 +44,10 @@ ScanCache::ScanCache(Environment *env) {
  */
 void ScanCache::add(const struct stat *stat, const unsigned int response) {
     std::set<ScanResult *, ScanResultComperator>::iterator it;
+    std::pair < std::set<ScanResult *, ScanResultComperator>::iterator, bool> pair;
+
     ScanResult *scr = new ScanResult();
+    ScanResult *oldLeft;
     scr->dev = stat->st_dev;
     scr->ino = stat->st_ino;
     scr->mtime = stat->st_mtime;
@@ -52,9 +57,30 @@ void ScanCache::add(const struct stat *stat, const unsigned int response) {
     pthread_mutex_lock(&mutex);
     it = s->find(scr);
     if (it != s->end()) {
+        // Old matching entry found. Remove from linked list and delete.
+        *it->left->right = *it->right;
+        *it->right->left = *it->left;
+        delete *it;
+        s->erase(it);
+    } else if (s->size() > e->getCacheMaxSize()) {
+        // Cache size too big. Get last element.
+        *it = s->end();
+        it--;
+        // Remove from linked list and delete.
+        *it->left->right = *it->right;
+        *it->right->left = *it->left;
+        delete *it;
         s->erase(it);
     }
-    if (!s->insert(scr).second) {
+    pair = s->insert(scr);
+    if (s->insert(scr).second) {
+        // Successful insertion. Introduce leftmost in linked list.
+        root.right->left = scr;
+        scr->right = root.right;
+        scr->left = &root;
+        root.right = scr;
+    } else {
+        // element already existed
         delete scr;
     }
     pthread_mutex_unlock(&mutex);
@@ -76,16 +102,26 @@ int ScanCache::get(const struct stat *stat) {
     it = s->find(scr);
     delete scr;
     if (it == s->end()) {
-        pthread_mutex_unlock(&mutex);
         ret = CACHE_MISS;
         misses++;
     } else {
         scr = *it;
         // Check modification time.
         if (scr->mtime == stat->st_mtime) {
+            // Element is valid. Remove it from linked list.
+            scr->left->right = scr->right;
+            scr->right->left = scr->left;
+            // Insert it leftmost.
+            root.right->left = scr;
+            scr->right = root.right;
+            scr->left = &root;
+            root.right = scr;
             ret = scr->response;
             hits++;
         } else {
+            // Remove outdated element from linked list and delete it.
+            *it->left->right = *it->right;
+            *it->right->left = *it->left;
             delete *it;
             s->erase(it);
             ret = CACHE_MISS;
@@ -97,7 +133,7 @@ int ScanCache::get(const struct stat *stat) {
 }
 
 /**
- * @brief Adds scan result to cache.
+ * @brief Remove scan result from cache.
  * @param stat file status as returned by fstat()
  */
 void ScanCache::remove(const struct stat *stat) {
@@ -109,6 +145,9 @@ void ScanCache::remove(const struct stat *stat) {
     pthread_mutex_lock(&mutex);
     it = s->find(scr);
     if (it != s->end()) {
+        // Remove from linked list and delete.
+        *it->left->right = *it->right;
+        *it->right->left = *it->left;
         delete *it;
         s->erase(it);
     }

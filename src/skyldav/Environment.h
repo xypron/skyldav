@@ -40,6 +40,7 @@ public:
     StringSet *getNoMarkFileSystems();
     StringSet *getNoMarkMounts();
     StringSet *getLocalFileSystems();
+    int getCacheMaxSize();
     ScanCache *getScanCache();
     int getNumberOfThreads();
     void setNumberOfThreads(int);
@@ -65,6 +66,10 @@ private:
      * @brief Cache for scan results.
      */
     ScanCache *scache;
+    /**
+     * @brief Maximum cache size.
+     */
+    int cacheMaxSize;
 };
 
 #endif	/* ENVIRONMENT_H */
