@@ -2,8 +2,13 @@ Building from git repository
 ============================
 
 Install build dependencies. For Debian use the following command
-sudo apt-get install git autoconf-archive libclamav-dev libmount-dev \
-  libcap-dev pkg-config
+sudo apt-get install git autoconf-archive autotools-dev pkg-config \
+libc6-dev libcanberra-dev libcap-dev libclamav-dev libgtk2.0-dev \
+libmount-dev libnotify-dev
+
+For Fedora use the following command
+sudo yum install git libtool gcc-c++ gtk2-devel libnotify-devel \
+clamav-devel libcanberra-devel autoconf-archive libmount-devel libcap-devel
 
 # Clone repository
 git clone https://github.com/xypron/skyldav.git skyldav

@@ -25,8 +25,13 @@ Building from git repository
 ----------------------------
 
  Install build dependencies. For Debian use the following command
- <pre>sudo apt-get install git autoconf-archive libclamav-dev libmount-dev \
-  libcap-dev</pre>
+ <pre>sudo apt-get install git autoconf-archive autotools-dev pkg-config \
+ libc6-dev libcanberra-dev libcap-dev libclamav-dev libgtk2.0-dev \
+ libmount-dev libnotify-dev</pre>
+
+ For Fedora use the following command
+ <pre>sudo yum install git libtool gcc-c++ gtk2-devel libnotify-devel \
+ clamav-devel libcanberra-devel autoconf-archive libmount-devel libcap-devel</pre>
 
  Clone the git repository.
 

@@ -57,6 +57,8 @@ AC_CHECK_HEADER([canberra.h], [],
 NOTIFY_LIBS="-lcanberra $NOTIFY_LIBS"
 AC_CHECK_HEADER([libmount/libmount.h], [],
   [AC_MSG_ERROR([libmount/libmount.h header not found])])
+AC_CHECK_HEADER([sys/capability.h], [],
+  [AC_MSG_ERROR([sys/capability.h header not found])])
 PKG_CHECK_MODULES([SKYLDAV], [libclamav >= 0.97.8])
 SKYLDAV_LIBS="-lcap -lmount $SKYLDAV_LIBS"
 
