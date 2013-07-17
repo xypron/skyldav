@@ -3,6 +3,11 @@ dnl Skyld AV
 dnl Initialization
 AC_INIT([skyldav], [0.2], [xypron.glpk@gmx.de])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+
+dnl Archiver support.
+AM_PROG_AR
+
+dnl Enhanced libtool support.
 LT_INIT
 
 dnl Compiler check
