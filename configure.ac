@@ -52,11 +52,11 @@ dnl set linker flags
 LDFLAGS="-g $LDFLAGS"
 
 PKG_CHECK_MODULES([NOTIFY], [gtk+-2.0 >= 2.20.1 libnotify >= 0.5.0])
-AC_CHECK_HEADER([libmount.h], [],
-  [AC_MSG_ERROR([libmount.h header not found])])
 AC_CHECK_HEADER([canberra.h], [],
   [AC_MSG_ERROR([canberra.h header not found])])
 NOTIFY_LIBS="-lcanberra $NOTIFY_LIBS"
+AC_CHECK_HEADER([libmount/libmount.h], [],
+  [AC_MSG_ERROR([libmount/libmount.h header not found])])
 PKG_CHECK_MODULES([SKYLDAV], [libclamav >= 0.97.8])
 SKYLDAV_LIBS="-lcap -lmount $SKYLDAV_LIBS"
 
