@@ -58,11 +58,19 @@ extern "C" {
         int scan(const int fd);
         ~VirusScan();
     private:
-        void log_virus_found(const int fd, const char *virname);
+        /**
+         * @brief Struture indicating if database has changed.
+         */
+        struct cl_stat dbstat;
         /**
          * @brief Reference to virus scan engine.
          */
         struct cl_engine *engine;
+
+        void log_virus_found(const int fd, const char *virname);
+        void dbstat_clear();
+        int dbstat_check();
+        void dbstat_free();
     };
 #ifdef	__cplusplus
 }

@@ -20,6 +20,7 @@
  * @file VirusScan.cc
  * @brief Scans files for viruses.
  */
+#include <cstring>
 #include <limits.h>
 #include <sstream>
 #include <stdio.h>
@@ -120,6 +121,36 @@ int VirusScan::scan(const int fd) {
     }
     return success;
 }
+
+/**
+ * @brief Checks if database has changed.
+ * @returned 0 = unchanged, 1 = changed
+ */
+int VirusScan::dbstat_check() {
+    int ret = 0;
+	if(cl_statchkdir(&dbstat) == 1) {
+            ret = 1;
+	    cl_statfree(&dbstat);
+	    cl_statinidir(cl_retdbdir(), &dbstat);
+	}
+    return ret;
+}
+
+/**
+ * @brief Clears database status.
+ */
+void VirusScan::dbstat_clear() {
+    memset(&dbstat, 0, sizeof (struct cl_stat));
+    cl_statinidir(cl_retdbdir(), &dbstat);
+}
+
+/**
+ * @brief Frees database status.
+ */
+void VirusScan::dbstat_free() {
+    cl_statfree(&dbstat);
+}
+
 
 /**
  * @brief Deletes the virus scanner.
