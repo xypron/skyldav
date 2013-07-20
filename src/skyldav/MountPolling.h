@@ -55,7 +55,6 @@ extern "C" {
          * @brief fanotify file descriptor
          */
         int fd;
-        void callback();
         /**
          * @brief Mounts
          */
@@ -73,6 +72,9 @@ extern "C" {
          * @brief Status of thread.
          */
         sig_atomic_t status;
+
+        void callback();
+        int isFuse(const char *);
     };
 
 

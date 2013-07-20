@@ -150,9 +150,10 @@ void* FanotifyPolling::scanFile(void *workitem) {
             // For same process always allow.
             pid = getpid();
             if (pid == task->metadata.pid) {
+                // for Skyld AV process always allow.
                 response.response = FAN_ALLOW;
-                // For directories always allow.
             } else if (!S_ISREG(statbuf.st_mode)) {
+                // For directories always allow.
                 response.response = FAN_ALLOW;
             } else if (task->fp->virusScan->scan(task->metadata.fd)
                     == VirusScan::SCANOK) {
@@ -213,7 +214,7 @@ void FanotifyPolling::handleFanotifyEvent(
             response.response = FAN_ALLOW;
             pid = getpid();
             if (pid == metadata->pid) {
-                // For same process always allow.
+                // for Skyld AV process always allow.
                 ret = writeResponse(response, 0);
             } else if (!S_ISREG(statbuf.st_mode)) {
                 // For directories always allow.

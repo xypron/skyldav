@@ -132,15 +132,16 @@ void MountPolling::callback() {
             break;
         }
         while (!listmountnext(&dir, &type)) {
-            if (!MountPolling::nomarkfs->find(type)
-                    && !MountPolling::nomarkmnt->find(dir)) {
+            if (!isFuse(type)
+                    && !nomarkfs->find(type)
+                    && !nomarkmnt->find(dir)) {
                 cbmounts->add(dir);
             }
         }
     } while (0);
 
     for (pos = cbmounts->begin(); pos != cbmounts->end(); pos++) {
-        if (0 == MountPolling::mounts->count(*pos)) {
+        if (0 == mounts->count(*pos)) {
             str = *pos;
             FanotifyPolling::markMount(fd, str->c_str());
         }
@@ -152,10 +153,27 @@ void MountPolling::callback() {
         }
     }
 
-    delete(MountPolling::mounts);
-    MountPolling::mounts = cbmounts;
+    delete(mounts);
+    mounts = cbmounts;
 
     listmountfinalize();
+}
+
+/**
+ * @brief Checks if a mount is using a filesystem in userspace (fuse).
+ * @param type mount type
+ * @return 1 if mount type is "fuse" or starts with "fuse.".
+ */
+int MountPolling::isFuse(const char *type) {
+    int ret = 0;
+    if (type[0] == 'f'
+            && type[1] == 'u'
+            && type[2] == 's'
+            && type[3] == 'e'
+            && (type[4] == '.' || type[4] == '\0')) {
+        ret = 1;
+    }
+    return ret;
 }
 
 /**
