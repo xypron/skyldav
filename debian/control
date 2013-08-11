@@ -5,6 +5,7 @@ Maintainer: Heinrich Schuchardt <xypron.glpk@gmx.de>
 Build-Depends:
  debhelper (>= 9.0.0),
  autotools-dev,
+ autoconf-archive,
  pkg-config,
  libc6-dev,
  libcanberra-dev,
