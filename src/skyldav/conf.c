@@ -76,7 +76,7 @@ static void gettoken(FILE *file, char *token) {
             break;
         }
     }
-    do {
+    while (!feof(file)) {
         if (c <= ' ') {
             return;
         }
@@ -101,7 +101,7 @@ static void gettoken(FILE *file, char *token) {
         *pos = 0x00;
         count--;
         c = fgetc(file);
-    } while (!feof(file));
+    }
 }
 
 /**
