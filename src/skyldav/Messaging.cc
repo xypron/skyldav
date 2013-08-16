@@ -48,7 +48,7 @@ Messaging::Messaging() {
 
     // Open syslog.
     setlogmask(LOG_UPTO(LOG_NOTICE));
-    openlog(SYSLOG_ID , 0, LOG_USER);
+    openlog(SYSLOG_ID , LOG_PID, LOG_USER);
 
     // Set umask = 022;
     mask = umask(S_IWGRP | S_IWOTH);
