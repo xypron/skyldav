@@ -114,13 +114,19 @@ static void pidfile() {
     fd = open(filename, O_CREAT | O_TRUNC | O_WRONLY,
             S_IRUSR | S_IWUSR);
     if (fd == -1) {
-        syslog(LOG_ERR, "Cannot create pid file '%s'.", filename);
+        std::stringstream msg;
+        msg << "Cannot create pid file '" << filename << "'";
+        Messaging::message(Messaging::ERROR, msg.str());
     }
     len = snprintf(buffer, sizeof (buffer), "%d", (int) getpid());
     ret = write(fd, buffer, len);
-    syslog(LOG_ERR, "Cannot write pid file '%s'.", filename);
-    if (ret == -1)
-        close(fd);
+    if (ret == -1) {
+        std::stringstream msg;
+        msg << "Cannot write to pid file '" << filename << "': "
+                << strerror(errno);
+        Messaging::message(Messaging::ERROR, msg.str());
+    }
+    close(fd);
 }
 
 /**
@@ -222,7 +228,6 @@ static void daemonize(Environment *e) {
     if (NULL == freopen("/dev/null", "w", stderr)) {
         perror("Cannot redirect stderr to /dev/null");
     };
-    pidfile();
 }
 
 /**
@@ -332,6 +337,11 @@ int main(int argc, char *argv[]) {
     }
 
     Messaging::setLevel((Messaging::Level) messageLevel);
+
+    // If daemonized write PID file.
+    if (daemonized) {
+        pidfile();
+    }
 
     Messaging::message(Messaging::DEBUG, "Starting on access scanning.");
 

@@ -63,6 +63,8 @@ extern "C" {
 
     const char *PID_FILE = "/var/run/skyldav/skyldav.pid";
     
+    const char *SYSLOG_ID = "SkyldAV";
+    
 #ifdef	__cplusplus
 }
 #endif

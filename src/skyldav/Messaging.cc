@@ -32,6 +32,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include "config.h"
+#include "skyldav.h"
 #include "Messaging.h"
 
 Messaging *Messaging::singleton = NULL;
@@ -47,7 +48,7 @@ Messaging::Messaging() {
 
     // Open syslog.
     setlogmask(LOG_UPTO(LOG_NOTICE));
-    openlog("Skyld AV", 0, LOG_USER);
+    openlog(SYSLOG_ID , 0, LOG_USER);
 
     // Set umask = 022;
     mask = umask(S_IWGRP | S_IWOTH);

@@ -34,7 +34,6 @@
 #include <sys/fanotify.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <syslog.h>
 #include <unistd.h>
 #include "FanotifyPolling.h"
 #include "Messaging.h"
@@ -434,11 +433,12 @@ int FanotifyPolling::writeResponse(const struct fanotify_response response,
 
     ret = write(fd, &response, sizeof (struct fanotify_response));
     if (ret == -1 && errno != ENOENT) {
+        std::stringstream msg;
         fprintf(stderr, "Failure to write response %u: %s\n",
                 response.response,
                 strerror(errno));
-        syslog(LOG_CRIT, "Failure to write response: %s",
-                strerror(errno));
+        msg << "Failure to write response: " << strerror(errno);
+        Messaging::message(Messaging::ERROR, msg.str());
         ret = 1;
     } else {
         ret = 0;
