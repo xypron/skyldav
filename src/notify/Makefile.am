@@ -1,3 +1,4 @@
+if NOTIFICATION
 AM_CPPFLAGS = $(NOTIFY_CFLAGS)
 skyldavnotify_LDADD = $(NOTIFY_LIBS)
 
@@ -8,3 +9,4 @@ skyldavnotify_SOURCES = notify.h notify.cc
 
 check:
 	./skyldavnotify --version	
+endif
