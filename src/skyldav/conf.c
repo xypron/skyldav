@@ -60,7 +60,7 @@ static void skipcomment(FILE *file) {
  * @param token token
  */
 static void gettoken(FILE *file, char *token) {
-    char c;
+    char c = 0x00;
     char *pos = token;
     int count = CONF_VALUE_MAX_LEN - 1;
     *token = 0x00;
