@@ -56,11 +56,10 @@ AC_HELP_STRING([--with-notification],
    [Provide desktop notification [[default=yes]]]),
    [case $withval in
       yes | no) ;;
-      *) AC_MSG_ERROR([invalid value `$withval' for --with-notification]);;
+      *) AC_MSG_ERROR([invalid value '$withval' for --with-notification]);;
       esac],
    [with_notification=yes])
 
-AC_MSG_NOTICE([ ??????????????? = $with_notification])
 AM_CONDITIONAL([NOTIFICATION], [test "x$with_notification" = "xyes"])
 if test "x$with_notification" = "xyes"; then
   PKG_CHECK_MODULES([NOTIFY], [gtk+-2.0 >= 2.20.1 libnotify >= 0.5.0])
