@@ -66,7 +66,8 @@ Messaging::Messaging() {
             std::cerr << "Failure to set mask for logfile." << std::endl;
         }
     } catch (class std::ios_base::failure ex) {
-        std::cerr << "Failure to open logfile." << std::endl;
+        std::cerr << "Failure to open logfile '"
+            << LOGFILE << "'" << std::endl;
     }
 
     // Reset umask.
@@ -111,12 +112,13 @@ void Messaging::message(const enum Level level, const std::string message) {
             std::cout << message << std::endl;
             break;
     }
-    try {
-        singleton->logfs << type << message << std::endl;
-    } catch (class std::ios_base::failure ex) {
-        std::cerr << "Failure to write to logfile." << std::endl;
+    if (singleton->logfs.is_open()) {
+        try {
+            singleton->logfs << type << message << std::endl;
+        } catch (class std::ios_base::failure ex) {
+            std::cerr << "Failure to write to logfile." << std::endl;
+        }
     }
-
 }
 
 void Messaging::setLevel(const enum Level level) {
