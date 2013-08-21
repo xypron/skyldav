@@ -22,7 +22,7 @@
  * @brief Poll fanotify events.
  */
 #include <errno.h>
-#include <fcntl.h>
+#include <linux/fcntl.h>
 #include <linux/limits.h>
 #include <malloc.h>
 #include <poll.h>
