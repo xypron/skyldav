@@ -386,8 +386,8 @@ int main(int argc, char *argv[]) {
     } catch (FanotifyPolling::Status e) {
     }
     Messaging::message(Messaging::INFORMATION, "On access scanning stopped.");
-    Messaging::teardown();
     delete e;
+    Messaging::teardown();
     printf("done\n");
     return EXIT_SUCCESS;
 }
