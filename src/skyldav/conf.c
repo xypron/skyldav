@@ -59,34 +59,41 @@ static void skipcomment(FILE *file) {
  * @param file file
  * @param token token
  */
-static void gettoken(FILE *file, char *token) {
+static void gettoken(FILE *file, char *token, int *newline) {
     char c = 0x00;
     char *pos = token;
     int count = CONF_VALUE_MAX_LEN - 1;
     *token = 0x00;
+    *newline = 0;
 
     // skip leading whitespace
     while (!feof(file)) {
         c = fgetc(file);
         if (c == '#') {
             skipcomment(file);
+            *newline = 1;
+            return;
         } else if (c == '\n') {
+            *newline = 1;
             return;
         } else if (c > ' ') {
             break;
         }
     }
     while (!feof(file)) {
-        if (c <= ' ') {
+        if (c < ' ') {
+            *newline = 1;
             return;
         }
         switch (c) {
             case '#':
                 skipcomment(file);
+                *newline = 1;
                 return;
             case '\\':
                 c = fgetc(file);
                 if (feof(file) || c < ' ') {
+                    *newline = 1;
                     return;
                 }
                 break;
@@ -114,6 +121,7 @@ static void gettoken(FILE *file, char *token) {
  * @return success
  */
 int conf_parse(char *filename, conf_cb cb, void *info) {
+    int newline = 0;
     int ret = 0;
     FILE *file;
     char key[CONF_VALUE_MAX_LEN];
@@ -126,8 +134,8 @@ int conf_parse(char *filename, conf_cb cb, void *info) {
     }
 
     while (!feof(file)) {
-        gettoken(file, key);
-        if (*key == 0x00) {
+        gettoken(file, key, &newline);
+        if (newline || *key == 0x00) {
             continue;
         }
         if (*key == '=') {
@@ -135,27 +143,30 @@ int conf_parse(char *filename, conf_cb cb, void *info) {
             ret = 1;
             break;
         }
-        gettoken(file, value);
+        gettoken(file, value, &newline);
         if (strcmp(value, "=")) {
             fprintf(stderr, "missing '=' in '%s'\n", filename);
             ret = 1;
             break;
         }
+        gettoken(file, value, &newline);
         for (;;) {
-            gettoken(file, value);
+            if (cb == NULL) {
+                printf("%s = %s\n", key, value);
+            } else {
+                if (cb(key, value, info)) {
+                printf("Invalid entry in '%s': %s = %s\n", 
+                        filename, key, value);
+                    ret = 1;
+                };
+            }
+            if (newline) {
+                break;
+            }
+            gettoken(file, value, &newline);
             if (0 == strcmp(value, "")) {
                 break;
-            } else {
-                if (cb == NULL) {
-                    printf("%s = %s\n", key, value);
-                } else {
-                    if (cb(key, value, info)) {
-                    printf("Invalid entry in '%s': %s = %s\n", 
-                            filename, key, value);
-                        ret = 1;
-                    };
-                }
-            }
+			}
         }
     }
     fclose(file);
