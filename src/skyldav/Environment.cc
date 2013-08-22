@@ -24,12 +24,17 @@
 #include "Environment.h"
 
 Environment::Environment() {
+    excludepath = new StringSet();
+    localfs = new StringSet();
     nomarkfs = new StringSet();
     nomarkmnt = new StringSet();
-    localfs = new StringSet();
     scache = new ScanCache(this);
     nThreads = 4;
     cacheMaxSize = 10000;
+}
+
+StringSet *Environment::getExcludePaths() {
+    return excludepath;
 }
 
 StringSet *Environment::getNoMarkFileSystems() {
@@ -65,9 +70,10 @@ void Environment::setNumberOfThreads(int n) {
 }
 
 Environment::~Environment() {
+    delete localfs;
+    delete excludepath;
     delete nomarkfs;
     delete nomarkmnt;
-    delete localfs;
     delete scache;
 }
 

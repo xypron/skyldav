@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 #include <syslog.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -65,12 +66,20 @@ static int confcb(const char *key, const char *value, void *info) {
             ret = 1;
         }
         e->setCacheMaxSize(cacheMaxSize);
+    } else if (!strcmp(key, "EXCLUDE_PATH")) {
+        std::string val = value;
+        std::string::reverse_iterator rit = val.rbegin();
+        // Append missing trailing path separator.
+        if (0 == val.length() || *(val.rbegin()++) != '/') {
+            val += "/";
+        }
+        e->getExcludePaths()->add(val.c_str());
+    } else if (!strcmp(key, "LOCAL_FS")) {
+        e->getLocalFileSystems()->add(value);
     } else if (!strcmp(key, "NOMARK_FS")) {
         e->getNoMarkFileSystems()->add(value);
     } else if (!strcmp(key, "NOMARK_MNT")) {
         e->getNoMarkMounts()->add(value);
-    } else if (!strcmp(key, "LOCAL_FS")) {
-        e->getLocalFileSystems()->add(value);
     } else if (!strcmp(key, "THREADS")) {
         std::stringstream ss(value);
         ss >> nThread;

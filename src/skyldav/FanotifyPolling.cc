@@ -128,6 +128,39 @@ void *FanotifyPolling::run(void *obj) {
 }
 
 /**
+ * @brief Check if file is in exclude path.
+ * 
+ * @param fd file descriptor
+ * @return 1 if in exclude path.
+ */
+int FanotifyPolling::exclude(const int fd) {
+    int path_len;
+    char path[PATH_MAX + 1];
+    std::stringstream msg;
+    StringSet *exclude;
+    StringSet::iterator pos;
+    std::string fname;
+
+    // Get absolute file path.
+    snprintf(path, sizeof (path), "/proc/self/fd/%d", fd);
+    path_len = readlink(path, path, sizeof (path) - 1);
+    if (path_len < 0) {
+        path_len = 0;
+    }
+    path[path_len] = '\0';
+    fname = path;
+
+    // Search in exclude paths.    
+    exclude = e->getExcludePaths();
+    for (pos = exclude->begin();  pos != exclude->end(); pos++) {
+        if (0 == fname.find(**pos)) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+/**
  * @brief Scans a file.
  */
 void* FanotifyPolling::scanFile(void *workitem) {
@@ -154,8 +187,12 @@ void* FanotifyPolling::scanFile(void *workitem) {
             } else if (!S_ISREG(statbuf.st_mode)) {
                 // For directories always allow.
                 response.response = FAN_ALLOW;
+            } else if (task->fp->exclude(task->metadata.fd)) {
+                // In exclude path.
+                response.response = FAN_ALLOW;
             } else if (task->fp->virusScan->scan(task->metadata.fd)
                     == VirusScan::SCANOK) {
+                // No virus found.
                 response.response = FAN_ALLOW;
             } else {
                 response.response = FAN_DENY;
