@@ -24,6 +24,8 @@
 #define	VIRUSSCAN_H
 
 #include <clamav.h>
+#include <pthread.h>
+#include "Environment.h"
 
 #ifdef	__cplusplus
 extern "C" {
@@ -32,7 +34,7 @@ extern "C" {
     /**
      * @brief Scans files for viruses.
      */
-    
+
     class VirusScan {
     public:
 
@@ -54,10 +56,20 @@ extern "C" {
             SCANVIRUS = 1
         };
 
-        VirusScan();
+        enum RunStatus {
+            RUNNING,
+            STOPPING,
+            STOPPED,
+        };
+
+        VirusScan(Environment *);
         int scan(const int fd);
         ~VirusScan();
     private:
+        /**
+         * @brief environment
+         */
+        Environment * env;
         /**
          * @brief Struture indicating if database has changed.
          */
@@ -66,11 +78,37 @@ extern "C" {
          * @brief Reference to virus scan engine.
          */
         struct cl_engine *engine;
+        /**
+         * @brief Mutex for accessing the engine.
+         */
+        pthread_mutex_t mutexEngine;
+        /**
+         * @brief Mutex for accessing the engine.
+         */
+        pthread_mutex_t mutexUpdate;
+        /**
+         * Run status
+         */
+        enum RunStatus status;
+        /**
+         * @brief Thrad for updating
+         */
+        pthread_t updateThread;
+        /**
+         * @brief Reference count of virus scan enginge.
+         */
+        int engineRefCount;
 
-        void log_virus_found(const int fd, const char *virname);
+        struct cl_engine *createEngine();
+        int createThread();
         void dbstat_clear();
         int dbstat_check();
         void dbstat_free();
+        void destroyEngine(cl_engine *);
+        struct cl_engine *getEngine();
+        void releaseEngine();
+        void log_virus_found(const int fd, const char *virname);
+        static void *updater(void *);
     };
 #ifdef	__cplusplus
 }

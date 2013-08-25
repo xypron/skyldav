@@ -111,8 +111,6 @@ extern "C" {
         static void *scanFile(void *workitem);
         void handleFanotifyEvents(const void *buf, int len);
         void handleFanotifyEvent(const struct fanotify_event_metadata *);
-        
-        
         int writeResponse(const struct fanotify_response, int);
         int fanotifyOpen();
         int fanotifyClose();

@@ -52,6 +52,10 @@ extern "C" {
         ~MountPolling();
     private:
         /**
+         * @brif Environment.
+         */
+        Environment *env;
+        /**
          * @brief fanotify file descriptor
          */
         int fd;

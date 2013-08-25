@@ -88,6 +88,17 @@ void ScanCache::add(const struct stat *stat, const unsigned int response) {
     pthread_mutex_unlock(&mutex);
 }
 
+void ScanCache::clear() {
+    pthread_mutex_lock(&mutex);
+    std::set<ScanResult *, ScanResultComperator>::iterator pos;
+    for (pos = s->begin(); pos != s->end(); pos++) {
+        delete *pos;
+    }
+    s->clear();
+    Messaging::message(Messaging::DEBUG, "Cache cleared.");
+    pthread_mutex_unlock(&mutex);
+}
+
 /**
  * @brief Adds scan result to cache.
  * @param stat file status as returned by fstat()
@@ -158,14 +169,10 @@ void ScanCache::remove(const struct stat *stat) {
 }
 
 ScanCache::~ScanCache() {
-    std::set<ScanResult *, ScanResultComperator>::iterator pos;
     std::stringstream msg;
     msg << "Cache size " << s->size() <<
             ", cache hits " << hits << ", cache misses " << misses << ".";
-    for (pos = s->begin(); pos != s->end(); pos++) {
-        delete *pos;
-    }
-    s->clear();
+    clear();
     pthread_mutex_destroy(&mutex);
     Messaging::message(Messaging::INFORMATION, msg.str());
 }

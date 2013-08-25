@@ -323,9 +323,8 @@ FanotifyPolling::FanotifyPolling(Environment * env) {
 
     status = INITIAL;
 
-    Messaging::message(Messaging::DEBUG, "Loading virus database\n");
     try {
-        virusScan = new VirusScan();
+        virusScan = new VirusScan(e);
     } catch (enum VirusScan::Status e) {
         Messaging::message(Messaging::ERROR, "Loading database failed.\n");
         throw FAILURE;

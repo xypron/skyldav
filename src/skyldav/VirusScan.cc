@@ -22,12 +22,164 @@
  */
 #include <cstring>
 #include <limits.h>
+#include <signal.h>
 #include <sstream>
 #include <stdio.h>
 #include <syslog.h>
 #include "unistd.h"
 #include "VirusScan.h"
 #include "Messaging.h"
+
+/**
+ * @brief Initializes virus scan engine.
+ */
+VirusScan::VirusScan(Environment * e) {
+    int ret;
+
+    env = e;
+    status = RUNNING;
+    pthread_mutex_init(&mutexEngine, NULL);
+    pthread_mutex_init(&mutexUpdate, NULL);
+
+    ret = cl_init(CL_INIT_DEFAULT);
+    if (ret != CL_SUCCESS) {
+        std::stringstream msg;
+        msg << "cl_init() error: " << cl_strerror(ret);
+        Messaging::message(Messaging::ERROR, msg.str());
+        throw SCANERROR;
+    }
+
+    // Create virus scan engine.
+    engine = createEngine();
+    // Initialize monitoring of pattern update.
+    dbstat_clear();
+
+    if (createThread()) {
+        Messaging::message(Messaging::ERROR, "Cannot create thread.");
+        cl_engine_free(engine);
+        throw SCANERROR;
+    }
+}
+
+/**
+ * @brief Creates a new virus scan engine.
+ * 
+ * @return virus scan engine
+ */
+struct cl_engine *VirusScan::createEngine() {
+    int ret;
+    unsigned int sigs;
+    cl_engine *e;
+
+    Messaging::message(Messaging::DEBUG, "Loading virus database");
+    e = cl_engine_new();
+    if (e == NULL) {
+        Messaging::message(Messaging::ERROR,
+                "Can't create new virus scan engine.");
+        throw SCANERROR;
+    }
+    // sigs must be zero before calling cl_load.
+    sigs = 0;
+    ret = cl_load(cl_retdbdir(), e, &sigs, CL_DB_STDOPT);
+    if (ret != CL_SUCCESS) {
+        std::stringstream msg;
+        msg << "cl_retdbdir() error: " << cl_strerror(ret);
+        Messaging::message(Messaging::ERROR, msg.str());
+        cl_engine_free(e);
+        throw SCANERROR;
+    } else {
+        std::stringstream msg;
+        msg << sigs << "  signatures loaded";
+        Messaging::message(Messaging::DEBUG, msg.str());
+    }
+    if ((ret = cl_engine_compile(e)) != CL_SUCCESS) {
+        std::stringstream msg;
+        msg << "cl_engine_compile() error: " << cl_strerror(ret);
+        Messaging::message(Messaging::ERROR, msg.str());
+        cl_engine_free(e);
+        throw SCANERROR;
+    }
+    return e;
+}
+
+/**
+ * Destroys virus scan engine.
+ * @param e virus scan engine
+ */
+void VirusScan::destroyEngine(cl_engine *e) {
+    int ret;
+    ret = cl_engine_free(e);
+    if (ret != 0) {
+        std::stringstream msg;
+        msg << "cl_engine_free() error: " << cl_strerror(ret);
+        Messaging::message(Messaging::ERROR, msg.str());
+        throw SCANERROR;
+    }
+}
+
+/**
+ * @brief Gets reference to virus scan engine.
+ * 
+ * @return scan engine
+ */
+struct cl_engine *VirusScan::getEngine() {
+    struct cl_engine *ret = NULL;
+
+    // Wait for update to complete
+    pthread_mutex_lock(&mutexUpdate);
+    pthread_mutex_unlock(&mutexUpdate);
+
+    pthread_mutex_lock(&mutexEngine);
+    ret = engine;
+    engineRefCount++;
+    pthread_mutex_unlock(&mutexEngine);
+    return ret;
+}
+
+/**
+ * @brief Creates a new thread for managing the scan engine.
+ * 
+ * @return success = 0
+ */
+int VirusScan::createThread() {
+    int ret;
+
+    if (pthread_create(&updateThread, NULL, updater, this)) {
+        ret = 1;
+    } else {
+        ret = 0;
+    }
+    return ret;
+}
+
+/**
+ * @brief Checks if database has changed.
+ * @returned 0 = unchanged, 1 = changed
+ */
+int VirusScan::dbstat_check() {
+    int ret = 0;
+    if (cl_statchkdir(&dbstat) == 1) {
+        ret = 1;
+        cl_statfree(&dbstat);
+        cl_statinidir(cl_retdbdir(), &dbstat);
+    }
+    return ret;
+}
+
+/**
+ * @brief Clears database status.
+ */
+void VirusScan::dbstat_clear() {
+    memset(&dbstat, 0, sizeof (struct cl_stat));
+    cl_statinidir(cl_retdbdir(), &dbstat);
+}
+
+/**
+ * @brief Frees database status.
+ */
+void VirusScan::dbstat_free() {
+    cl_statfree(&dbstat);
+}
 
 /**
  * @brief Writes log entry.
@@ -51,46 +203,12 @@ void VirusScan::log_virus_found(const int fd, const char *virname) {
 }
 
 /**
- * @brief Initializes virus scan engine.
+ * Decreases the viurs engine reference count.
  */
-VirusScan::VirusScan() {
-    int ret;
-    unsigned int sigs;
-
-    ret = cl_init(CL_INIT_DEFAULT);
-    if (ret != CL_SUCCESS) {
-        std::stringstream msg;
-        msg << "cl_init() error: " << cl_strerror(ret);
-        Messaging::message(Messaging::ERROR, msg.str());
-        throw SCANERROR;
-    }
-    engine = cl_engine_new();
-    if (engine == NULL) {
-        Messaging::message(Messaging::ERROR,
-                "Can't create new viurs scan engine.");
-        throw SCANERROR;
-    }
-    // sigs must be zero before calling cl_load.
-    sigs = 0;
-    ret = cl_load(cl_retdbdir(), engine, &sigs, CL_DB_STDOPT);
-    if (ret != CL_SUCCESS) {
-        std::stringstream msg;
-        msg << "cl_retdbdir() error: " << cl_strerror(ret);
-        Messaging::message(Messaging::ERROR, msg.str());
-        cl_engine_free(engine);
-        throw SCANERROR;
-    } else {
-        std::stringstream msg;
-        msg << sigs << "  signatures loaded\n";
-        Messaging::message(Messaging::DEBUG, msg.str());
-    }
-    if ((ret = cl_engine_compile(engine)) != CL_SUCCESS) {
-        std::stringstream msg;
-        msg << "cl_engine_compile() error: " << cl_strerror(ret);
-        Messaging::message(Messaging::ERROR, msg.str());
-        cl_engine_free(engine);
-        throw SCANERROR;
-    }
+void VirusScan::releaseEngine() {
+    pthread_mutex_lock(&mutexEngine);
+    engineRefCount--;
+    pthread_mutex_unlock(&mutexEngine);
 }
 
 /**
@@ -103,7 +221,7 @@ int VirusScan::scan(const int fd) {
     int ret;
     const char *virname;
 
-    ret = cl_scandesc(fd, &virname, NULL, engine, CL_SCAN_STDOPT);
+    ret = cl_scandesc(fd, &virname, NULL, getEngine(), CL_SCAN_STDOPT);
     switch (ret) {
         case CL_CLEAN:
             success = SCANOK;
@@ -119,49 +237,90 @@ int VirusScan::scan(const int fd) {
             success = SCANOK;
             break;
     }
+    releaseEngine();
     return success;
 }
 
 /**
- * @brief Checks if database has changed.
- * @returned 0 = unchanged, 1 = changed
+ * @brief Thread to update engine.
+ * 
+ * @param threadPool thread pool
+ * @return return value
  */
-int VirusScan::dbstat_check() {
-    int ret = 0;
-	if(cl_statchkdir(&dbstat) == 1) {
-            ret = 1;
-	    cl_statfree(&dbstat);
-	    cl_statinidir(cl_retdbdir(), &dbstat);
-	}
-    return ret;
-}
+void * VirusScan::updater(void *virusScan) {
+    int count = 0;
+    cl_engine *e;
+    struct timespec interval = {
+        1,
+        0
+    };
+    struct timespec interval2 = {
+        0,
+        100000
+    };
+    VirusScan *vs;
 
-/**
- * @brief Clears database status.
- */
-void VirusScan::dbstat_clear() {
-    memset(&dbstat, 0, sizeof (struct cl_stat));
-    cl_statinidir(cl_retdbdir(), &dbstat);
-}
+    vs = (VirusScan *) virusScan;
 
-/**
- * @brief Frees database status.
- */
-void VirusScan::dbstat_free() {
-    cl_statfree(&dbstat);
+    for (;;) {
+        if (vs->status == STOPPING) {
+            break;
+        }
+        nanosleep(&interval, NULL);
+        count++;
+        // Every minute check for virus database updates
+        if (count >= 60) {
+            if (vs->dbstat_check()) {
+                Messaging::message(Messaging::DEBUG,
+                        "Database update detected.");
+                try {
+                    // Create the new engine.
+                    e = vs->createEngine();
+                    // Stop scanning.
+                    pthread_mutex_lock(&(vs->mutexUpdate));
+                    // Wait for all running scans to be finished.
+                    for (;;) {
+                        pthread_mutex_lock(&(vs->mutexEngine));
+                        if (vs->engineRefCount == 0) {
+                            break;
+                        }
+                        pthread_mutex_unlock(&(vs->mutexEngine));
+                        nanosleep(&interval2, NULL);
+                    }
+                    // Destroy the old engine
+                    vs->destroyEngine(vs->engine);
+                    vs->engine = e;
+                    vs->env->getScanCache()->clear();
+                    pthread_mutex_unlock(&(vs->mutexEngine));
+                    Messaging::message(Messaging::DEBUG,
+                            "Using updated database.");
+                } catch (Status e) {
+                }
+                // Allow scanning.
+                pthread_mutex_unlock(&(vs->mutexUpdate));
+            }
+        }
+    }
+    vs->status = STOPPED;
+    return NULL;
 }
-
 
 /**
  * @brief Deletes the virus scanner.
  */
 VirusScan::~VirusScan() {
-    int ret;
-    ret = cl_engine_free(engine);
-    if (ret != 0) {
-        std::stringstream msg;
-        msg << "cl_engine_free() error: " << cl_strerror(ret);
-        Messaging::message(Messaging::ERROR, msg.str());
-        throw SCANERROR;
-    }
+    struct timespec interval = {
+        0,
+        1000000
+    };
+
+    status = STOPPING;
+    do {
+        nanosleep(&interval, NULL);
+    } while (status == STOPPING);
+
+    destroyEngine(engine);
+    pthread_mutex_destroy(&mutexUpdate);
+    pthread_mutex_destroy(&mutexEngine);
+    dbstat_free();
 }

@@ -104,6 +104,7 @@ public:
     static const unsigned int CACHE_MISS = 0xfffd;
     ScanCache(Environment *);
     void add(const struct stat *, const unsigned int);
+    void clear();
     int get(const struct stat *);
     void remove(const struct stat *);
     virtual ~ScanCache();
