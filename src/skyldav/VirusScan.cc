@@ -271,8 +271,8 @@ void * VirusScan::updater(void *virusScan) {
         // Every minute check for virus database updates
         if (count >= 60) {
             if (vs->dbstat_check()) {
-                Messaging::message(Messaging::DEBUG,
-                        "Database update detected.");
+                Messaging::message(Messaging::INFORMATION,
+                        "ClamAV database update detected.");
                 try {
                     // Create the new engine.
                     e = vs->createEngine();
@@ -292,8 +292,8 @@ void * VirusScan::updater(void *virusScan) {
                     vs->engine = e;
                     vs->env->getScanCache()->clear();
                     pthread_mutex_unlock(&(vs->mutexEngine));
-                    Messaging::message(Messaging::DEBUG,
-                            "Using updated database.");
+                    Messaging::message(Messaging::INFORMATION,
+                            "Using updated ClamAV database.");
                 } catch (Status e) {
                 }
                 // Allow scanning.
