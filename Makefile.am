@@ -41,3 +41,6 @@ dist-hook:
 	
 documentation:
 	doxygen
+
+loadtest:
+	cd test && $(MAKE) loadtest

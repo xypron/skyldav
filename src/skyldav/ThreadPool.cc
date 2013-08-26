@@ -112,6 +112,20 @@ void *ThreadPool::getWorkItem() {
 }
 
 /**
+ * Gets size of worklist.
+ * @return size of worklist, -1 signals error
+ */
+long ThreadPool::getWorklistSize() {
+    long ret = -1;
+    if (pthread_mutex_lock(&mutexWorkItem)) {
+        return ret;
+    }
+    ret = worklist.size();
+    pthread_mutex_unlock(&mutexWorkItem);
+    return ret;
+}
+
+/**
  * @brief Is thread pool stopping.
  * 
  * @return thread pool is stopping
