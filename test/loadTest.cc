@@ -20,9 +20,10 @@
 #include <sstream>
 #include <iostream>
 #include <fcntl.h>
-#include <sys/stat.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include "config.h"
 #include "ScanCache.h"
@@ -67,6 +68,24 @@ struct Task {
 };
 
 /**
+ * Status
+ */
+enum {
+    RUNNING = 1,
+    TERMINATING = 2
+} status;
+
+/**
+ * @brief Handles signal.
+ * 
+ * @param sig signal
+ */
+static void hdl(int sig) {
+    status = TERMINATING;
+    fprintf(stderr, "Terminating\n");
+}
+
+/**
  * @brief Open and close one file.
  */
 static void* work(void *workitem) {
@@ -109,6 +128,10 @@ static void version() {
  * @brief Main.
  */
 int main(int argc, char** argv) {
+    // action to take when signal occurs
+    struct sigaction act;
+    // signal mask
+    sigset_t blockset;
     // thread pool
     ThreadPool *tp;
     // index
@@ -126,8 +149,8 @@ int main(int argc, char** argv) {
     if (nThread < 4) {
         // Use at least one thread.
         nThread = 4;
-    }    
-    
+    }
+
     // Analyze command line options.
     for (i = 1; i < argc; i++) {
         opt = argv[i];
@@ -161,7 +184,29 @@ int main(int argc, char** argv) {
         }
     }
 
-    std::cout << "number of worker threads = " << nThread << std::endl;
+    // Set status
+    status = RUNNING;
+
+    // Block signals.
+    sigemptyset(&blockset);
+    sigaddset(&blockset, SIGUSR1);
+    if (sigprocmask(0 * SIG_BLOCK, &blockset, NULL) == -1) {
+        perror("main, sigmaskprocmask");
+        return EXIT_FAILURE;
+    }
+    // Set handler for SIGTERM.
+    act.sa_handler = hdl;
+    sigemptyset(&act.sa_mask);
+    act.sa_flags = 0;
+    if (sigaction(SIGTERM, &act, NULL)
+            || sigaction(SIGINT, &act, NULL)
+            || sigaction(SIGUSR1, &act, NULL)) {
+        perror("main, sigaction");
+        return EXIT_FAILURE;
+    }
+
+    std::cout << "Number of worker threads = " << nThread << std::endl
+            << "Terminate with CTRL+C" << std::endl;
 
     tp = new ThreadPool(nThread, work);
 
@@ -176,10 +221,15 @@ int main(int argc, char** argv) {
                 task->id = i;
                 task->filename = argv[0];
                 tp->add((void *) task);
+                if (status != RUNNING) {
+                    break;
+                }
             }
-            std::cout << "*";
         } else {
             nanosleep(&interval, NULL);
+        }
+        if (status != RUNNING) {
+            break;
         }
     }
     delete tp;
