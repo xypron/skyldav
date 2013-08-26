@@ -45,6 +45,11 @@ ScanCache::ScanCache(Environment *env) {
 void ScanCache::add(const struct stat *stat, const unsigned int response) {
     std::set<ScanResult *, ScanResultComperator>::iterator it;
     std::pair < std::set<ScanResult *, ScanResultComperator>::iterator, bool> pair;
+    unsigned int cacheMaxSize = e->getCacheMaxSize();
+    
+    if (0 == cacheMaxSize) {
+        return;
+    }
 
     ScanResult *scr = new ScanResult();
     scr->dev = stat->st_dev;
@@ -61,7 +66,7 @@ void ScanCache::add(const struct stat *stat, const unsigned int response) {
         (*it)->right->left = (*it)->left;
         delete *it;
         s->erase(it);
-    } else while (s->size() >= e->getCacheMaxSize()) {
+    } else while (s->size() >= cacheMaxSize) {
             // Cache size too big. Get last element.
             it = s->find(root.left);
             if (it != s->end()) {
