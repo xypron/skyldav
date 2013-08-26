@@ -17,6 +17,13 @@
  *
  */
 
+/**
+ * @file loadTest.cc
+ * @brief Implements a load test.
+ * A threadpool is created. The work list is filled with tasks to open and
+ * close a file.
+ */
+
 #include <sstream>
 #include <iostream>
 #include <fcntl.h>
