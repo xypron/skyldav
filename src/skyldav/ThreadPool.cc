@@ -112,7 +112,8 @@ void *ThreadPool::getWorkItem() {
 }
 
 /**
- * Gets size of worklist.
+ * @brief Gets size of worklist.
+ * 
  * @return size of worklist, -1 signals error
  */
 long ThreadPool::getWorklistSize() {

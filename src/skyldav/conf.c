@@ -44,7 +44,7 @@
  * @brief Skips comment.
  * @param file file
  */
-static void skipcomment(FILE *file) {
+static void skipComment(FILE *file) {
     char c;
     while (!feof(file)) {
         c = fgetc(file);
@@ -59,7 +59,7 @@ static void skipcomment(FILE *file) {
  * @param file file
  * @param token token
  */
-static void gettoken(FILE *file, char *token, int *newline) {
+static void getToken(FILE *file, char *token, int *newline) {
     char c = 0x00;
     char *pos = token;
     int count = CONF_VALUE_MAX_LEN - 1;
@@ -70,7 +70,7 @@ static void gettoken(FILE *file, char *token, int *newline) {
     while (!feof(file)) {
         c = fgetc(file);
         if (c == '#') {
-            skipcomment(file);
+            skipComment(file);
             *newline = 1;
             return;
         } else if (c == '\n') {
@@ -87,7 +87,7 @@ static void gettoken(FILE *file, char *token, int *newline) {
         }
         switch (c) {
             case '#':
-                skipcomment(file);
+                skipComment(file);
                 *newline = 1;
                 return;
             case '\\':
@@ -120,7 +120,7 @@ static void gettoken(FILE *file, char *token, int *newline) {
  * @prame info parameter passed to callback function
  * @return success
  */
-int conf_parse(char *filename, conf_cb cb, void *info) {
+int parseConfigurationFile(char *filename, conf_cb cb, void *info) {
     int newline = 0;
     int ret = 0;
     FILE *file;
@@ -134,7 +134,7 @@ int conf_parse(char *filename, conf_cb cb, void *info) {
     }
 
     while (!feof(file)) {
-        gettoken(file, key, &newline);
+        getToken(file, key, &newline);
         if (newline || *key == 0x00) {
             continue;
         }
@@ -143,13 +143,13 @@ int conf_parse(char *filename, conf_cb cb, void *info) {
             ret = 1;
             break;
         }
-        gettoken(file, value, &newline);
+        getToken(file, value, &newline);
         if (strcmp(value, "=")) {
             fprintf(stderr, "missing '=' in '%s'\n", filename);
             ret = 1;
             break;
         }
-        gettoken(file, value, &newline);
+        getToken(file, value, &newline);
         for (;;) {
             if (cb == NULL) {
                 printf("%s = %s\n", key, value);
@@ -163,7 +163,7 @@ int conf_parse(char *filename, conf_cb cb, void *info) {
             if (newline) {
                 break;
             }
-            gettoken(file, value, &newline);
+            getToken(file, value, &newline);
             if (0 == strcmp(value, "")) {
                 break;
 			}

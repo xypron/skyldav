@@ -27,11 +27,17 @@
 #include "Messaging.h"
 #include "ScanCache.h"
 
+/**
+ * Creates cache for virus scan results.
+ * @param env environment
+ */
 ScanCache::ScanCache(Environment *env) {
     e = env;
     s = new std::set<ScanResult *, ScanResultComperator>();
     hits = 0;
     misses = 0;
+    
+    // Initialize the double linked list of scan results.
     root.left = &root;
     root.right = &root;
     pthread_mutex_init(&mutex, NULL);
@@ -93,6 +99,9 @@ void ScanCache::add(const struct stat *stat, const unsigned int response) {
     pthread_mutex_unlock(&mutex);
 }
 
+/**
+ * @brief Removes all entries from the cache.
+ */
 void ScanCache::clear() {
     pthread_mutex_lock(&mutex);
     std::set<ScanResult *, ScanResultComperator>::iterator pos;

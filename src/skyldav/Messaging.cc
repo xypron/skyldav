@@ -35,8 +35,14 @@
 #include "skyldav.h"
 #include "Messaging.h"
 
+/**
+ * @brief Singleton responsible for all messages sent.
+ */
 Messaging *Messaging::singleton = NULL;
 
+/**
+ * @brief Creates the singleton.
+ */
 Messaging::Messaging() {
     char *path;
     char *filename;
@@ -48,7 +54,7 @@ Messaging::Messaging() {
 
     // Open syslog.
     setlogmask(LOG_UPTO(LOG_NOTICE));
-    openlog(SYSLOG_ID , LOG_PID, LOG_USER);
+    openlog(SYSLOG_ID, LOG_PID, LOG_USER);
 
     // Set umask = 022;
     mask = umask(S_IWGRP | S_IWOTH);
@@ -67,19 +73,30 @@ Messaging::Messaging() {
         }
     } catch (class std::ios_base::failure ex) {
         std::cerr << "Failure to open logfile '"
-            << LOGFILE << "'" << std::endl;
+                << LOGFILE << "'" << std::endl;
     }
 
     // Reset umask.
     umask(mask);
 }
 
+/**
+ * @brief Sends an error message based on errno.
+ * 
+ * @param label label to futher detail error message
+ */
 void Messaging::error(const std::string label) {
     std::stringstream text;
     text << label << ": " << strerror(errno);
     message(ERROR, text.str());
 }
 
+/**
+ * @brief Sends message.
+ * 
+ * @param level message priority
+ * @param message message text
+ */
 void Messaging::message(const enum Level level, const std::string message) {
     std::string type;
 
@@ -121,11 +138,19 @@ void Messaging::message(const enum Level level, const std::string message) {
     }
 }
 
+/**
+ * @brief Sets message level.
+ * 
+ * @param level message level
+ */
 void Messaging::setLevel(const enum Level level) {
     getSingleton();
     singleton->messageLevel = level;
 }
 
+/**
+ * @brief Retrieves the messaging singleton.
+ */
 Messaging *Messaging::getSingleton() {
     if (singleton == NULL) {
         singleton = new Messaging();
@@ -133,10 +158,19 @@ Messaging *Messaging::getSingleton() {
     return singleton;
 }
 
+/**
+ * @brief Deletes the singleton.
+ */
 void Messaging::teardown() {
-    delete singleton;
+    if (singleton != NULL) {
+        delete singleton;
+        singleton = NULL;
+    }
 }
 
+/**
+ * @brief Deletes singleton.
+ */
 Messaging::~Messaging() {
     closelog();
     try {
@@ -145,4 +179,3 @@ Messaging::~Messaging() {
         std::cerr << "Failure to close logfile." << std::endl;
     }
 }
-

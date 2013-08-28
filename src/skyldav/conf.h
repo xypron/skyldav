@@ -33,7 +33,7 @@ extern "C" {
     
     typedef int (*conf_cb)(const char *key, const char *value, void *info);
     
-    int conf_parse(char *filename, conf_cb cb, void *info);
+    int parseConfigurationFile(char *filename, conf_cb cb, void *info);
 
 #ifdef	__cplusplus
 }

@@ -34,10 +34,25 @@
  */
 class Messaging {
 public:
+    /**
+     * @brief Message levels available.
+     */
     enum Level{
+        /**
+         * @brief Debugging information only to be shown in the console.
+         */
         DEBUG = 1,
+        /**
+         * @brief Information, e.g. access scanning has started.
+         */
         INFORMATION = 2,
+        /**
+         * @brief Warning, e.g. file access has been blocked.
+         */
         WARNING = 3,
+        /**
+         * @brief Error, e.g. malfunction of the code, malware detected.
+         */
         ERROR = 4
     };
     
