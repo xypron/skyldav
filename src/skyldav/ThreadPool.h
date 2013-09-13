@@ -42,6 +42,7 @@ public:
     ThreadPool(int nThreads, void* (*workRoutine) (void *));
     void add(void *workItem);
     void *getWorkItem();
+    long getWorklistSize();
     virtual ~ThreadPool();
 private:
     enum status status;

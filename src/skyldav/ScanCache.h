@@ -77,7 +77,7 @@ public:
      * @brief Compares two ScanResults.
      * @param value1 left ScanResult
      * @param value2 right ScanResult
-     * @return value1 is less then value2
+     * @return 1 if value1 is less then value2, else 0
      */
     bool operator() (ScanResult *value1, ScanResult *value2) const {
         if (value1->dev < value2->dev) {
@@ -94,7 +94,16 @@ public:
 
 
 /**
- * @brief cache for virus scanning results.
+ * @brief Cache for virus scanning results.
+ * 
+ * <p>The scan results are kept in two data structures:</p><ul>
+ * <li>a double linked list with with <code>root</code> as left and right end
+ * </li><li>an ordered set.</li></ul>
+ * <p>The linked list is used for implementing a LRU (least recently used)
+ * strategy. Accessed entries are brought to the  * left end of the double
+ * linked list. When the cache exceeds its maximum size the rightmost element is
+ * eliminated.</p>
+ * <p> The set is used to find a scan result in O(log(n)) time.</p>
  */
 class ScanCache {
 public:
@@ -104,6 +113,7 @@ public:
     static const unsigned int CACHE_MISS = 0xfffd;
     ScanCache(Environment *);
     void add(const struct stat *, const unsigned int);
+    void clear();
     int get(const struct stat *);
     void remove(const struct stat *);
     virtual ~ScanCache();

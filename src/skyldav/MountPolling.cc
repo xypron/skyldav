@@ -43,6 +43,7 @@
 #include "listmounts.h"
 #include "Messaging.h"
 #include "MountPolling.h"
+#include "ScanCache.h"
 
 /**
  * @brief thread.
@@ -124,6 +125,7 @@ void MountPolling::callback() {
     StringSet *cbmounts;
     StringSet::iterator pos;
     std::string *str;
+    int newMount = 0;
 
     cbmounts = new StringSet();
 
@@ -144,6 +146,7 @@ void MountPolling::callback() {
         if (0 == mounts->count(*pos)) {
             str = *pos;
             FanotifyPolling::markMount(fd, str->c_str());
+            newMount = 1;
         }
     }
     for (pos = mounts->begin(); pos != mounts->end(); pos++) {
@@ -151,6 +154,10 @@ void MountPolling::callback() {
             str = *pos;
             FanotifyPolling::unmarkMount(fd, str->c_str());
         }
+    }
+    if (newMount) {
+        // If new mounts are marked clear the cache.
+        env->getScanCache()->clear();
     }
 
     delete(mounts);
@@ -182,12 +189,13 @@ int MountPolling::isFuse(const char *type) {
  * @param nomarkfs
  * @param nomarkmnt
  */
-MountPolling::MountPolling(int ffd, Environment *env) {
+MountPolling::MountPolling(int ffd, Environment *e) {
     pthread_attr_t attr;
     int ret;
     struct timespec waiting_time_rem;
     struct timespec waiting_time_req;
 
+    env = e;
     fd = ffd;
     this->nomarkfs = env->getNoMarkFileSystems();
     this->nomarkmnt = env->getNoMarkMounts();

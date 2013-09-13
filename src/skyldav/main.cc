@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 #include <syslog.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -44,11 +45,12 @@
 
 /**
  * @brief Callback function for reading configuration file.
+ * 
  * @param key key value
  * @param value parameter value
  * @return success
  */
-static int confcb(const char *key, const char *value, void *info) {
+static int configurationCallback(const char *key, const char *value, void *info) {
     Environment *e = (Environment *) info;
     int ret = 0;
     unsigned int cacheMaxSize;
@@ -65,12 +67,20 @@ static int confcb(const char *key, const char *value, void *info) {
             ret = 1;
         }
         e->setCacheMaxSize(cacheMaxSize);
+    } else if (!strcmp(key, "EXCLUDE_PATH")) {
+        std::string val = value;
+        std::string::reverse_iterator rit = val.rbegin();
+        // Append missing trailing path separator.
+        if (0 == val.length() || *(val.rbegin()++) != '/') {
+            val += "/";
+        }
+        e->getExcludePaths()->add(val.c_str());
+    } else if (!strcmp(key, "LOCAL_FS")) {
+        e->getLocalFileSystems()->add(value);
     } else if (!strcmp(key, "NOMARK_FS")) {
         e->getNoMarkFileSystems()->add(value);
     } else if (!strcmp(key, "NOMARK_MNT")) {
         e->getNoMarkMounts()->add(value);
-    } else if (!strcmp(key, "LOCAL_FS")) {
-        e->getLocalFileSystems()->add(value);
     } else if (!strcmp(key, "THREADS")) {
         std::stringstream ss(value);
         ss >> nThread;
@@ -284,6 +294,7 @@ int main(int argc, char *argv[]) {
         }
         switch (*opt) {
             case 'c':
+                // configuration file
                 i++;
                 if (i < argc) {
                     cfile = argv[i];
@@ -292,9 +303,11 @@ int main(int argc, char *argv[]) {
                 }
                 break;
             case 'd':
+                // daemonize
                 shalldaemonize = 1;
                 break;
             case 'm':
+                // message level
                 i++;
                 if (i < argc) {
                     std::istringstream(argv[i]) >> messageLevel;
@@ -307,16 +320,18 @@ int main(int argc, char *argv[]) {
                 }
                 break;
             case 'v':
+                // version
                 version();
                 ;
                 break;
             default:
+                // all others
                 help();
         }
     }
 
     // Parse configuration file.
-    if (conf_parse(cfile, confcb, (void *) e)) {
+    if (parseConfigurationFile(cfile, configurationCallback, (void *) e)) {
         return EXIT_FAILURE;
     }
 
@@ -386,8 +401,8 @@ int main(int argc, char *argv[]) {
     } catch (FanotifyPolling::Status e) {
     }
     Messaging::message(Messaging::INFORMATION, "On access scanning stopped.");
-    Messaging::teardown();
     delete e;
+    Messaging::teardown();
     printf("done\n");
     return EXIT_SUCCESS;
 }

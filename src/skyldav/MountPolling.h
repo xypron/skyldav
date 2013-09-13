@@ -36,6 +36,9 @@ extern "C" {
     class MountPolling {
     public:
 
+        /**
+         * @brief Status that may occur.
+         */
         enum Status {
             INITIAL = 0,
             RUNNING = 1,
@@ -45,14 +48,18 @@ extern "C" {
         };
 
         /**
-         * Pointer to callback function for polling mounts.
+         * @brief Pointer to callback function for polling mounts.
          */
         typedef void (*callbackptr)();
         MountPolling(int ffd, Environment *);
         ~MountPolling();
     private:
         /**
-         * @brief fanotify file descriptor
+         * @brief Environment.
+         */
+        Environment *env;
+        /**
+         * @brief Fanotify file descriptor.
          */
         int fd;
         /**

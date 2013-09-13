@@ -27,11 +27,17 @@
 #include "Messaging.h"
 #include "ScanCache.h"
 
+/**
+ * Creates cache for virus scan results.
+ * @param env environment
+ */
 ScanCache::ScanCache(Environment *env) {
     e = env;
     s = new std::set<ScanResult *, ScanResultComperator>();
     hits = 0;
     misses = 0;
+    
+    // Initialize the double linked list of scan results.
     root.left = &root;
     root.right = &root;
     pthread_mutex_init(&mutex, NULL);
@@ -45,6 +51,11 @@ ScanCache::ScanCache(Environment *env) {
 void ScanCache::add(const struct stat *stat, const unsigned int response) {
     std::set<ScanResult *, ScanResultComperator>::iterator it;
     std::pair < std::set<ScanResult *, ScanResultComperator>::iterator, bool> pair;
+    unsigned int cacheMaxSize = e->getCacheMaxSize();
+    
+    if (0 == cacheMaxSize) {
+        return;
+    }
 
     ScanResult *scr = new ScanResult();
     scr->dev = stat->st_dev;
@@ -61,7 +72,7 @@ void ScanCache::add(const struct stat *stat, const unsigned int response) {
         (*it)->right->left = (*it)->left;
         delete *it;
         s->erase(it);
-    } else while (s->size() >= e->getCacheMaxSize()) {
+    } else while (s->size() >= cacheMaxSize) {
             // Cache size too big. Get last element.
             it = s->find(root.left);
             if (it != s->end()) {
@@ -85,6 +96,20 @@ void ScanCache::add(const struct stat *stat, const unsigned int response) {
         // element already existed
         delete scr;
     }
+    pthread_mutex_unlock(&mutex);
+}
+
+/**
+ * @brief Removes all entries from the cache.
+ */
+void ScanCache::clear() {
+    pthread_mutex_lock(&mutex);
+    std::set<ScanResult *, ScanResultComperator>::iterator pos;
+    for (pos = s->begin(); pos != s->end(); pos++) {
+        delete *pos;
+    }
+    s->clear();
+    Messaging::message(Messaging::DEBUG, "Cache cleared.");
     pthread_mutex_unlock(&mutex);
 }
 
@@ -158,14 +183,10 @@ void ScanCache::remove(const struct stat *stat) {
 }
 
 ScanCache::~ScanCache() {
-    std::set<ScanResult *, ScanResultComperator>::iterator pos;
     std::stringstream msg;
     msg << "Cache size " << s->size() <<
             ", cache hits " << hits << ", cache misses " << misses << ".";
-    for (pos = s->begin(); pos != s->end(); pos++) {
-        delete *pos;
-    }
-    s->clear();
+    clear();
     pthread_mutex_destroy(&mutex);
     Messaging::message(Messaging::INFORMATION, msg.str());
 }

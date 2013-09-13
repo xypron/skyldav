@@ -38,9 +38,10 @@ class ScanCache;
 class Environment {
 public:
     Environment();
+    StringSet *getExcludePaths();
+    StringSet *getLocalFileSystems();
     StringSet *getNoMarkFileSystems();
     StringSet *getNoMarkMounts();
-    StringSet *getLocalFileSystems();
     unsigned int getCacheMaxSize();
     void setCacheMaxSize(unsigned int);
     ScanCache *getScanCache();
@@ -49,6 +50,14 @@ public:
     virtual ~Environment();
 private:
     /**
+     * @brief Paths to be excluded from scanning.
+     */
+    StringSet *excludepath;
+    /**
+     * @brief File systems for local drives.
+     */
+    StringSet *localfs;
+    /**
      * @brief File systems which shall not be scanned.
      */
     StringSet *nomarkfs;
@@ -56,10 +65,6 @@ private:
      * @brief Mounts that shall not be scanned.
      */
     StringSet *nomarkmnt;
-    /**
-     * @brief File systems for local drives.
-     */
-    StringSet *localfs;
     /**
      * @brief Number of threads for virus scanning.
      */
