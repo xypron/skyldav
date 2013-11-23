@@ -21,6 +21,7 @@
  * @brief Scans files for viruses.
  */
 #include <cstring>
+#include <ctime>
 #include <limits.h>
 #include <signal.h>
 #include <sstream>
@@ -99,6 +100,29 @@ struct cl_engine *VirusScan::createEngine() {
         cl_engine_free(e);
         throw SCANERROR;
     }
+    {
+        int err;
+        time_t db_time;
+        struct tm *timeinfo;
+        uint version;
+        std::stringstream msg;
+        char buffer[80];
+
+        do {
+            version = (uint) cl_engine_get_num(e, CL_ENGINE_DB_VERSION, &err);
+            if (err != CL_SUCCESS) {
+                break;
+            }
+            db_time = (time_t) cl_engine_get_num(e, CL_ENGINE_DB_TIME, &err);
+            if (err != CL_SUCCESS) {
+                break;
+            }
+            timeinfo = gmtime(&db_time);
+            strftime(buffer, sizeof (buffer), "%F %T UTC", timeinfo);
+            msg << "ClamAV database version " << version << ", " << buffer;
+            Messaging::message(Messaging::INFORMATION, msg.str());
+        } while (0);
+    }
     return e;
 }
 
@@ -106,7 +130,7 @@ struct cl_engine *VirusScan::createEngine() {
  * Destroys virus scan engine.
  * @param e virus scan engine
  */
-void VirusScan::destroyEngine(cl_engine *e) {
+void VirusScan::destroyEngine(cl_engine * e) {
     int ret;
     ret = cl_engine_free(e);
     if (ret != 0) {
@@ -122,7 +146,7 @@ void VirusScan::destroyEngine(cl_engine *e) {
  * 
  * @return scan engine
  */
-struct cl_engine *VirusScan::getEngine() {
+struct cl_engine * VirusScan::getEngine() {
     struct cl_engine *ret = NULL;
 
     // Wait for update to complete

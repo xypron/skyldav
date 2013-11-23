@@ -32,7 +32,7 @@ libskyldav_la_SOURCES = \
   ThreadPool.cc \
   VirusScan.cc
 
-bin_PROGRAMS = \
+sbin_PROGRAMS = \
   skyldav
 
 skyldav_LDFLAGS = \
