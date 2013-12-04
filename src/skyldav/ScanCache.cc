@@ -36,11 +36,10 @@ ScanCache::ScanCache(Environment *env) {
     s = new std::set<ScanResult *, ScanResultComperator>();
     hits = 0;
     misses = 0;
-    
-    // Initialize the double linked list of scan results.
-    root.left = &root;
-    root.right = &root;
+    // Initialize mutex.
     pthread_mutex_init(&mutex, NULL);
+    // Initialize the double linked list of scan results.
+    clear();
 }
 
 /**
@@ -109,6 +108,9 @@ void ScanCache::clear() {
         delete *pos;
     }
     s->clear();
+    // Initialize the double linked list of scan results.
+    root.left = &root;
+    root.right = &root;
     Messaging::message(Messaging::DEBUG, "Cache cleared.");
     pthread_mutex_unlock(&mutex);
 }

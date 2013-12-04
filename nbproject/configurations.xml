@@ -12,6 +12,7 @@
           <in>Environment.h</in>
           <in>FanotifyPolling.cc</in>
           <in>FanotifyPolling.h</in>
+          <in>Messaging.cc</in>
           <in>Messaging.h</in>
           <in>MountPolling.cc</in>
           <in>MountPolling.h</in>
@@ -31,6 +32,10 @@
           <in>skyldav.h</in>
         </df>
       </df>
+      <df name="test">
+        <in>loadTest.cc</in>
+      </df>
+      <in>config.h</in>
     </df>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -61,31 +66,64 @@
           <buildCommand>${MAKE} -f Makefile</buildCommand>
           <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
           <executablePath>src/notify/skyldavnotify</executablePath>
-          <ccTool>
+          <cTool>
             <incDir>
               <pElem>src/skyldav</pElem>
-              <pElem>src/notify</pElem>
+              <pElem>.</pElem>
             </incDir>
+            <preprocessorList>
+              <Elem>HAVE_CONFIG_H</Elem>
+              <Elem>PIC</Elem>
+              <Elem>_FILE_OFFSET_BITS=64</Elem>
+              <Elem>_FORTIFY_SOURCE=2</Elem>
+              <Elem>__SSP__=1</Elem>
+            </preprocessorList>
+          </cTool>
+          <ccTool>
+            <preprocessorList>
+              <Elem>HAVE_CONFIG_H</Elem>
+              <Elem>_FILE_OFFSET_BITS=64</Elem>
+              <Elem>_FORTIFY_SOURCE=2</Elem>
+              <Elem>__SSP__=1</Elem>
+            </preprocessorList>
           </ccTool>
         </makeTool>
       </makefileType>
+      <item path="config.h" ex="false" tool="3" flavor2="0">
+      </item>
       <folder path="skyldav/src/notify">
         <ccTool>
           <incDir>
-            <pElem>/usr/lib/x86_64-linux-gnu/glib-2.0/include</pElem>
-            <pElem>/usr/include/glib-2.0/glib</pElem>
-            <pElem>/usr/include/glib-2.0/gobject</pElem>
-            <pElem>/usr/include/gtk-2.0/gdk</pElem>
-            <pElem>/usr/include/libnotify</pElem>
-            <pElem>/usr/include/gtk-2.0/gtk</pElem>
             <pElem>src/notify</pElem>
+            <pElem>.</pElem>
+            <pElem>/usr/include/gtk-2.0</pElem>
+            <pElem>/usr/lib/x86_64-linux-gnu/gtk-2.0/include</pElem>
+            <pElem>/usr/include/atk-1.0</pElem>
+            <pElem>/usr/include/cairo</pElem>
+            <pElem>/usr/include/gdk-pixbuf-2.0</pElem>
+            <pElem>/usr/include/pango-1.0</pElem>
+            <pElem>/usr/include/gio-unix-2.0</pElem>
             <pElem>/usr/include/glib-2.0</pElem>
+            <pElem>/usr/lib/x86_64-linux-gnu/glib-2.0/include</pElem>
+            <pElem>/usr/include/pixman-1</pElem>
+            <pElem>/usr/include/freetype2</pElem>
+            <pElem>/usr/include/libpng12</pElem>
           </incDir>
         </ccTool>
       </folder>
       <folder path="skyldav/src/skyldav">
         <ccTool>
           <incDir>
+            <pElem>src/skyldav</pElem>
+            <pElem>.</pElem>
+          </incDir>
+        </ccTool>
+      </folder>
+      <folder path="skyldav/test">
+        <ccTool>
+          <incDir>
+            <pElem>test</pElem>
+            <pElem>.</pElem>
             <pElem>src/skyldav</pElem>
           </incDir>
         </ccTool>
@@ -95,50 +133,85 @@
       <item path="src/notify/notify.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/skyldav/Environment.cc" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <preprocessorList>
+            <Elem>PIC</Elem>
+          </preprocessorList>
+        </ccTool>
       </item>
       <item path="src/skyldav/Environment.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/skyldav/FanotifyPolling.cc" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <preprocessorList>
+            <Elem>PIC</Elem>
+          </preprocessorList>
+        </ccTool>
       </item>
       <item path="src/skyldav/FanotifyPolling.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/skyldav/Messaging.cc" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <preprocessorList>
+            <Elem>PIC</Elem>
+          </preprocessorList>
+        </ccTool>
       </item>
       <item path="src/skyldav/Messaging.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/skyldav/MountPolling.cc" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <preprocessorList>
+            <Elem>PIC</Elem>
+          </preprocessorList>
+        </ccTool>
       </item>
       <item path="src/skyldav/MountPolling.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/skyldav/ScanCache.cc" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <preprocessorList>
+            <Elem>PIC</Elem>
+          </preprocessorList>
+        </ccTool>
       </item>
       <item path="src/skyldav/ScanCache.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/skyldav/StringSet.cc" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <preprocessorList>
+            <Elem>PIC</Elem>
+          </preprocessorList>
+        </ccTool>
       </item>
       <item path="src/skyldav/StringSet.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/skyldav/ThreadPool.cc" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <preprocessorList>
+            <Elem>PIC</Elem>
+          </preprocessorList>
+        </ccTool>
       </item>
       <item path="src/skyldav/ThreadPool.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/skyldav/VirusScan.cc" ex="false" tool="1" flavor2="0">
+        <ccTool>
+          <preprocessorList>
+            <Elem>PIC</Elem>
+          </preprocessorList>
+        </ccTool>
       </item>
       <item path="src/skyldav/VirusScan.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/skyldav/conf.c" ex="false" tool="0" flavor2="2">
         <cTool>
-          <incDir>
-            <pElem>src/skyldav</pElem>
-          </incDir>
         </cTool>
       </item>
       <item path="src/skyldav/conf.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/skyldav/listmounts.c" ex="false" tool="0" flavor2="2">
         <cTool>
-          <incDir>
-            <pElem>/usr/include/libmount</pElem>
-            <pElem>src/skyldav</pElem>
-          </incDir>
         </cTool>
       </item>
       <item path="src/skyldav/listmounts.h" ex="false" tool="3" flavor2="0">
@@ -146,6 +219,8 @@
       <item path="src/skyldav/main.cc" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/skyldav/skyldav.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="test/loadTest.cc" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
   </confs>
