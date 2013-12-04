@@ -39,6 +39,7 @@ VirusScan::VirusScan(Environment * e) {
 
     env = e;
     status = RUNNING;
+    engineRefCount = 0;
     pthread_mutex_init(&mutexEngine, NULL);
     pthread_mutex_init(&mutexUpdate, NULL);
 
