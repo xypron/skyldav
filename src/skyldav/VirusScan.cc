@@ -152,12 +152,14 @@ struct cl_engine * VirusScan::getEngine() {
 
     // Wait for update to complete
     pthread_mutex_lock(&mutexUpdate);
-    pthread_mutex_unlock(&mutexUpdate);
-
     pthread_mutex_lock(&mutexEngine);
+
     ret = engine;
+    // Increase reference count.
     engineRefCount++;
+
     pthread_mutex_unlock(&mutexEngine);
+    pthread_mutex_unlock(&mutexUpdate);
     return ret;
 }
 
