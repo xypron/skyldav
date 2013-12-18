@@ -1,8 +1,8 @@
-skyldav (0.3-6) unstable; urgency=low
+skyldav (0.3-7) unstable; urgency=low
 
   * Log ClavAV data base version
 
- -- Heinrich Schuchardt <xypron.glpk@gmx.de> Fri, 03 Dec 2013 14:00:00 +0200
+ -- Heinrich Schuchardt <xypron.glpk@gmx.de> Fri, 18 Dec 2013 14:00:00 +0200
 
 skyldav (0.2-11) unstable; urgency=low
 
