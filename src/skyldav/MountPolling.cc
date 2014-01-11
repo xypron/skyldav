@@ -57,7 +57,7 @@ static pthread_t thread;
  * @return pointer to int indicating success
  */
 void * MountPolling::run(void *obj) {
-    MountPolling *mp = (MountPolling *) obj;
+    MountPolling *mp = static_cast<MountPolling *> (obj);
     /*
      * file descriptor
      */
@@ -70,10 +70,6 @@ void * MountPolling::run(void *obj) {
      * number of file descriptors
      */
     nfds_t nfds = 1;
-    /*
-     * number of structures with nonzero revents fields, 0 = timeout
-     */
-    int ret;
 
     mp->status = INITIAL;
 
@@ -93,6 +89,10 @@ void * MountPolling::run(void *obj) {
     fds.revents = 0;
     mp->status = RUNNING;
     while (mp->status == RUNNING) {
+        /*
+         * number of structures with nonzero revents fields, 0 = timeout
+         */
+        int ret;
         ret = poll(&fds, nfds, 1);
         if (ret > 0) {
             if (fds.revents & POLLERR) {
@@ -142,14 +142,14 @@ void MountPolling::callback() {
         }
     } while (0);
 
-    for (pos = cbmounts->begin(); pos != cbmounts->end(); pos++) {
+    for (pos = cbmounts->begin(); pos != cbmounts->end(); ++pos) {
         if (0 == mounts->count(*pos)) {
             str = *pos;
             FanotifyPolling::markMount(fd, str->c_str());
             newMount = 1;
         }
     }
-    for (pos = mounts->begin(); pos != mounts->end(); pos++) {
+    for (pos = mounts->begin(); pos != mounts->end(); ++pos) {
         if (0 == cbmounts->count(*pos)) {
             str = *pos;
             FanotifyPolling::unmarkMount(fd, str->c_str());
@@ -239,12 +239,10 @@ MountPolling::MountPolling(int ffd, Environment *e) {
 MountPolling::~MountPolling() {
     void *result;
     int ret;
-    StringSet::iterator pos;
-    std::string *str;
 
     if (status != RUNNING) {
         Messaging::message(Messaging::ERROR, "Polling not started.\n");
-        throw FAILURE;
+        return;
     }
 
     // Ask polling thread to stop.
@@ -252,7 +250,9 @@ MountPolling::~MountPolling() {
 
     // Unmark all mounts.
     if (mounts != NULL) {
-        for (pos = mounts->begin(); pos != mounts->end(); pos++) {
+        StringSet::iterator pos;
+        for (pos = mounts->begin(); pos != mounts->end(); ++pos) {
+            std::string *str;
             str = *pos;
             FanotifyPolling::unmarkMount(fd, str->c_str());
         }
@@ -266,11 +266,10 @@ MountPolling::~MountPolling() {
         std::stringstream msg;
         msg << "Failure to join thread: " << strerror(ret);
         Messaging::message(Messaging::ERROR, msg.str());
-        throw FAILURE;
+        return;
     }
     if (status != SUCCESS) {
-        Messaging::message(Messaging::ERROR, 
+        Messaging::message(Messaging::ERROR,
                 "Ending thread signals failure.\n");
-        throw FAILURE;
     }
 }

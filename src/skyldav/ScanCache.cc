@@ -104,7 +104,7 @@ void ScanCache::add(const struct stat *stat, const unsigned int response) {
 void ScanCache::clear() {
     pthread_mutex_lock(&mutex);
     std::set<ScanResult *, ScanResultComperator>::iterator pos;
-    for (pos = s->begin(); pos != s->end(); pos++) {
+    for (pos = s->begin(); pos != s->end(); ++pos) {
         delete *pos;
     }
     s->clear();

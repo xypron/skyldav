@@ -45,8 +45,8 @@
  * @param file file
  */
 static void skipComment(FILE *file) {
-    char c;
     while (!feof(file)) {
+        char c;
         c = fgetc(file);
         if (c == '\n') {
             break;
@@ -155,8 +155,8 @@ int parseConfigurationFile(char *filename, conf_cb cb, void *info) {
                 printf("%s = %s\n", key, value);
             } else {
                 if (cb(key, value, info)) {
-                printf("Invalid entry in '%s': %s = %s\n", 
-                        filename, key, value);
+                    printf("Invalid entry in '%s': %s = %s\n",
+                            filename, key, value);
                     ret = 1;
                 };
             }
@@ -166,7 +166,7 @@ int parseConfigurationFile(char *filename, conf_cb cb, void *info) {
             getToken(file, value, &newline);
             if (0 == strcmp(value, "")) {
                 break;
-			}
+            }
         }
     }
     fclose(file);

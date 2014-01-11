@@ -77,6 +77,9 @@ private:
      * @brief Maximum cache size.
      */
     unsigned int cacheMaxSize;
+
+    // Do not allow copy.    
+    Environment(const Environment&);
 };
 
 #endif	/* ENVIRONMENT_H */

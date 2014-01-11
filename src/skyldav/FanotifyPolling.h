@@ -114,6 +114,8 @@ extern "C" {
         int writeResponse(const struct fanotify_response, int);
         int fanotifyOpen();
         int fanotifyClose();
+        // Do not allow copying.
+        FanotifyPolling(const FanotifyPolling&);
     };
 
 #ifdef	__cplusplus

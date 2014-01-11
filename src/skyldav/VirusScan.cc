@@ -101,29 +101,26 @@ struct cl_engine *VirusScan::createEngine() {
         cl_engine_free(e);
         throw SCANERROR;
     }
-    {
+    do {
         int err;
         time_t db_time;
-        struct tm *timeinfo;
         uint version;
         std::stringstream msg;
         char buffer[80];
-
-        do {
-            version = (uint) cl_engine_get_num(e, CL_ENGINE_DB_VERSION, &err);
-            if (err != CL_SUCCESS) {
-                break;
-            }
-            db_time = (time_t) cl_engine_get_num(e, CL_ENGINE_DB_TIME, &err);
-            if (err != CL_SUCCESS) {
-                break;
-            }
-            timeinfo = gmtime(&db_time);
-            strftime(buffer, sizeof (buffer), "%F %T UTC", timeinfo);
-            msg << "ClamAV database version " << version << ", " << buffer;
-            Messaging::message(Messaging::INFORMATION, msg.str());
-        } while (0);
-    }
+        struct tm *timeinfo;
+        version = (uint) cl_engine_get_num(e, CL_ENGINE_DB_VERSION, &err);
+        if (err != CL_SUCCESS) {
+            break;
+        }
+        db_time = (time_t) cl_engine_get_num(e, CL_ENGINE_DB_TIME, &err);
+        if (err != CL_SUCCESS) {
+            break;
+        }
+        timeinfo = gmtime(&db_time);
+        strftime(buffer, sizeof (buffer), "%F %T UTC", timeinfo);
+        msg << "ClamAV database version " << version << ", " << buffer;
+        Messaging::message(Messaging::INFORMATION, msg.str());
+    } while (0);
     return e;
 }
 
@@ -287,7 +284,7 @@ void * VirusScan::updater(void *virusScan) {
     };
     VirusScan *vs;
 
-    vs = (VirusScan *) virusScan;
+    vs = static_cast<VirusScan *> (virusScan);
 
     for (;;) {
         if (vs->status == STOPPING) {
@@ -321,7 +318,7 @@ void * VirusScan::updater(void *virusScan) {
                     pthread_mutex_unlock(&(vs->mutexEngine));
                     Messaging::message(Messaging::INFORMATION,
                             "Using updated ClamAV database.");
-                } catch (Status e) {
+                } catch (Status& e) {
                 }
                 // Allow scanning.
                 pthread_mutex_unlock(&(vs->mutexUpdate));

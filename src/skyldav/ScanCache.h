@@ -142,6 +142,9 @@ private:
      * @brief Root for double linked list.
      */
     ScanResult root;
+    
+    // Do not allow copying.
+    ScanCache(const ScanCache&);
 };
 
 #endif	/* SCANCACHE_H */

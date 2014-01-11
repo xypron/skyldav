@@ -142,12 +142,12 @@ int ThreadPool::isStopping() {
  * @return return value
  */
 void * ThreadPool::worker(void *threadPool) {
-    void *workitem;
     ThreadPool *tp;
 
-    tp = (ThreadPool *) threadPool;
+    tp = static_cast<ThreadPool *> (threadPool);
 
     for (;;) {
+        void *workitem;
         pthread_mutex_lock(&tp->mutexWorker);
         while (!tp->isStopping() && tp->worklist.size() == 0) {
             pthread_cond_wait(&tp->cond, &tp->mutexWorker);

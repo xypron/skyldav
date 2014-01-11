@@ -85,7 +85,7 @@ Messaging::Messaging() {
  * 
  * @param label label to futher detail error message
  */
-void Messaging::error(const std::string label) {
+void Messaging::error(const std::string &label) {
     std::stringstream text;
     text << label << ": " << strerror(errno);
     message(ERROR, text.str());
@@ -97,7 +97,7 @@ void Messaging::error(const std::string label) {
  * @param level message priority
  * @param message message text
  */
-void Messaging::message(const enum Level level, const std::string message) {
+void Messaging::message(const enum Level level, const std::string &message) {
     std::string type;
 
     getSingleton();

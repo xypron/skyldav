@@ -57,8 +57,8 @@ public:
     };
     
     static void setLevel(const enum Level);
-    static void error(const std::string);
-    static void message(const enum Level, const std::string);
+    static void error(const std::string&);
+    static void message(const enum Level, const std::string&);
     static void teardown();
 private:
     static Messaging *singleton;

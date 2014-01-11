@@ -30,6 +30,7 @@
 #include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
 #include <string.h>
 #include <sys/fanotify.h>
 #include <sys/stat.h>
@@ -60,10 +61,6 @@ void *FanotifyPolling::run(void *obj) {
      * number of file descriptors
      */
     nfds_t nfds = 1;
-    /*
-     * number of structures with nonzero revents fields, 0 = timeout
-     */
-    int ret;
     /**
      * Buffer.
      */
@@ -71,7 +68,7 @@ void *FanotifyPolling::run(void *obj) {
 
     // Copy fanotify object
     if (obj) {
-        fp = (FanotifyPolling *) obj;
+        fp = static_cast<FanotifyPolling *> (obj);
     } else {
         return NULL;
     }
@@ -83,6 +80,10 @@ void *FanotifyPolling::run(void *obj) {
     fp->status = RUNNING;
     // Continue while the status is not changed.
     while (fp->status == RUNNING) {
+        /*
+         * number of structures with nonzero revents fields, 0 = timeout
+         */
+        int ret;
         // Poll for 10 ms. Then recheck status.
         ret = poll(&fds, nfds, 1000);
         if (ret > 0) {
@@ -136,7 +137,6 @@ void *FanotifyPolling::run(void *obj) {
 int FanotifyPolling::exclude(const int fd) {
     int path_len;
     char path[PATH_MAX + 1];
-    std::stringstream msg;
     StringSet *exclude;
     StringSet::iterator pos;
     std::string fname;
@@ -152,8 +152,11 @@ int FanotifyPolling::exclude(const int fd) {
 
     // Search in exclude paths.    
     exclude = e->getExcludePaths();
-    for (pos = exclude->begin();  pos != exclude->end(); pos++) {
-        if (0 == fname.find(**pos)) {
+    
+    for (pos = exclude->begin(); pos != exclude->end(); ++pos) {
+        std::string *str = *pos;
+
+        if (0 == fname.compare(0, str->size(), *str)) {
             return 1;
         }
     }
@@ -164,13 +167,13 @@ int FanotifyPolling::exclude(const int fd) {
  * @brief Scans a file.
  */
 void* FanotifyPolling::scanFile(void *workitem) {
-    int ret;
     struct ScanTask *task = (struct ScanTask *) workitem;
     struct fanotify_response response;
     pid_t pid;
     struct stat statbuf;
 
     if (task->metadata.mask & FAN_ALL_PERM_EVENTS) {
+        int ret;
         ret = fstat(task->metadata.fd, &statbuf);
         if (ret == -1) {
             std::stringstream msg;
@@ -197,7 +200,7 @@ void* FanotifyPolling::scanFile(void *workitem) {
             } else {
                 response.response = FAN_DENY;
             }
-            ret = task->fp->writeResponse(response, 1);
+            task->fp->writeResponse(response, 1);
         }
     }
     close(task->metadata.fd);
@@ -221,7 +224,6 @@ void FanotifyPolling::handleFanotifyEvent(
     pid_t pid;
     struct stat statbuf;
     struct fanotify_response response;
-    struct ScanTask *task;
     int tobeclosed = 1;
 
     ret = fstat(metadata->fd, &statbuf);
@@ -256,18 +258,24 @@ void FanotifyPolling::handleFanotifyEvent(
                 // For directories always allow.
                 ret = writeResponse(response, 0);
             } else {
-                // It is a file.
+                // It is a file. Unignore it.
                 ret = fanotify_mark(fd, FAN_MARK_REMOVE |
                         FAN_MARK_IGNORED_MASK, FAN_MODIFY, metadata->fd,
                         NULL);
+                if (ret == -1 && errno != ENOENT) {
+                    std::stringstream msg;
+                    msg << "Failure to unignore file: " << strerror(errno);
+                    Messaging::message(Messaging::ERROR, msg.str());
+                }
                 response.response = e->getScanCache()->get(&statbuf);
                 if (response.response == ScanCache::CACHE_MISS) {
+                    struct ScanTask *task;
                     task = (struct ScanTask *) malloc(sizeof (struct ScanTask));
                     if (task == NULL) {
                         Messaging::message(Messaging::ERROR, "Out of memory\n");
                         response.fd = metadata->fd;
                         response.response = FAN_ALLOW;
-                        ret = writeResponse(response, 0);
+                        writeResponse(response, 0);
                     } else {
                         tobeclosed = 0;
                         task->metadata = *metadata;
@@ -275,7 +283,7 @@ void FanotifyPolling::handleFanotifyEvent(
                         tp->add((void *) task);
                     }
                 } else {
-                    ret = writeResponse(response, 0);
+                    writeResponse(response, 0);
                 }
             }
         } // FAN_OPEN_PERM
@@ -370,26 +378,19 @@ FanotifyPolling::FanotifyPolling(Environment * env) {
 
 /**
  * @brief Stops polling fanotify events.
- * 
- * @return success
  */
 FanotifyPolling::~FanotifyPolling() {
     void *result;
     int ret;
-    enum Status success = SUCCESS;
 
     if (status != RUNNING) {
         Messaging::message(Messaging::ERROR, "Polling not started.\n");
-        throw FAILURE;
+        return;
     }
 
     // Stop the mount polling thread.
-    try {
-        if (mp) {
-            delete mp;
-        }
-    } catch (MountPolling::Status e) {
-        throw FAILURE;
+    if (mp) {
+        delete mp;
     }
 
     // Stop the fanotify polling thread.
@@ -399,11 +400,9 @@ FanotifyPolling::~FanotifyPolling() {
         std::stringstream msg;
         msg << "Failure to joing thread: " << strerror(ret);
         Messaging::message(Messaging::ERROR, msg.str());
-        success = FAILURE;
     } else if (status != SUCCESS) {
         Messaging::message(Messaging::ERROR,
                 "Ending thread signals failure.\n");
-        success = FAILURE;
     }
 
     // Close the fanotify file descriptor.
@@ -417,7 +416,6 @@ FanotifyPolling::~FanotifyPolling() {
         std::stringstream msg;
         msg << "Failure destroying thread: " << strerror(ret);
         Messaging::message(Messaging::ERROR, msg.str());
-        success = FAILURE;
     }
 
     // Unload the virus scanner.
@@ -426,10 +424,6 @@ FanotifyPolling::~FanotifyPolling() {
     } catch (enum VirusScan::Status e) {
         Messaging::message(Messaging::ERROR,
                 "Failure unloading virus scanner\n");
-        success = FAILURE;
-    }
-    if (success != SUCCESS) {
-        throw FAILURE;
     }
 }
 

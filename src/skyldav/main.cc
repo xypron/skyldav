@@ -51,16 +51,16 @@
  * @return success
  */
 static int configurationCallback(const char *key, const char *value, void *info) {
-    Environment *e = (Environment *) info;
+    Environment *e = static_cast<Environment *> (info);
     int ret = 0;
-    unsigned int cacheMaxSize;
-    int nThread;
 
     if (e == NULL) {
         throw 0;
     }
 
     if (!strcmp(key, "CACHE_MAX_SIZE")) {
+        unsigned int cacheMaxSize;
+
         std::stringstream ss(value);
         ss >> cacheMaxSize;
         if (ss.fail()) {
@@ -69,7 +69,6 @@ static int configurationCallback(const char *key, const char *value, void *info)
         e->setCacheMaxSize(cacheMaxSize);
     } else if (!strcmp(key, "EXCLUDE_PATH")) {
         std::string val = value;
-        std::string::reverse_iterator rit = val.rbegin();
         // Append missing trailing path separator.
         if (0 == val.length() || *(val.rbegin()++) != '/') {
             val += "/";
@@ -82,6 +81,8 @@ static int configurationCallback(const char *key, const char *value, void *info)
     } else if (!strcmp(key, "NOMARK_MNT")) {
         e->getNoMarkMounts()->add(value);
     } else if (!strcmp(key, "THREADS")) {
+        int nThread;
+
         std::stringstream ss(value);
         ss >> nThread;
         if (ss.fail()) {
@@ -260,8 +261,6 @@ int main(int argc, char *argv[]) {
     sigset_t blockset;
     // counter
     int i;
-    // command line option
-    char *opt;
     // configuration file
     char *cfile = (char *) CONF_FILE;
     // Fanotify polling object
@@ -283,6 +282,8 @@ int main(int argc, char *argv[]) {
 
     // Analyze command line options.
     for (i = 1; i < argc; i++) {
+        char *opt;
+
         opt = argv[i];
         if (*opt == '-') {
             opt++;

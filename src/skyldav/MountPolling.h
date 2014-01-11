@@ -82,6 +82,9 @@ extern "C" {
 
         void callback();
         int isFuse(const char *);
+        
+        // Do not allow copying.
+        MountPolling(const MountPolling&);
     };
 
 

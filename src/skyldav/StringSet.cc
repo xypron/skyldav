@@ -62,7 +62,7 @@ int StringSet::find(const char *value) {
  */
 void StringSet::print() {
     StringSet::iterator pos;
-    for (pos = this->begin(); pos != this->end(); pos++) {
+    for (pos = this->begin(); pos != this->end(); ++pos) {
         std::cout << "'" <<**pos << "'" << std::endl;
     }
 }
@@ -72,7 +72,7 @@ void StringSet::print() {
  */
 StringSet::~StringSet() {
     StringSet::iterator pos;
-    for (pos = this->begin(); pos != this->end(); pos++) {
+    for (pos = this->begin(); pos != this->end(); ++pos) {
         delete *pos;
     }
     this->clear();
