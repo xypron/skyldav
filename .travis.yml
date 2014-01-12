@@ -4,7 +4,7 @@ branches:
   only:
     - master
 
-before-install:
+before_install:
   - apt-get install debhelper autotools-dev autoconf-archive pkg-config libc6-dev libcanberra-dev libcap-dev libclamav-dev  libgtk2.0-dev libmount-dev libnotify-dev
 
 install:
