@@ -152,7 +152,7 @@ int FanotifyPolling::exclude(const int fd) {
 
     // Search in exclude paths.    
     exclude = e->getExcludePaths();
-    
+
     for (pos = exclude->begin(); pos != exclude->end(); ++pos) {
         std::string *str = *pos;
 
@@ -462,7 +462,7 @@ int FanotifyPolling::writeResponse(const struct fanotify_response response,
     }
 
     ret = write(fd, &response, sizeof (struct fanotify_response));
-    if (ret == -1 && errno != ENOENT) {
+    if (ret == -1 && status == RUNNING && errno != ENOENT) {
         std::stringstream msg;
         fprintf(stderr, "Failure to write response %u: %s\n",
                 response.response,
