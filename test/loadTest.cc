@@ -96,15 +96,14 @@ static void hdl(int sig) {
  * @brief Open and close one file.
  */
 static void* work(void *workitem) {
-    Task *task = (Task *) workitem;
+    Task *task = static_cast<Task *> (workitem);
     int fd;
-    int ret;
 
     fd = open(task->filename, O_RDONLY);
     if (fd == -1) {
         perror("Failure to open file");
     } else {
-        ret = close(fd);
+        int ret = close(fd);
         if (ret == -1) {
             perror("Failure to close file");
         }
@@ -144,12 +143,10 @@ int main(int argc, char** argv) {
     // index
     int i;
     // number of threads
-    int nThread = 4;
+    int nThread;
     // number of tasks
     int nTask = 10000;
     Task *task;
-    // command line option
-    char *opt;
 
     // Set the number of threads to the number of available CPUs.
     nThread = sysconf(_SC_NPROCESSORS_ONLN);
@@ -160,6 +157,9 @@ int main(int argc, char** argv) {
 
     // Analyze command line options.
     for (i = 1; i < argc; i++) {
+        // command line option
+        char *opt;
+
         opt = argv[i];
         if (*opt == '-') {
             opt++;

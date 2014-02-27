@@ -29,13 +29,12 @@
 static void checkEqual(const unsigned int actual, const unsigned int expected,
         const char *lbl) {
     if (actual != expected) {
-        printf("%s: actual '%d', expected '%d'.\n", lbl, actual, expected);
+        printf("%s: actual '%u', expected '%u'.\n", lbl, actual, expected);
         throw EXIT_FAILURE;
     }
 }
 
 int main(int argc, char *argv[]) {
-    int actual, expected;
     int ret = EXIT_SUCCESS;
     ScanCache *c;
     Environment *e;

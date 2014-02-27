@@ -14,3 +14,6 @@
 Makefile
 /nbproject/private/
 /build/
+/test/Makefile.in
+/test/loadTest
+/test/testScanCache
