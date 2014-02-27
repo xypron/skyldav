@@ -84,6 +84,7 @@ void *FanotifyPolling::run(void *obj) {
          * number of structures with nonzero revents fields, 0 = timeout
          */
         int ret;
+        char errbuf[256];
         // Poll for 10 ms. Then recheck status.
         ret = poll(&fds, nfds, 1000);
         if (ret > 0) {
@@ -100,7 +101,7 @@ void *FanotifyPolling::run(void *obj) {
                         }
                         std::stringstream msg;
                         msg << "Reading from fanotify failed: "
-                                << strerror(errno);
+                                << strerror_r(errno, errbuf, sizeof (errbuf));
                         Messaging::message(Messaging::ERROR, msg.str());
                         Messaging::message(Messaging::WARNING,
                                 "Fanotiy thread stopped.");
@@ -114,7 +115,7 @@ void *FanotifyPolling::run(void *obj) {
             if (errno != EINTR) {
                 std::stringstream msg;
                 msg << "Poll failed: "
-                        << strerror(errno);
+                        << strerror_r(errno, errbuf, sizeof (errbuf));
                 Messaging::message(Messaging::ERROR, msg.str());
                 Messaging::message(Messaging::WARNING,
                         "Fanotiy thread stopped.");
@@ -176,9 +177,10 @@ void* FanotifyPolling::scanFile(void *workitem) {
         int ret;
         ret = fstat(task->metadata.fd, &statbuf);
         if (ret == -1) {
+            char errbuf[256];
             std::stringstream msg;
             msg << "scanFile: failure to read file status: "
-                    << strerror(errno);
+                    << strerror_r(errno, errbuf, sizeof (errbuf));
             Messaging::message(Messaging::ERROR, msg.str());
         } else {
             response.fd = task->metadata.fd;
@@ -229,8 +231,9 @@ void FanotifyPolling::handleFanotifyEvent(
     ret = fstat(metadata->fd, &statbuf);
     if (ret == -1) {
         std::stringstream msg;
+        char errbuf[256];
         msg << "analyze: failure to read file status: "
-                << strerror(errno);
+                << strerror_r(errno, errbuf, sizeof (errbuf));
         Messaging::message(Messaging::ERROR, msg.str());
         ret = writeResponse(response, 0);
     } else {
@@ -264,7 +267,9 @@ void FanotifyPolling::handleFanotifyEvent(
                         NULL);
                 if (ret == -1 && errno != ENOENT) {
                     std::stringstream msg;
-                    msg << "Failure to unignore file: " << strerror(errno);
+                    char errbuf[256];
+                    msg << "Failure to unignore file: "
+                            << strerror_r(errno, errbuf, sizeof (errbuf));
                     Messaging::message(Messaging::ERROR, msg.str());
                 }
                 response.response = e->getScanCache()->get(&statbuf);
@@ -326,6 +331,7 @@ FanotifyPolling::FanotifyPolling(Environment * env) {
     int ret;
     struct timespec waiting_time_rem;
     struct timespec waiting_time_req;
+    char errbuf[256];
 
     e = env;
 
@@ -341,7 +347,8 @@ FanotifyPolling::FanotifyPolling(Environment * env) {
     ret = pthread_mutex_init(&mutex_response, NULL);
     if (ret != 0) {
         std::stringstream msg;
-        msg << "Failure to intialize mutex: " << strerror(ret);
+        msg << "Failure to intialize mutex: "
+                << strerror_r(errno, errbuf, sizeof (errbuf));
         Messaging::message(Messaging::ERROR, msg.str());
         throw FAILURE;
     }
@@ -356,7 +363,8 @@ FanotifyPolling::FanotifyPolling(Environment * env) {
     ret = pthread_create(&thread, NULL, run, (void *) this);
     if (ret != 0) {
         std::stringstream msg;
-        msg << "Failure to create thread: " << strerror(ret);
+        msg << "Failure to create thread: "
+                << strerror_r(errno, errbuf, sizeof (errbuf));
         Messaging::message(Messaging::ERROR, msg.str());
         throw FAILURE;
     }
@@ -382,6 +390,7 @@ FanotifyPolling::FanotifyPolling(Environment * env) {
 FanotifyPolling::~FanotifyPolling() {
     void *result;
     int ret;
+    char errbuf[256];
 
     if (status != RUNNING) {
         Messaging::message(Messaging::ERROR, "Polling not started.\n");
@@ -398,7 +407,8 @@ FanotifyPolling::~FanotifyPolling() {
     ret = (int) pthread_join(thread, &result);
     if (ret != 0) {
         std::stringstream msg;
-        msg << "Failure to joing thread: " << strerror(ret);
+        msg << "Failure to joing thread: "
+                << strerror_r(errno, errbuf, sizeof (errbuf));
         Messaging::message(Messaging::ERROR, msg.str());
     } else if (status != SUCCESS) {
         Messaging::message(Messaging::ERROR,
@@ -414,7 +424,8 @@ FanotifyPolling::~FanotifyPolling() {
     // Destroy the mutex.
     if (pthread_mutex_destroy(&mutex_response)) {
         std::stringstream msg;
-        msg << "Failure destroying thread: " << strerror(ret);
+        msg << "Failure destroying thread: "
+                << strerror_r(errno, errbuf, sizeof (errbuf));
         Messaging::message(Messaging::ERROR, msg.str());
     }
 
@@ -464,10 +475,12 @@ int FanotifyPolling::writeResponse(const struct fanotify_response response,
     ret = write(fd, &response, sizeof (struct fanotify_response));
     if (ret == -1 && status == RUNNING && errno != ENOENT) {
         std::stringstream msg;
+        char errbuf[256];
         fprintf(stderr, "Failure to write response %u: %s\n",
                 response.response,
-                strerror(errno));
-        msg << "Failure to write response: " << strerror(errno);
+                strerror_r(errno, errbuf, sizeof (errbuf)));
+        msg << "Failure to write response: "
+                << strerror_r(errno, errbuf, sizeof (errbuf));
         Messaging::message(Messaging::ERROR, msg.str());
         ret = 1;
     } else {
@@ -496,7 +509,9 @@ int FanotifyPolling::fanotifyOpen() {
     fd = fanotify_init(flags, event_f_flags);
     if (fd == -1) {
         std::stringstream msg;
-        msg << "fanotifyOpen: " << strerror(errno);
+        char errbuf[256];
+        msg << "fanotifyOpen: "
+                << strerror_r(errno, errbuf, sizeof (errbuf));
         Messaging::message(Messaging::ERROR, msg.str());
         status = FAILURE;
         return -1;
@@ -513,9 +528,10 @@ int FanotifyPolling::fanotifyOpen() {
 int FanotifyPolling::fanotifyClose() {
     int ret = close(fd);
     if (ret == -1) {
+        char errbuf[256];
         status = FAILURE;
         std::stringstream msg;
-        msg << "fanotifyClose: " << strerror(errno);
+        msg << "fanotifyClose: " << strerror_r(errno, errbuf, sizeof (errbuf));
         Messaging::message(Messaging::ERROR, msg.str());
         return -1;
     } else {
@@ -538,7 +554,9 @@ int FanotifyPolling::markMount(int fd, const char *mount) {
     ret = fanotify_mark(fd, flags, mask, dfd, mount);
     if (ret != 0) {
         std::stringstream msg;
-        msg << "Failure to set mark on '" << mount << "': " << strerror(errno);
+        char errbuf[256];
+        msg << "Failure to set mark on '" << mount << "': "
+                << strerror_r(errno, errbuf, sizeof (errbuf));
         Messaging::message(Messaging::ERROR, msg.str());
         return EXIT_FAILURE;
     }
@@ -563,8 +581,9 @@ int FanotifyPolling::unmarkMount(int fd, const char *mount) {
     ret = fanotify_mark(fd, flags, mask, dfd, mount);
     if (ret != 0 && errno != ENOENT) {
         std::stringstream msg;
+        char errbuf[256];
         msg << "Failure to remove mark from '"
-                << mount << "': " << strerror(errno);
+                << mount << "': " << strerror_r(errno, errbuf, sizeof (errbuf));
         Messaging::message(Messaging::ERROR, msg.str());
         return EXIT_FAILURE;
     }

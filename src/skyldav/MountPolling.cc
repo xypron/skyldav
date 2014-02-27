@@ -59,17 +59,21 @@ static pthread_t thread;
 void * MountPolling::run(void *obj) {
     MountPolling *mp = static_cast<MountPolling *> (obj);
     /*
-     * file descriptor
+     * file descriptor.
      */
     int mfd;
     /**
-     * set of file descriptors to be monitored
+     * set of file descriptors to be monitored.
      */
     struct pollfd fds;
     /**
-     * number of file descriptors
+     * number of file descriptors.
      */
     nfds_t nfds = 1;
+    /**
+     * buffer for strerror_r.
+     */
+    char errbuf[256];
 
     mp->status = INITIAL;
 
@@ -78,7 +82,7 @@ void * MountPolling::run(void *obj) {
     if (mfd < 0) {
         std::stringstream msg;
         msg << "Failure to open /proc/mounts: "
-                << strerror(errno);
+                << strerror_r(errno, errbuf, sizeof(errbuf));
         Messaging::message(Messaging::ERROR, msg.str());
 
         mp->status = FAILURE;
@@ -103,7 +107,7 @@ void * MountPolling::run(void *obj) {
             if (errno != EINTR) {
                 std::stringstream msg;
                 msg << "Failure to poll /proc/mounts: "
-                        << strerror(errno);
+                        << strerror_r(errno, errbuf, sizeof(errbuf));
                 Messaging::message(Messaging::ERROR, msg.str());
                 close(mfd);
                 mp->status = FAILURE;
@@ -194,6 +198,7 @@ MountPolling::MountPolling(int ffd, Environment *e) {
     int ret;
     struct timespec waiting_time_rem;
     struct timespec waiting_time_req;
+    char errbuf[256];
 
     env = e;
     fd = ffd;
@@ -212,14 +217,16 @@ MountPolling::MountPolling(int ffd, Environment *e) {
     ret = pthread_attr_init(&attr);
     if (ret != 0) {
         std::stringstream msg;
-        msg << "Failure to set thread attributes: " << strerror(ret);
+        msg << "Failure to set thread attributes: " 
+                << strerror_r(errno, errbuf, sizeof(errbuf));
         Messaging::message(Messaging::ERROR, msg.str());
         throw FAILURE;
     }
     ret = pthread_create(&thread, &attr, run, (void *) this);
     if (ret != 0) {
         std::stringstream msg;
-        msg << "Failure to create thread: " << strerror(ret);
+        msg << "Failure to create thread: " 
+                << strerror_r(errno, errbuf, sizeof(errbuf));
         Messaging::message(Messaging::ERROR, msg.str());
         throw FAILURE;
     }
@@ -264,7 +271,9 @@ MountPolling::~MountPolling() {
     ret = (int) pthread_join(thread, &result);
     if (ret != 0) {
         std::stringstream msg;
-        msg << "Failure to join thread: " << strerror(ret);
+        char errbuf[256];
+        msg << "Failure to join thread: " 
+                << strerror_r(errno, errbuf, sizeof(errbuf));
         Messaging::message(Messaging::ERROR, msg.str());
         return;
     }

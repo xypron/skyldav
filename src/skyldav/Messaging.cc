@@ -87,7 +87,8 @@ Messaging::Messaging() {
  */
 void Messaging::error(const std::string &label) {
     std::stringstream text;
-    text << label << ": " << strerror(errno);
+    char errbuf[256];
+    text << label << ": " << strerror_r(errno, errbuf, sizeof(errbuf));
     message(ERROR, text.str());
 }
 

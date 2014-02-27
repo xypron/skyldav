@@ -133,8 +133,9 @@ static void pidfile() {
     ret = write(fd, buffer, len);
     if (ret == -1) {
         std::stringstream msg;
+        char errbuf[256];
         msg << "Cannot write to pid file '" << filename << "': "
-                << strerror(errno);
+                << strerror_r(errno, errbuf, sizeof(errbuf));
         Messaging::message(Messaging::ERROR, msg.str());
     }
     close(fd);
