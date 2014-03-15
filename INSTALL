@@ -26,10 +26,10 @@ git pull
 ./configure
 
 # Make
-./make -j6
+make -j6
 
 # Test
-./make check
+make check
 
 # Install
 sudo make install
