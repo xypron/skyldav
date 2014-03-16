@@ -74,7 +74,7 @@ void *FanotifyPolling::run(void *obj) {
     }
 
     fds.fd = fp->fd;
-    fds.events = POLLIN | POLLERR;
+    fds.events = POLLIN;
     fds.revents = 0;
 
     fp->status = RUNNING;
@@ -85,7 +85,7 @@ void *FanotifyPolling::run(void *obj) {
          */
         int ret;
         char errbuf[256];
-        // Poll for 10 ms. Then recheck status.
+        // Poll for 1 s. Then recheck status.
         ret = poll(&fds, nfds, 1000);
         if (ret > 0) {
             if (fds.revents & POLLIN) {
@@ -407,7 +407,7 @@ FanotifyPolling::~FanotifyPolling() {
     ret = (int) pthread_join(thread, &result);
     if (ret != 0) {
         std::stringstream msg;
-        msg << "Failure to joing thread: "
+        msg << "Failure to join thread: "
                 << strerror_r(errno, errbuf, sizeof (errbuf));
         Messaging::message(Messaging::ERROR, msg.str());
     } else if (status != SUCCESS) {
