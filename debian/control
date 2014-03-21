@@ -30,7 +30,7 @@ Depends:
  libgtk2.0-0,
  libmount1,
  libnotify4,
- freedesktop-sound-theme
+ sound-theme-freedesktop
 Suggests: clamav-freshclam
 Description: Skyld AV
  "Skyld AV" provides on access virus scanning for Linux.
