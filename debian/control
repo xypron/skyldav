@@ -23,10 +23,10 @@ Package: skyldav
 Section: utils
 Architecture: any
 Depends:
+ clamav,
  libc6,
  libcanberra0,
  libcap2,
- libclamav6,
  libgtk2.0-0,
  libmount1,
  libnotify4,
