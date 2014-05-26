@@ -237,6 +237,9 @@ void FanotifyPolling::handleFanotifyEvent(
         Messaging::message(Messaging::ERROR, msg.str());
         ret = writeResponse(response, 0);
     } else {
+        if (metadata->mask & FAN_CLOSE_WRITE) {
+            e->getScanCache()->remove(&statbuf);
+		}
         if (metadata->mask & FAN_MODIFY) {
             if (S_ISREG(statbuf.st_mode)) {
                 // It is a file. Do not receive further MODIFY events.
@@ -547,7 +550,7 @@ int FanotifyPolling::fanotifyClose() {
  */
 int FanotifyPolling::markMount(int fd, const char *mount) {
     unsigned int flags = FAN_MARK_ADD | FAN_MARK_MOUNT;
-    uint64_t mask = FAN_OPEN_PERM | FAN_MODIFY;
+    uint64_t mask = FAN_OPEN_PERM | FAN_MODIFY | FAN_CLOSE_WRITE;
     int dfd = AT_FDCWD;
     int ret;
 
@@ -574,7 +577,7 @@ int FanotifyPolling::markMount(int fd, const char *mount) {
  */
 int FanotifyPolling::unmarkMount(int fd, const char *mount) {
     unsigned int flags = FAN_MARK_REMOVE | FAN_MARK_MOUNT;
-    uint64_t mask = FAN_OPEN_PERM | FAN_CLOSE_WRITE;
+    uint64_t mask = FAN_OPEN_PERM | FAN_MODIFY | FAN_CLOSE_WRITE;
     int dfd = AT_FDCWD;
     int ret;
 
