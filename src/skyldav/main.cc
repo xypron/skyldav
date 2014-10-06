@@ -365,7 +365,7 @@ int main(int argc, char *argv[]) {
     // Block signals.
     sigemptyset(&blockset);
     sigaddset(&blockset, SIGUSR1);
-    if (sigprocmask(0 * SIG_BLOCK, &blockset, NULL) == -1) {
+    if (sigprocmask(SIG_BLOCK, &blockset, NULL) == -1) {
         Messaging::error("main, pthread_sigmask");
         return EXIT_FAILURE;
     }
