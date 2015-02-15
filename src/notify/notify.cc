@@ -40,7 +40,6 @@
 volatile sig_atomic_t status;
 
 static void sigint_handler(int sig) {
-    write(0, "\nSTOPPING\n", 10);
     status = STOPPING;
 }
 
