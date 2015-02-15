@@ -1,3 +1,9 @@
+skyldav (0.5.0) unstable; urgency=medium
+
+  * Bug fixes
+
+ -- Heinrich Schuchardt <xypron.glpk@gmx.de>  Sun, 15 Feb 2015 20:26:30 +0100
+
 skyldav (0.4.3) unstable; urgency=medium
 
   * Bug fixes 

@@ -49,7 +49,7 @@ const char *HELP_TEXT =
 
 const char *VERSION_TEXT =
     "On access virus scanner.\n\n"
-    "Copyright 2013 Heinrich Schuchardt <xypron.glpk@gmx.de>\n\n"
+    "Copyright 2013-2015 Heinrich Schuchardt <xypron.glpk@gmx.de>\n\n"
     "Licensed under the Apache License, Version 2.0 (the\n"
     "\"License\"); you may not use this file except in compliance\n"
     "with the License. You may obtain a copy of the License at\n\n"
