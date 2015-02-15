@@ -208,6 +208,11 @@ static void daemonize(Environment *e) {
     if (getppid() == 1) {
         return;
     }
+
+    // Do not wait for children.
+    signal(SIGCHLD, SIG_IGN);
+
+    // Create child process.
     pid = fork();
     if (pid == -1) {
         perror("Cannot fork");
