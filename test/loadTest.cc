@@ -77,7 +77,7 @@ struct Task {
 /**
  * Status
  */
-enum {
+static enum {
     RUNNING = 1,
     TERMINATING = 2
 } status;
