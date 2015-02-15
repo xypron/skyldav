@@ -1,14 +1,14 @@
-/* 
+/*
  * File:   ScanCache.h
- * 
+ *
  * Copyright 2013 Heinrich Schuchardt <xypron.glpk@gmx.de>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,7 +51,7 @@ void ScanCache::add(const struct stat *stat, const unsigned int response) {
     std::set<ScanResult *, ScanResultComperator>::iterator it;
     std::pair < std::set<ScanResult *, ScanResultComperator>::iterator, bool> pair;
     unsigned int cacheMaxSize = e->getCacheMaxSize();
-    
+
     if (0 == cacheMaxSize) {
         return;
     }
@@ -187,7 +187,7 @@ void ScanCache::remove(const struct stat *stat) {
 ScanCache::~ScanCache() {
     std::stringstream msg;
     msg << "Cache size " << s->size() <<
-            ", cache hits " << hits << ", cache misses " << misses << ".";
+        ", cache hits " << hits << ", cache misses " << misses << ".";
     clear();
     pthread_mutex_destroy(&mutex);
     Messaging::message(Messaging::INFORMATION, msg.str());

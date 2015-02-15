@@ -1,14 +1,14 @@
-/* 
+/*
  * File:   conf.c
- * 
+ *
  * Copyright 2013 Heinrich Schuchardt <xypron.glpk@gmx.de>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,7 +20,7 @@
 /**
  * @file conf.c
  * @brief Analyze configuration file.
- * 
+ *
  * <p>Each assignement line must have a key and a value separated by an equal
  * sign.</p>
  * <pre>key = value</pre>
@@ -156,7 +156,7 @@ int parseConfigurationFile(char *filename, conf_cb cb, void *info) {
             } else {
                 if (cb(key, value, info)) {
                     printf("Invalid entry in '%s': %s = %s\n",
-                            filename, key, value);
+                           filename, key, value);
                     ret = 1;
                 };
             }

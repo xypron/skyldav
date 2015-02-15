@@ -1,14 +1,14 @@
-/* 
+/*
  * File:   Environment.cc
- * 
+ *
  * Copyright 2013 Heinrich Schuchardt <xypron.glpk@gmx.de>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,8 +38,8 @@ Environment::Environment() {
 
 /**
  * @brief Gets the set of paths that shall not be scanned.
- * 
- * @return paths no to be scanned 
+ *
+ * @return paths no to be scanned
  */
 StringSet *Environment::getExcludePaths() {
     return excludepath;
@@ -47,7 +47,7 @@ StringSet *Environment::getExcludePaths() {
 
 /**
  * @brief Gets the list of file systems that shall not be scanned.
- * 
+ *
  * @return file systems not to be scanned.
  */
 StringSet *Environment::getNoMarkFileSystems() {
@@ -56,7 +56,7 @@ StringSet *Environment::getNoMarkFileSystems() {
 
 /**
  * @brief Gets the list of mounts not to be scanned.
- * 
+ *
  * @return mounts not to be scanned
  */
 StringSet *Environment::getNoMarkMounts() {
@@ -66,7 +66,7 @@ StringSet *Environment::getNoMarkMounts() {
 /**
  * @brief Gets the list of file systems considered local.
  * This list can be used to decide if scan results shall be cached.
- * 
+ *
  * @return list of file systems considered local
  */
 StringSet *Environment::getLocalFileSystems() {
@@ -75,7 +75,7 @@ StringSet *Environment::getLocalFileSystems() {
 
 /**
  * @brief Gets the maximum number of entries in the cache with scan results.
- * 
+ *
  * @return maximum cache size
  */
 unsigned int Environment::getCacheMaxSize() {
@@ -84,7 +84,7 @@ unsigned int Environment::getCacheMaxSize() {
 
 /**
  * @brief Sets the maximum number of entries in the cache with scan results.
- * 
+ *
  * @param size maximum cache size
  */
 void Environment::setCacheMaxSize(unsigned int size) {
@@ -93,7 +93,7 @@ void Environment::setCacheMaxSize(unsigned int size) {
 
 /**
  * @brief Gets the scan cache.
- * 
+ *
  * @return scan cache
  */
 ScanCache *Environment::getScanCache() {
@@ -102,7 +102,7 @@ ScanCache *Environment::getScanCache() {
 
 /**
  * @brief Gets the number of threads used to call the virus scanner.
- * 
+ *
  * @return number of threads
  */
 int Environment::getNumberOfThreads() {
@@ -111,7 +111,7 @@ int Environment::getNumberOfThreads() {
 
 /**
  * @brief sets the number of threads used to call the virus scanner.
- * 
+ *
  * @param n number of threads
  */
 void Environment::setNumberOfThreads(int n) {

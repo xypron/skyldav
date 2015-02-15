@@ -1,14 +1,14 @@
-/* 
+/*
  * File:   ThreadPool.cc
- * 
+ *
  * Copyright 2013 Heinrich Schuchardt <xypron.glpk@gmx.de>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,7 @@
 
 /**
  * @brief Creates a new thread pool.
- * 
+ *
  * @param nThreads number of threads to be created
  * @param workRoutine routine that handles the individual units of work
  */
@@ -49,7 +49,7 @@ ThreadPool::ThreadPool(int nThreads, void* (*workRoutine) (void *)) {
 
 /**
  * @brief Adds a work item to the work list.
- * 
+ *
  * @param workItem work item
  */
 void ThreadPool::add(void *workItem) {
@@ -61,7 +61,7 @@ void ThreadPool::add(void *workItem) {
 
 /**
  * @brief Creates a new worker thread.
- * 
+ *
  * @return success = 0
  */
 int ThreadPool::createThread() {
@@ -81,7 +81,7 @@ int ThreadPool::createThread() {
 
 /**
  * @brief Exits a worker thread
- * 
+ *
  * @param retval return value
  */
 void ThreadPool::exitThread(void *retval) {
@@ -94,7 +94,7 @@ void ThreadPool::exitThread(void *retval) {
 
 /**
  * @brief Gets a work item.
- * 
+ *
  * @return work item or NULL
  */
 void *ThreadPool::getWorkItem() {
@@ -113,7 +113,7 @@ void *ThreadPool::getWorkItem() {
 
 /**
  * @brief Gets size of worklist.
- * 
+ *
  * @return size of worklist, -1 signals error
  */
 long ThreadPool::getWorklistSize() {
@@ -128,7 +128,7 @@ long ThreadPool::getWorklistSize() {
 
 /**
  * @brief Is thread pool stopping.
- * 
+ *
  * @return thread pool is stopping
  */
 int ThreadPool::isStopping() {
@@ -137,7 +137,7 @@ int ThreadPool::isStopping() {
 
 /**
  * @brief Working thread.
- * 
+ *
  * @param threadPool thread pool
  * @return return value
  */

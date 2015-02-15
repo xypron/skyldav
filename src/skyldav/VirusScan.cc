@@ -1,14 +1,14 @@
-/* 
+/*
  * File:   virusscan.c
- * 
+ *
  * Copyright 2013 Heinrich Schuchardt <xypron.glpk@gmx.de>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -65,7 +65,7 @@ VirusScan::VirusScan(Environment * e) {
 
 /**
  * @brief Creates a new virus scan engine.
- * 
+ *
  * @return virus scan engine
  */
 struct cl_engine *VirusScan::createEngine() {
@@ -77,7 +77,7 @@ struct cl_engine *VirusScan::createEngine() {
     e = cl_engine_new();
     if (e == NULL) {
         Messaging::message(Messaging::ERROR,
-                "Can't create new virus scan engine.");
+                           "Can't create new virus scan engine.");
         throw SCANERROR;
     }
     // sigs must be zero before calling cl_load.
@@ -141,7 +141,7 @@ void VirusScan::destroyEngine(cl_engine * e) {
 
 /**
  * @brief Gets reference to virus scan engine.
- * 
+ *
  * @return scan engine
  */
 struct cl_engine * VirusScan::getEngine() {
@@ -162,7 +162,7 @@ struct cl_engine * VirusScan::getEngine() {
 
 /**
  * @brief Creates a new thread for managing the scan engine.
- * 
+ *
  * @return success = 0
  */
 int VirusScan::createThread() {
@@ -267,7 +267,7 @@ int VirusScan::scan(const int fd) {
 
 /**
  * @brief Thread to update engine.
- * 
+ *
  * @param threadPool thread pool
  * @return return value
  */
@@ -296,7 +296,7 @@ void * VirusScan::updater(void *virusScan) {
         if (count >= 60) {
             if (vs->dbstat_check()) {
                 Messaging::message(Messaging::INFORMATION,
-                        "ClamAV database update detected.");
+                                   "ClamAV database update detected.");
                 try {
                     // Create the new engine.
                     e = vs->createEngine();
@@ -317,7 +317,7 @@ void * VirusScan::updater(void *virusScan) {
                     vs->env->getScanCache()->clear();
                     pthread_mutex_unlock(&(vs->mutexEngine));
                     Messaging::message(Messaging::INFORMATION,
-                            "Using updated ClamAV database.");
+                                       "Using updated ClamAV database.");
                 } catch (Status& e) {
                 }
                 // Allow scanning.

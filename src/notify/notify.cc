@@ -1,14 +1,14 @@
-/* 
+/*
  * File:   notify.c
- * 
+ *
  * Copyright 2013 Heinrich Schuchardt <xypron.glpk@gmx.de>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -145,7 +145,7 @@ int main(int argc, char **argv) {
             case '\0':
             case '\n':
                 n = notify_notification_new(title, "<Empty message>",
-                        "dialog-information");
+                                            "dialog-information");
                 break;
             case 'E':
                 n = notify_notification_new(title, body + 1, "dialog-error");
@@ -172,9 +172,9 @@ int main(int argc, char **argv) {
 
         ca_context_create(&c);
         ca_context_play(c, 0,
-                CA_PROP_EVENT_ID, "dialog-warning",
-                CA_PROP_EVENT_DESCRIPTION, title,
-                NULL);
+                        CA_PROP_EVENT_ID, "dialog-warning",
+                        CA_PROP_EVENT_DESCRIPTION, title,
+                        NULL);
         usleep(500000);
     }
 

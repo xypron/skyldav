@@ -1,14 +1,14 @@
-/* 
+/*
  * File:   ScanCache.h
- * 
+ *
  * Copyright 2013 Heinrich Schuchardt <xypron.glpk@gmx.de>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -52,7 +52,7 @@ public:
     /**
      * @brief Result of scan.
      */
-    unsigned int response; /* FAN_ALLOW or FAN_DENY */    
+    unsigned int response; /* FAN_ALLOW or FAN_DENY */
     /**
      * @brief Time when this record entered the cache.
      */
@@ -95,7 +95,7 @@ public:
 
 /**
  * @brief Cache for virus scanning results.
- * 
+ *
  * <p>The scan results are kept in two data structures:</p><ul>
  * <li>a double linked list with with <code>root</code> as left and right end
  * </li><li>an ordered set.</li></ul>
@@ -142,7 +142,7 @@ private:
      * @brief Root for double linked list.
      */
     ScanResult root;
-    
+
     // Do not allow copying.
     ScanCache(const ScanCache&);
 };

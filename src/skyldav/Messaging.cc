@@ -1,14 +1,14 @@
-/* 
+/*
  * File:   Messaging.cc
- * 
+ *
  * Copyright 2013 Heinrich Schuchardt <xypron.glpk@gmx.de>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -73,7 +73,7 @@ Messaging::Messaging() {
         }
     } catch (class std::ios_base::failure ex) {
         std::cerr << "Failure to open logfile '"
-                << LOGFILE << "'" << std::endl;
+                  << LOGFILE << "'" << std::endl;
     }
 
     // Reset umask.
@@ -82,7 +82,7 @@ Messaging::Messaging() {
 
 /**
  * @brief Sends an error message based on errno.
- * 
+ *
  * @param label label to futher detail error message
  */
 void Messaging::error(const std::string &label) {
@@ -94,7 +94,7 @@ void Messaging::error(const std::string &label) {
 
 /**
  * @brief Sends message.
- * 
+ *
  * @param level message priority
  * @param message message text
  */
@@ -141,7 +141,7 @@ void Messaging::message(const enum Level level, const std::string &message) {
 
 /**
  * @brief Sets message level.
- * 
+ *
  * @param level message level
  */
 void Messaging::setLevel(const enum Level level) {

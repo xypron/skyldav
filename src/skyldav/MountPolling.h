@@ -1,14 +1,14 @@
-/* 
+/*
  * File:   MountPolling.h
- * 
+ *
  * Copyright 2012 Heinrich Schuchardt <xypron.glpk@gmx.de>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,62 +30,62 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Polls mount and unmout events
+ */
+class MountPolling {
+public:
+
     /**
-     * @brief Polls mount and unmout events
+     * @brief Status that may occur.
      */
-    class MountPolling {
-    public:
-
-        /**
-         * @brief Status that may occur.
-         */
-        enum Status {
-            INITIAL = 0,
-            RUNNING = 1,
-            STOPPING = 2,
-            FAILURE = 3,
-            SUCCESS = 4
-        };
-
-        /**
-         * @brief Pointer to callback function for polling mounts.
-         */
-        typedef void (*callbackptr)();
-        MountPolling(int ffd, Environment *);
-        ~MountPolling();
-    private:
-        /**
-         * @brief Environment.
-         */
-        Environment *env;
-        /**
-         * @brief Fanotify file descriptor.
-         */
-        int fd;
-        /**
-         * @brief Mounts
-         */
-        StringSet *mounts;
-        /**
-         * @brief File systems that shall not be tracked.
-         */
-        StringSet *nomarkfs;
-        /**
-         * @brief Mount points that shall not be tracked.
-         */
-        StringSet *nomarkmnt;
-        static void *run(void *);
-        /**
-         * @brief Status of thread.
-         */
-        sig_atomic_t status;
-
-        void callback();
-        int isFuse(const char *);
-        
-        // Do not allow copying.
-        MountPolling(const MountPolling&);
+    enum Status {
+        INITIAL = 0,
+        RUNNING = 1,
+        STOPPING = 2,
+        FAILURE = 3,
+        SUCCESS = 4
     };
+
+    /**
+     * @brief Pointer to callback function for polling mounts.
+     */
+    typedef void (*callbackptr)();
+    MountPolling(int ffd, Environment *);
+    ~MountPolling();
+private:
+    /**
+     * @brief Environment.
+     */
+    Environment *env;
+    /**
+     * @brief Fanotify file descriptor.
+     */
+    int fd;
+    /**
+     * @brief Mounts
+     */
+    StringSet *mounts;
+    /**
+     * @brief File systems that shall not be tracked.
+     */
+    StringSet *nomarkfs;
+    /**
+     * @brief Mount points that shall not be tracked.
+     */
+    StringSet *nomarkmnt;
+    static void *run(void *);
+    /**
+     * @brief Status of thread.
+     */
+    sig_atomic_t status;
+
+    void callback();
+    int isFuse(const char *);
+
+    // Do not allow copying.
+    MountPolling(const MountPolling&);
+};
 
 
 #ifdef	__cplusplus

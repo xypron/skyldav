@@ -1,14 +1,14 @@
-/* 
+/*
  * File:   skyldav.c
- * 
+ *
  * Copyright 2012 Heinrich Schuchardt <xypron.glpk@gmx.de>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,7 +45,7 @@
 
 /**
  * @brief Callback function for reading configuration file.
- * 
+ *
  * @param key key value
  * @param value parameter value
  * @return success
@@ -97,7 +97,7 @@ static int configurationCallback(const char *key, const char *value, void *info)
 
 /**
  * @brief Handles signal.
- * 
+ *
  * @param sig signal
  */
 static void hdl(int sig) {
@@ -123,7 +123,7 @@ static void pidfile() {
     int ret;
 
     fd = open(filename, O_CREAT | O_TRUNC | O_WRONLY,
-            S_IRUSR | S_IWUSR);
+              S_IRUSR | S_IWUSR);
     if (fd == -1) {
         std::stringstream msg;
         msg << "Cannot create pid file '" << filename << "'";
@@ -135,7 +135,7 @@ static void pidfile() {
         std::stringstream msg;
         char errbuf[256];
         msg << "Cannot write to pid file '" << filename << "': "
-                << strerror_r(errno, errbuf, sizeof(errbuf));
+            << strerror_r(errno, errbuf, sizeof(errbuf));
         Messaging::message(Messaging::ERROR, msg.str());
     }
     close(fd);
@@ -160,7 +160,7 @@ static void version() {
 
 /**
  * @brief Check if the process has a capability.
- * 
+ *
  * @param cap capability
  * @return 1 if process has capability, else 0.
  */
@@ -244,7 +244,7 @@ static void daemonize(Environment *e) {
 
 /**
  * @brief Main.
- * 
+ *
  * @param argc argument count
  * @param argv arguments
  * @return success
@@ -385,7 +385,7 @@ int main(int argc, char *argv[]) {
         fp = new FanotifyPolling(e);
     } catch (FanotifyPolling::Status ex) {
         Messaging::message(Messaging::ERROR,
-                "Failure starting fanotify listener.");
+                           "Failure starting fanotify listener.");
         delete e;
         return EXIT_FAILURE;
     }

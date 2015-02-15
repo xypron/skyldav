@@ -1,14 +1,14 @@
-/* 
+/*
  * File:   MountPolling.c
- * 
+ *
  * Copyright 2012 Heinrich Schuchardt <xypron.glpk@gmx.de>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -52,7 +52,7 @@ static pthread_t thread;
 
 /**
  * @brief Thread listening to mount events.
- * 
+ *
  * @param ccbptr pointer to callback routine
  * @return pointer to int indicating success
  */
@@ -82,7 +82,7 @@ void * MountPolling::run(void *obj) {
     if (mfd < 0) {
         std::stringstream msg;
         msg << "Failure to open /proc/mounts: "
-                << strerror_r(errno, errbuf, sizeof(errbuf));
+            << strerror_r(errno, errbuf, sizeof(errbuf));
         Messaging::message(Messaging::ERROR, msg.str());
 
         mp->status = FAILURE;
@@ -107,7 +107,7 @@ void * MountPolling::run(void *obj) {
             if (errno != EINTR) {
                 std::stringstream msg;
                 msg << "Failure to poll /proc/mounts: "
-                        << strerror_r(errno, errbuf, sizeof(errbuf));
+                    << strerror_r(errno, errbuf, sizeof(errbuf));
                 Messaging::message(Messaging::ERROR, msg.str());
                 close(mfd);
                 mp->status = FAILURE;
@@ -189,7 +189,7 @@ int MountPolling::isFuse(const char *type) {
 
 /**
  * Creates new mount polling object.
- * 
+ *
  * @param nomarkfs
  * @param nomarkmnt
  */
@@ -217,16 +217,16 @@ MountPolling::MountPolling(int ffd, Environment *e) {
     ret = pthread_attr_init(&attr);
     if (ret != 0) {
         std::stringstream msg;
-        msg << "Failure to set thread attributes: " 
-                << strerror_r(errno, errbuf, sizeof(errbuf));
+        msg << "Failure to set thread attributes: "
+            << strerror_r(errno, errbuf, sizeof(errbuf));
         Messaging::message(Messaging::ERROR, msg.str());
         throw FAILURE;
     }
     ret = pthread_create(&thread, &attr, run, (void *) this);
     if (ret != 0) {
         std::stringstream msg;
-        msg << "Failure to create thread: " 
-                << strerror_r(errno, errbuf, sizeof(errbuf));
+        msg << "Failure to create thread: "
+            << strerror_r(errno, errbuf, sizeof(errbuf));
         Messaging::message(Messaging::ERROR, msg.str());
         throw FAILURE;
     }
@@ -272,13 +272,13 @@ MountPolling::~MountPolling() {
     if (ret != 0) {
         std::stringstream msg;
         char errbuf[256];
-        msg << "Failure to join thread: " 
-                << strerror_r(errno, errbuf, sizeof(errbuf));
+        msg << "Failure to join thread: "
+            << strerror_r(errno, errbuf, sizeof(errbuf));
         Messaging::message(Messaging::ERROR, msg.str());
         return;
     }
     if (status != SUCCESS) {
         Messaging::message(Messaging::ERROR,
-                "Ending thread signals failure.\n");
+                           "Ending thread signals failure.\n");
     }
 }
