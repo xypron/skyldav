@@ -2,7 +2,7 @@
 
 test -f configure.ac || {
   echo "Please, run this script in the top level project directory."
-  DIE=1
+  exit
 }
 
 libtoolize --force --copy
