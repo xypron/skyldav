@@ -314,7 +314,9 @@ void * VirusScan::updater(void *virusScan) {
                     // Destroy the old engine
                     vs->destroyEngine(vs->engine);
                     vs->engine = e;
-                    vs->env->getScanCache()->clear();
+                    if (vs->env->isCleanCacheOnUpdate()) {
+                        vs->env->getScanCache()->clear();
+                    }
                     pthread_mutex_unlock(&(vs->mutexEngine));
                     Messaging::message(Messaging::INFORMATION,
                                        "Using updated ClamAV database.");

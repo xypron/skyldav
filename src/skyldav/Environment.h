@@ -38,12 +38,14 @@ class ScanCache;
 class Environment {
 public:
     Environment();
+    int isCleanCacheOnUpdate();
     StringSet *getExcludePaths();
     StringSet *getLocalFileSystems();
     StringSet *getNoMarkFileSystems();
     StringSet *getNoMarkMounts();
     unsigned int getCacheMaxSize();
     void setCacheMaxSize(unsigned int);
+    void setCleanCacheOnUpdate(int);
     ScanCache *getScanCache();
     int getNumberOfThreads();
     void setNumberOfThreads(int);
@@ -77,6 +79,10 @@ private:
      * @brief Maximum cache size.
      */
     unsigned int cacheMaxSize;
+    /**
+     * @brief Clean cache when the virus scanner receives a new pattern file.
+     */
+    int cleanCacheOnUpdate;
 
     // Do not allow copy.
     Environment(const Environment&);

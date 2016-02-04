@@ -67,6 +67,17 @@ static int configurationCallback(const char *key, const char *value, void *info)
             ret = 1;
         }
         e->setCacheMaxSize(cacheMaxSize);
+    } else if (!strcmp(key, "CLEAN_CACHE_ON_UPDATE")) {
+        int cleanCacheOnUpdate = 1;
+
+        if (!strcmp(value, "yes")) {
+            e->setCleanCacheOnUpdate(1);
+        } else if (!strcmp(value, "no")) {
+            e->setCleanCacheOnUpdate(0);
+        } else {
+            fprintf(stderr, "illegal value '%s' for CLEAN_CACHE_ON_UPDATE \n",
+                value);
+        }
     } else if (!strcmp(key, "EXCLUDE_PATH")) {
         std::string val = value;
         // Append missing trailing path separator.

@@ -34,6 +34,17 @@ Environment::Environment() {
     scache = new ScanCache(this);
     nThreads = 4;
     cacheMaxSize = 10000;
+    cleanCacheOnUpdate = 1;
+}
+
+/**
+ * @brief Determines if cache shall be cleaned when the virus scanner
+ * receives a new pattern file.
+ *
+ * @return cache shall be cleaned on update
+ */
+int Environment::isCleanCacheOnUpdate() {
+    return cleanCacheOnUpdate;
 }
 
 /**
@@ -107,6 +118,16 @@ ScanCache *Environment::getScanCache() {
  */
 int Environment::getNumberOfThreads() {
     return nThreads;
+}
+
+/**
+ * @brief Sets if cache shall be cleaned when the virus scanner receives a new
+ * pattern file.
+ *
+ * @param value cache shall be cleaned on update
+ */
+void Environment::setCleanCacheOnUpdate(int value) {
+    cleanCacheOnUpdate = value;
 }
 
 /**
