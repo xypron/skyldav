@@ -117,7 +117,7 @@ static void getToken(FILE *file, char *token, int *newline) {
  * Returns 0 if successful.
  * @param filename file name
  * @param cb callback function
- * @prame info parameter passed to callback function
+ * @param info parameter passed to callback function
  * @return success
  */
 int parseConfigurationFile(char *filename, conf_cb cb, void *info) {
