@@ -118,15 +118,17 @@ void Messaging::message(const enum Level level, const std::string &message) {
             break;
         case INFORMATION:
             type = "I";
-            syslog(LOG_NOTICE, "%s", message.c_str());
+            syslog(LOG_INFO, "%s", message.c_str());
             std::cout << message << std::endl;
             break;
         case DEBUG:
             type = "D";
+            syslog(LOG_DEBUG, "%s", message.c_str());
             std::cout << message << std::endl;
             return;
         default:
             type = " ";
+            syslog(LOG_NOTICE, "%s", message.c_str());
             std::cout << message << std::endl;
             break;
     }
