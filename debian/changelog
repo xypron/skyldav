@@ -1,3 +1,10 @@
+skyldav (0.6.0) unstable; urgency=medium
+
+  * Add CACHE_CLEAN_ON_UPDATE configuration option.
+  * Bug fixes
+
+ -- Heinrich Schuchardt <xypron.glpk@gmx.de>  Wed, 13 Apr 2016 00:53:52 +0200
+
 skyldav (0.5.0) unstable; urgency=medium
 
   * Bug fixes
