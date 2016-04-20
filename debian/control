@@ -36,8 +36,8 @@ Suggests: clamav-freshclam
 Description: Skyld AV
  "Skyld AV" provides on access virus scanning for Linux.
  .
- The fanotify API is used to control file access. This requires a kernel compiled
- with
+ The fanotify API is used to control file access. This requires a kernel
+ compiled with
  .
  CONFIG_FANOTIFY=y
  CONFIG_FANOTIFY_ACCESS_PERMISSIONS=y
@@ -63,8 +63,8 @@ Depends:
 Description: Debugging symbols for Skyld AV
  "Skyld AV" provides on access virus scanning for Linux.
  .
- The fanotify API is used to control file access. This requires a kernel compiled
- with
+ The fanotify API is used to control file access. This requires a kernel
+ compiled with
  .
  CONFIG_FANOTIFY=y
  CONFIG_FANOTIFY_ACCESS_PERMISSIONS=y
