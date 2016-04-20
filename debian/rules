@@ -12,6 +12,7 @@ export DH_OPTIONS
 override_dh_auto_install:
 	dh_auto_install --destdir=debian/skyldav
 	find debian/skyldav -name '*.la' -delete
+	find debian/skyldav -name '*.so' -delete
 
 override_dh_strip:
 	dh_strip --dbg-package=skyldav-dbg
