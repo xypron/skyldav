@@ -1,0 +1,6 @@
+<map id="VirusScan::createEngine" name="VirusScan::createEngine">
+<area shape="rect" id="node2" href="$classMessaging.html#ab64c1b4671c006ff521c9cc8575b870a" title="Sends message. " alt="" coords="220,5,367,32"/>
+<area shape="rect" id="node5" href="$notify_8cc.html#a8fd0d93500cc0785f6fc728dbe3c6a85" title="Shows version information and exits. " alt="" coords="261,56,325,83"/>
+<area shape="rect" id="node3" href="$classMessaging.html#a5ec4a7b49d4537a404edeb4082b569db" title="Retrieves the messaging singleton. " alt="" coords="415,5,580,32"/>
+<area shape="rect" id="node4" href="$classMessaging.html#ad0cbbf3c3d159becda91f3fef412afc4" title="Creates the singleton. " alt="" coords="628,5,784,32"/>
+</map>

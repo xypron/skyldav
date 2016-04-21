@@ -1,0 +1,7 @@
+<map id="ThreadPool::ThreadPool" name="ThreadPool::ThreadPool">
+<area shape="rect" id="node2" href="$classThreadPool.html#a50ce67b8d7d6d39ca4647da93b93b415" title="Creates a new worker thread. " alt="" coords="216,56,388,83"/>
+<area shape="rect" id="node3" href="$classThreadPool.html#a4f835b73ccd1a2714bd5dc7a57151149" title="Working thread. " alt="" coords="436,56,571,83"/>
+<area shape="rect" id="node4" href="$classThreadPool.html#a904c1e10bfec751a3d32e25e93db85d8" title="Is thread pool stopping. " alt="" coords="625,5,783,32"/>
+<area shape="rect" id="node5" href="$classThreadPool.html#abb30921a260bd0965d542bd975cc7430" title="Gets a work item. " alt="" coords="619,56,789,83"/>
+<area shape="rect" id="node6" href="$classThreadPool.html#afce41ff336f69530a2c08fc798f54cfe" title="Exits a worker thread. " alt="" coords="625,107,783,133"/>
+</map>

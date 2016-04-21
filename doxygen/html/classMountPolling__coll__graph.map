@@ -1,0 +1,6 @@
+<map id="MountPolling" name="MountPolling">
+<area shape="rect" id="node2" href="$classStringSet.html" title="Set of pointers to strings. " alt="" coords="30,147,134,283"/>
+<area shape="rect" id="node4" href="$classEnvironment.html" title="The environment holds variables that are shared by instances of multiple classes. ..." alt="" coords="159,389,349,687"/>
+<area shape="rect" id="node5" href="$classScanCache.html" title="Cache for virus scanning results. " alt="" coords="274,749,397,973"/>
+<area shape="rect" id="node6" href="$structScanResult.html" title="Result of scanning a file for viruses. " alt="" coords="374,470,465,606"/>
+</map>

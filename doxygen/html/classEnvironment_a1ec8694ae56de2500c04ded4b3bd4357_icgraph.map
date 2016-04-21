@@ -1,0 +1,14 @@
+<map id="Environment::getScanCache" name="Environment::getScanCache">
+<area shape="rect" id="node2" href="$classFanotifyPolling.html#a3ffd2c60179a9e0c331ab3acd5555b6b" title="Handle fanotify events. " alt="" coords="493,5,695,47"/>
+<area shape="rect" id="node6" href="$classFanotifyPolling.html#a2ef1645764ad0c97309b55b609e7ddbe" title="Writes fanotify response. " alt="" coords="243,71,445,98"/>
+<area shape="rect" id="node8" href="$classMountPolling.html#a69f0659a8eb8cfd7dd1a3d1091f80b50" title="Tracks mountevents. " alt="" coords="267,122,421,149"/>
+<area shape="rect" id="node11" href="$classVirusScan.html#a98d7670681d5d0da63cd0c74f683196c" title="Thread to update engine. " alt="" coords="277,198,411,225"/>
+<area shape="rect" id="node3" href="$classFanotifyPolling.html#a188ddad02a3ee9944160d319949fa8c5" title="Handle fanotify events. " alt="" coords="743,5,944,47"/>
+<area shape="rect" id="node4" href="$classFanotifyPolling.html#ace94a01dbc2d6a33dfad9276c78f211a" title="Thread listening to fanotify events. " alt="" coords="1007,15,1142,42"/>
+<area shape="rect" id="node5" href="$classFanotifyPolling.html#ae96f5002a56628ec01dc20957d74e250" title="Starts polling fanotify events. " alt="" coords="1205,35,1368,76"/>
+<area shape="rect" id="node7" href="$classFanotifyPolling.html#a8c69ca2e4eef2f0e360bbfc8a2f28d05" title="Scans a file. " alt="" coords="992,67,1157,94"/>
+<area shape="rect" id="node9" href="$classMountPolling.html#a01ba55253ce8a455ededae6a6f693feb" title="Thread listening to mount events. " alt="" coords="533,122,655,149"/>
+<area shape="rect" id="node10" href="$classMountPolling.html#a43cc45b069852759298fd0a7d6e5a6af" title="MountPolling::MountPolling" alt="" coords="753,147,933,174"/>
+<area shape="rect" id="node12" href="$classVirusScan.html#a32c65f47da574a393ec553af1eb97887" title="Creates a new thread for managing the scan engine. " alt="" coords="511,223,677,250"/>
+<area shape="rect" id="node13" href="$classVirusScan.html#ab40427bf6e5350231aea0943da04c0db" title="Initializes virus scan engine. " alt="" coords="768,223,919,250"/>
+</map>

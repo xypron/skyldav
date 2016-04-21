@@ -1,0 +1,8 @@
+<map id="FanotifyPolling::writeResponse" name="FanotifyPolling::writeResponse">
+<area shape="rect" id="node2" href="$classEnvironment.html#a1ec8694ae56de2500c04ded4b3bd4357" title="Gets the scan cache. " alt="" coords="256,5,445,32"/>
+<area shape="rect" id="node3" href="$classScanCache.html#a5605933bd17b213f7c64a0b3f5854c6c" title="Adds scan result to cache. " alt="" coords="291,56,410,83"/>
+<area shape="rect" id="node5" href="$classMessaging.html#ab64c1b4671c006ff521c9cc8575b870a" title="Sends message. " alt="" coords="277,107,424,133"/>
+<area shape="rect" id="node4" href="$classEnvironment.html#a9faa35a271099e6695db7a5b0c90fb22" title="Gets the maximum number of entries in the cache with scan results. " alt="" coords="493,56,704,83"/>
+<area shape="rect" id="node6" href="$classMessaging.html#a5ec4a7b49d4537a404edeb4082b569db" title="Retrieves the messaging singleton. " alt="" coords="516,107,681,133"/>
+<area shape="rect" id="node7" href="$classMessaging.html#ad0cbbf3c3d159becda91f3fef412afc4" title="Creates the singleton. " alt="" coords="752,107,908,133"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="FanotifyPolling::ScanTask" name="FanotifyPolling::ScanTask">
+<area shape="rect" id="node2" href="$classFanotifyPolling.html" title="Polls fanotify events. " alt="" coords="285,1153,449,1451"/>
+<area shape="rect" id="node3" href="$classVirusScan.html" title="Scans files for viruses. " alt="" coords="153,749,282,1091"/>
+<area shape="rect" id="node4" href="$classEnvironment.html" title="The environment holds variables that are shared by instances of multiple classes. ..." alt="" coords="194,389,385,687"/>
+<area shape="rect" id="node7" href="$classScanCache.html" title="Cache for virus scanning results. " alt="" coords="5,808,128,1032"/>
+<area shape="rect" id="node10" href="$classMountPolling.html" title="Polls mount and unmout events. " alt="" coords="371,837,496,1003"/>
+<area shape="rect" id="node5" href="$classStringSet.html" title="Set of pointers to strings. " alt="" coords="321,147,425,283"/>
+<area shape="rect" id="node8" href="$structScanResult.html" title="Result of scanning a file for viruses. " alt="" coords="17,470,108,606"/>
+<area shape="rect" id="node9" href="$classThreadPool.html" title="Implements the thread pool pattern. " alt="" coords="521,771,655,1069"/>
+</map>

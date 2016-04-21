@@ -1,0 +1,8 @@
+<map id="src/skyldav/FanotifyPolling.h" name="src/skyldav/FanotifyPolling.h">
+<area shape="rect" id="node4" href="$Environment_8h.html" title="Envronment. " alt="" coords="405,155,512,181"/>
+<area shape="rect" id="node9" href="$StringSet_8h.html" title="Set of strings. " alt="" coords="242,229,329,256"/>
+<area shape="rect" id="node12" href="$MountPolling_8h.html" title="Poll /proc/mounts to detect mount events. " alt="" coords="190,80,298,107"/>
+<area shape="rect" id="node14" href="$ThreadPool_8h.html" title="Implements the thread pool pattern. " alt="" coords="323,80,421,107"/>
+<area shape="rect" id="node16" href="$VirusScan_8h.html" title="Scans files for viruses. " alt="" coords="637,80,731,107"/>
+<area shape="rect" id="node6" href="$ScanCache_8h.html" title="Cache for virus scanning results. " alt="" coords="408,229,509,256"/>
+</map>

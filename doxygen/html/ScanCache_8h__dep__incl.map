@@ -1,0 +1,11 @@
+<map id="src/skyldav/ScanCache.h" name="src/skyldav/ScanCache.h">
+<area shape="rect" id="node2" href="$Environment_8h.html" title="Envronment. " alt="" coords="311,80,489,107"/>
+<area shape="rect" id="node7" href="$MountPolling_8cc.html" title="Poll /proc/mounts to detect mount events. " alt="" coords="447,304,633,331"/>
+<area shape="rect" id="node10" href="$ScanCache_8cc.html" title="src/skyldav/ScanCache.cc" alt="" coords="617,80,796,107"/>
+<area shape="rect" id="node3" href="$Environment_8cc.html" title="Envronment. " alt="" coords="308,155,492,181"/>
+<area shape="rect" id="node4" href="$FanotifyPolling_8h.html" title="Poll fanotify events. " alt="" coords="239,229,430,256"/>
+<area shape="rect" id="node6" href="$main_8cc.html" title="Online virus scanner. " alt="" coords="5,304,144,331"/>
+<area shape="rect" id="node8" href="$VirusScan_8h.html" title="Scans files for viruses. " alt="" coords="69,155,233,181"/>
+<area shape="rect" id="node5" href="$FanotifyPolling_8cc.html" title="Poll fanotify events. " alt="" coords="225,304,423,331"/>
+<area shape="rect" id="node9" href="$VirusScan_8cc.html" title="Scans files for viruses. " alt="" coords="44,229,215,256"/>
+</map>

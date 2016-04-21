@@ -1,0 +1,7 @@
+<map id="Environment::getExcludePaths" name="Environment::getExcludePaths">
+<area shape="rect" id="node2" href="$classFanotifyPolling.html#a72062f9fe389e2b3622af7b21dfb4568" title="Check if file is in exclude path. " alt="" coords="256,13,417,39"/>
+<area shape="rect" id="node5" href="$main_8cc.html#a48a1e2980824137f695d472695064533" title="Callback function for reading configuration file. " alt="" coords="263,63,410,90"/>
+<area shape="rect" id="node3" href="$classFanotifyPolling.html#a8c69ca2e4eef2f0e360bbfc8a2f28d05" title="Scans a file. " alt="" coords="465,13,631,39"/>
+<area shape="rect" id="node4" href="$classFanotifyPolling.html#ae96f5002a56628ec01dc20957d74e250" title="Starts polling fanotify events. " alt="" coords="679,5,841,47"/>
+<area shape="rect" id="node6" href="$main_8cc.html#a0ddf1224851353fc92bfbff6f499fa97" title="Main. " alt="" coords="523,63,573,90"/>
+</map>

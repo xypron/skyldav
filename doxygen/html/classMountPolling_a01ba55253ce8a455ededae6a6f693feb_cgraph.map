@@ -1,0 +1,16 @@
+<map id="MountPolling::run" name="MountPolling::run">
+<area shape="rect" id="node2" href="$classMessaging.html#ab64c1b4671c006ff521c9cc8575b870a" title="Sends message. " alt="" coords="620,335,767,362"/>
+<area shape="rect" id="node5" href="$classMountPolling.html#a69f0659a8eb8cfd7dd1a3d1091f80b50" title="Tracks mountevents. " alt="" coords="176,259,329,286"/>
+<area shape="rect" id="node3" href="$classMessaging.html#a5ec4a7b49d4537a404edeb4082b569db" title="Retrieves the messaging singleton. " alt="" coords="815,335,980,362"/>
+<area shape="rect" id="node4" href="$classMessaging.html#ad0cbbf3c3d159becda91f3fef412afc4" title="Creates the singleton. " alt="" coords="1028,335,1184,362"/>
+<area shape="rect" id="node6" href="$listmounts_8c.html#aecf8a1b9134409e3f96c97cbe067b998" title="listmountinit" alt="" coords="429,57,521,83"/>
+<area shape="rect" id="node7" href="$listmounts_8c.html#a1b38850bba58222d63d2f66748b0aeef" title="listmountnext" alt="" coords="425,107,525,134"/>
+<area shape="rect" id="node8" href="$classMountPolling.html#a2012dcd6c23f44d828fe8077abb5de4b" title="Checks if a mount is using a filesystem in userspace (fuse). " alt="" coords="403,158,547,185"/>
+<area shape="rect" id="node9" href="$classStringSet.html#a74718cb1fb31f8c9bb14a172efdf0ae3" title="Finds entry in string set. " alt="" coords="422,209,527,235"/>
+<area shape="rect" id="node10" href="$classStringSet.html#aacef6bd0f7fa035ec05c9e336037327f" title="Adds entry to string set. " alt="" coords="422,259,527,286"/>
+<area shape="rect" id="node11" href="$classFanotifyPolling.html#ac856d59d19fe6dda514ce1049e25e0b8" title="Marks a mount for polling fanotify events. " alt="" coords="384,310,565,337"/>
+<area shape="rect" id="node12" href="$classFanotifyPolling.html#abdae058353ab17106a46b252a8628c52" title="Removes a mount from polling fanotify events. " alt="" coords="377,361,572,387"/>
+<area shape="rect" id="node13" href="$classEnvironment.html#a1ec8694ae56de2500c04ded4b3bd4357" title="Gets the scan cache. " alt="" coords="380,411,569,438"/>
+<area shape="rect" id="node14" href="$classScanCache.html#abab2e80ca33348511ec5ad70b67bba1f" title="Removes all entries from the cache. " alt="" coords="411,462,538,489"/>
+<area shape="rect" id="node15" href="$listmounts_8c.html#ad65c75f6655bf756a43a9cedb8054960" title="listmountfinalize" alt="" coords="417,513,533,539"/>
+</map>

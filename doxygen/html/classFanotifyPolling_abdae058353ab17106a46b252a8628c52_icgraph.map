@@ -1,0 +1,6 @@
+<map id="FanotifyPolling::unmarkMount" name="FanotifyPolling::unmarkMount">
+<area shape="rect" id="node2" href="$classMountPolling.html#a69f0659a8eb8cfd7dd1a3d1091f80b50" title="Tracks mountevents. " alt="" coords="265,31,419,57"/>
+<area shape="rect" id="node5" href="$classMountPolling.html#abe9e6e6a7c3651dab1b4a4025d2a98e9" title="Deletes mount polling object. " alt="" coords="248,81,436,108"/>
+<area shape="rect" id="node3" href="$classMountPolling.html#a01ba55253ce8a455ededae6a6f693feb" title="Thread listening to mount events. " alt="" coords="484,5,607,32"/>
+<area shape="rect" id="node4" href="$classMountPolling.html#a43cc45b069852759298fd0a7d6e5a6af" title="MountPolling::MountPolling" alt="" coords="655,31,835,57"/>
+</map>

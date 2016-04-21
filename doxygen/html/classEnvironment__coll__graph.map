@@ -1,0 +1,5 @@
+<map id="Environment" name="Environment">
+<area shape="rect" id="node4" href="$classScanCache.html" title="Cache for virus scanning results. " alt="" coords="169,749,292,973"/>
+<area shape="rect" id="node2" href="$classStringSet.html" title="Set of pointers to strings. " alt="" coords="225,147,329,283"/>
+<area shape="rect" id="node5" href="$structScanResult.html" title="Result of scanning a file for viruses. " alt="" coords="5,470,96,606"/>
+</map>

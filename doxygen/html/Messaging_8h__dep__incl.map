@@ -1,0 +1,8 @@
+<map id="src/skyldav/Messaging.h" name="src/skyldav/Messaging.h">
+<area shape="rect" id="node2" href="$FanotifyPolling_8cc.html" title="Poll fanotify events. " alt="" coords="5,80,203,107"/>
+<area shape="rect" id="node3" href="$main_8cc.html" title="Online virus scanner. " alt="" coords="227,80,365,107"/>
+<area shape="rect" id="node4" href="$Messaging_8cc.html" title="Send messages. " alt="" coords="390,80,565,107"/>
+<area shape="rect" id="node5" href="$MountPolling_8cc.html" title="Poll /proc/mounts to detect mount events. " alt="" coords="589,80,776,107"/>
+<area shape="rect" id="node6" href="$ScanCache_8cc.html" title="src/skyldav/ScanCache.cc" alt="" coords="800,80,979,107"/>
+<area shape="rect" id="node7" href="$VirusScan_8cc.html" title="Scans files for viruses. " alt="" coords="1003,80,1173,107"/>
+</map>

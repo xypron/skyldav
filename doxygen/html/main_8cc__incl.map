@@ -1,0 +1,12 @@
+<map id="src/skyldav/main.cc" name="src/skyldav/main.cc">
+<area shape="rect" id="node16" href="$conf_8h.html" title="Analyze configuration file. " alt="" coords="1182,80,1241,107"/>
+<area shape="rect" id="node18" href="$Environment_8h.html" title="Envronment. " alt="" coords="1459,229,1566,256"/>
+<area shape="rect" id="node22" href="$StringSet_8h.html" title="Set of strings. " alt="" coords="1185,304,1272,331"/>
+<area shape="rect" id="node24" href="$FanotifyPolling_8h.html" title="Poll fanotify events. " alt="" coords="1511,80,1629,107"/>
+<area shape="rect" id="node31" href="$Messaging_8h.html" title="Send messages. " alt="" coords="918,80,1014,107"/>
+<area shape="rect" id="node33" href="$skyldav_8h.html" title="On access virus scanner. " alt="" coords="1653,80,1732,107"/>
+<area shape="rect" id="node20" href="$ScanCache_8h.html" title="Cache for virus scanning results. " alt="" coords="1461,304,1562,331"/>
+<area shape="rect" id="node26" href="$MountPolling_8h.html" title="Poll /proc/mounts to detect mount events. " alt="" coords="1171,155,1279,181"/>
+<area shape="rect" id="node27" href="$ThreadPool_8h.html" title="Implements the thread pool pattern. " alt="" coords="1803,155,1902,181"/>
+<area shape="rect" id="node29" href="$VirusScan_8h.html" title="Scans files for viruses. " alt="" coords="1686,155,1779,181"/>
+</map>

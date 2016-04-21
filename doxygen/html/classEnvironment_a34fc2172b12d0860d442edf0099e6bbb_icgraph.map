@@ -1,0 +1,5 @@
+<map id="Environment::isCleanCacheOnUpdate" name="Environment::isCleanCacheOnUpdate">
+<area shape="rect" id="node2" href="$classVirusScan.html#a98d7670681d5d0da63cd0c74f683196c" title="Thread to update engine. " alt="" coords="239,13,372,39"/>
+<area shape="rect" id="node3" href="$classVirusScan.html#a32c65f47da574a393ec553af1eb97887" title="Creates a new thread for managing the scan engine. " alt="" coords="420,13,587,39"/>
+<area shape="rect" id="node4" href="$classVirusScan.html#ab40427bf6e5350231aea0943da04c0db" title="Initializes virus scan engine. " alt="" coords="635,13,785,39"/>
+</map>

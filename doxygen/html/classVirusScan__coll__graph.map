@@ -1,0 +1,6 @@
+<map id="VirusScan" name="VirusScan">
+<area shape="rect" id="node2" href="$classEnvironment.html" title="The environment holds variables that are shared by instances of multiple classes. ..." alt="" coords="182,389,373,687"/>
+<area shape="rect" id="node5" href="$classScanCache.html" title="Cache for virus scanning results. " alt="" coords="108,808,231,1032"/>
+<area shape="rect" id="node3" href="$classStringSet.html" title="Set of pointers to strings. " alt="" coords="225,147,329,283"/>
+<area shape="rect" id="node6" href="$structScanResult.html" title="Result of scanning a file for viruses. " alt="" coords="5,470,96,606"/>
+</map>

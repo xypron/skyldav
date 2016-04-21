@@ -1,0 +1,6 @@
+<map id="ScanCache::~ScanCache" name="ScanCache::~ScanCache">
+<area shape="rect" id="node2" href="$classScanCache.html#abab2e80ca33348511ec5ad70b67bba1f" title="Removes all entries from the cache. " alt="" coords="228,5,355,32"/>
+<area shape="rect" id="node3" href="$classMessaging.html#ab64c1b4671c006ff521c9cc8575b870a" title="Sends message. " alt="" coords="403,31,549,57"/>
+<area shape="rect" id="node4" href="$classMessaging.html#a5ec4a7b49d4537a404edeb4082b569db" title="Retrieves the messaging singleton. " alt="" coords="597,31,763,57"/>
+<area shape="rect" id="node5" href="$classMessaging.html#ad0cbbf3c3d159becda91f3fef412afc4" title="Creates the singleton. " alt="" coords="811,31,967,57"/>
+</map>

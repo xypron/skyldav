@@ -1,0 +1,6 @@
+<map id="FanotifyPolling::~FanotifyPolling" name="FanotifyPolling::~FanotifyPolling">
+<area shape="rect" id="node2" href="$classMessaging.html#ab64c1b4671c006ff521c9cc8575b870a" title="Sends message. " alt="" coords="431,13,577,39"/>
+<area shape="rect" id="node5" href="$classFanotifyPolling.html#a4f3214784a9aace8df0e65f45aa8a5e4" title="Closes fanotify file descriptor. " alt="" coords="224,35,383,76"/>
+<area shape="rect" id="node3" href="$classMessaging.html#a5ec4a7b49d4537a404edeb4082b569db" title="Retrieves the messaging singleton. " alt="" coords="625,13,791,39"/>
+<area shape="rect" id="node4" href="$classMessaging.html#ad0cbbf3c3d159becda91f3fef412afc4" title="Creates the singleton. " alt="" coords="839,13,995,39"/>
+</map>

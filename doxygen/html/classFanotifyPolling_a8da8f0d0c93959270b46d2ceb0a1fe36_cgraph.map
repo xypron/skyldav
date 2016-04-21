@@ -1,0 +1,5 @@
+<map id="FanotifyPolling::fanotifyOpen" name="FanotifyPolling::fanotifyOpen">
+<area shape="rect" id="node2" href="$classMessaging.html#ab64c1b4671c006ff521c9cc8575b870a" title="Sends message. " alt="" coords="244,5,391,32"/>
+<area shape="rect" id="node3" href="$classMessaging.html#a5ec4a7b49d4537a404edeb4082b569db" title="Retrieves the messaging singleton. " alt="" coords="439,5,604,32"/>
+<area shape="rect" id="node4" href="$classMessaging.html#ad0cbbf3c3d159becda91f3fef412afc4" title="Creates the singleton. " alt="" coords="652,5,808,32"/>
+</map>

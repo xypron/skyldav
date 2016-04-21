@@ -1,0 +1,8 @@
+<map id="ScanCache::add" name="ScanCache::add">
+<area shape="rect" id="node2" href="$classFanotifyPolling.html#a2ef1645764ad0c97309b55b609e7ddbe" title="Writes fanotify response. " alt="" coords="172,35,375,61"/>
+<area shape="rect" id="node3" href="$classFanotifyPolling.html#a8c69ca2e4eef2f0e360bbfc8a2f28d05" title="Scans a file. " alt="" coords="690,5,855,32"/>
+<area shape="rect" id="node5" href="$classFanotifyPolling.html#a3ffd2c60179a9e0c331ab3acd5555b6b" title="Handle fanotify events. " alt="" coords="423,57,624,98"/>
+<area shape="rect" id="node4" href="$classFanotifyPolling.html#ae96f5002a56628ec01dc20957d74e250" title="Starts polling fanotify events. " alt="" coords="1104,27,1267,69"/>
+<area shape="rect" id="node6" href="$classFanotifyPolling.html#a188ddad02a3ee9944160d319949fa8c5" title="Handle fanotify events. " alt="" coords="672,57,873,98"/>
+<area shape="rect" id="node7" href="$classFanotifyPolling.html#ace94a01dbc2d6a33dfad9276c78f211a" title="Thread listening to fanotify events. " alt="" coords="921,60,1056,87"/>
+</map>

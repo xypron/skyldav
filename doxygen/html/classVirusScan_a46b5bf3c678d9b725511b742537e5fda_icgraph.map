@@ -1,0 +1,4 @@
+<map id="VirusScan::scan" name="VirusScan::scan">
+<area shape="rect" id="node2" href="$classFanotifyPolling.html#a8c69ca2e4eef2f0e360bbfc8a2f28d05" title="Scans a file. " alt="" coords="172,13,337,39"/>
+<area shape="rect" id="node3" href="$classFanotifyPolling.html#ae96f5002a56628ec01dc20957d74e250" title="Starts polling fanotify events. " alt="" coords="385,5,548,47"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="StringSet::add" name="StringSet::add">
+<area shape="rect" id="node2" href="$main_8cc.html#a48a1e2980824137f695d472695064533" title="Callback function for reading configuration file. " alt="" coords="162,5,309,32"/>
+<area shape="rect" id="node4" href="$classMountPolling.html#a69f0659a8eb8cfd7dd1a3d1091f80b50" title="Tracks mountevents. " alt="" coords="159,56,312,83"/>
+<area shape="rect" id="node3" href="$main_8cc.html#a0ddf1224851353fc92bfbff6f499fa97" title="Main. " alt="" coords="396,5,447,32"/>
+<area shape="rect" id="node5" href="$classMountPolling.html#a01ba55253ce8a455ededae6a6f693feb" title="Thread listening to mount events. " alt="" coords="360,56,483,83"/>
+<area shape="rect" id="node6" href="$classMountPolling.html#a43cc45b069852759298fd0a7d6e5a6af" title="MountPolling::MountPolling" alt="" coords="531,81,711,108"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="main" name="main">
+<area shape="rect" id="node2" href="$notify_8cc.html#ad8c51bbfda76f19f61c727838e6eee30" title="Prints help message and exits. " alt="" coords="132,5,179,32"/>
+<area shape="rect" id="node3" href="$notify_8cc.html#a8fd0d93500cc0785f6fc728dbe3c6a85" title="Shows version information and exits. " alt="" coords="123,56,187,83"/>
+<area shape="rect" id="node4" href="$notify_8cc.html#aed429b7c618757d735b6bea2609c229a" title="sigint_handler" alt="" coords="104,107,207,133"/>
+</map>

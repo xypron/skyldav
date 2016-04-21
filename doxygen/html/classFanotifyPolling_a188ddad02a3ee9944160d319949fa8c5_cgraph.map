@@ -1,0 +1,13 @@
+<map id="FanotifyPolling::handleFanotifyEvents" name="FanotifyPolling::handleFanotifyEvents">
+<area shape="rect" id="node2" href="$classMessaging.html#ab64c1b4671c006ff521c9cc8575b870a" title="Sends message. " alt="" coords="776,5,923,32"/>
+<area shape="rect" id="node5" href="$classFanotifyPolling.html#a3ffd2c60179a9e0c331ab3acd5555b6b" title="Handle fanotify events. " alt="" coords="255,99,456,141"/>
+<area shape="rect" id="node3" href="$classMessaging.html#a5ec4a7b49d4537a404edeb4082b569db" title="Retrieves the messaging singleton. " alt="" coords="1015,5,1180,32"/>
+<area shape="rect" id="node4" href="$classMessaging.html#ad0cbbf3c3d159becda91f3fef412afc4" title="Creates the singleton. " alt="" coords="1251,5,1407,32"/>
+<area shape="rect" id="node6" href="$classFanotifyPolling.html#a2ef1645764ad0c97309b55b609e7ddbe" title="Writes fanotify response. " alt="" coords="504,56,707,83"/>
+<area shape="rect" id="node7" href="$classEnvironment.html#a1ec8694ae56de2500c04ded4b3bd4357" title="Gets the scan cache. " alt="" coords="755,107,944,133"/>
+<area shape="rect" id="node10" href="$classScanCache.html#a7c3ad483aac5184a8b7d81c65c4cc0ea" title="Remove scan result from cache. " alt="" coords="535,157,676,184"/>
+<area shape="rect" id="node11" href="$classScanCache.html#a30ef5187476584f298ac6a1176ff4a9c" title="Adds scan result to cache. " alt="" coords="547,208,663,235"/>
+<area shape="rect" id="node12" href="$classThreadPool.html#ab7eed3718a666c4daf3ef936e90f5840" title="Adds a work item to the work list. " alt="" coords="547,259,664,285"/>
+<area shape="rect" id="node8" href="$classScanCache.html#a5605933bd17b213f7c64a0b3f5854c6c" title="Adds scan result to cache. " alt="" coords="790,56,909,83"/>
+<area shape="rect" id="node9" href="$classEnvironment.html#a9faa35a271099e6695db7a5b0c90fb22" title="Gets the maximum number of entries in the cache with scan results. " alt="" coords="992,56,1203,83"/>
+</map>

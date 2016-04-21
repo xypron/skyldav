@@ -1,0 +1,4 @@
+<map id="FanotifyPolling::handleFanotifyEvents" name="FanotifyPolling::handleFanotifyEvents">
+<area shape="rect" id="node2" href="$classFanotifyPolling.html#ace94a01dbc2d6a33dfad9276c78f211a" title="Thread listening to fanotify events. " alt="" coords="255,13,389,39"/>
+<area shape="rect" id="node3" href="$classFanotifyPolling.html#ae96f5002a56628ec01dc20957d74e250" title="Starts polling fanotify events. " alt="" coords="437,5,600,47"/>
+</map>

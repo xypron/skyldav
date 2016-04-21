@@ -1,0 +1,5 @@
+<map id="ThreadPool::worker" name="ThreadPool::worker">
+<area shape="rect" id="node2" href="$classThreadPool.html#a904c1e10bfec751a3d32e25e93db85d8" title="Is thread pool stopping. " alt="" coords="195,5,352,32"/>
+<area shape="rect" id="node3" href="$classThreadPool.html#abb30921a260bd0965d542bd975cc7430" title="Gets a work item. " alt="" coords="188,56,359,83"/>
+<area shape="rect" id="node4" href="$classThreadPool.html#afce41ff336f69530a2c08fc798f54cfe" title="Exits a worker thread. " alt="" coords="195,107,352,133"/>
+</map>

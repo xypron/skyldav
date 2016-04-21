@@ -1,0 +1,5 @@
+<map id="skipComment" name="skipComment">
+<area shape="rect" id="node2" href="$conf_8c.html#a82ac53baead60a7b7c130d12f766a05d" title="Gets token. " alt="" coords="156,5,232,32"/>
+<area shape="rect" id="node3" href="$conf_8h.html#ae56a1c63f39f1290f39eee02fafc68b6" title="Parses configuration file. If cb is NULL the key value pairs are output to the console. Returns 0 if successful. " alt="" coords="280,5,432,32"/>
+<area shape="rect" id="node4" href="$main_8cc.html#a0ddf1224851353fc92bfbff6f499fa97" title="Main. " alt="" coords="480,5,531,32"/>
+</map>

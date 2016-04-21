@@ -1,0 +1,10 @@
+<map id="configurationCallback" name="configurationCallback">
+<area shape="rect" id="node2" href="$classEnvironment.html#ad4331c549a7749c75e205c227bd5a787" title="Sets the maximum number of entries in the cache with scan results. " alt="" coords="200,5,411,32"/>
+<area shape="rect" id="node3" href="$classEnvironment.html#a583261b2927c9c13ee93b78c20f8a4c5" title="Sets if cache shall be cleaned when the virus scanner receives a new pattern file. " alt="" coords="209,57,402,98"/>
+<area shape="rect" id="node4" href="$classEnvironment.html#a9157ef379f74d9490d224f23f6014c0f" title="Gets the set of paths that shall not be scanned. " alt="" coords="204,123,407,149"/>
+<area shape="rect" id="node5" href="$classStringSet.html#aacef6bd0f7fa035ec05c9e336037327f" title="Adds entry to string set. " alt="" coords="253,173,358,200"/>
+<area shape="rect" id="node6" href="$classEnvironment.html#a9046cadff0428f93537db006005c4f04" title="Gets the list of file systems considered local. This list can be used to decide if scan results shall..." alt="" coords="219,225,392,266"/>
+<area shape="rect" id="node7" href="$classEnvironment.html#acc1603f56757d6523ccc6ce61b1aad09" title="Gets the list of file systems that shall not be scanned. " alt="" coords="211,290,399,331"/>
+<area shape="rect" id="node8" href="$classEnvironment.html#ad2e8d5f949feec95dfffa13166cfa5e6" title="Gets the list of mounts not to be scanned. " alt="" coords="200,356,411,383"/>
+<area shape="rect" id="node9" href="$classEnvironment.html#a7274ddf8523f1f3965bbe34ed72d3b91" title="sets the number of threads used to call the virus scanner. " alt="" coords="215,407,396,449"/>
+</map>

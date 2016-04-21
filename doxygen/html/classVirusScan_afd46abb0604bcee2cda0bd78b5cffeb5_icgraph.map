@@ -1,0 +1,6 @@
+<map id="VirusScan::destroyEngine" name="VirusScan::destroyEngine">
+<area shape="rect" id="node2" href="$classVirusScan.html#a98d7670681d5d0da63cd0c74f683196c" title="Thread to update engine. " alt="" coords="239,5,373,32"/>
+<area shape="rect" id="node5" href="$classVirusScan.html#a7aa531e8d895aa7fa40059de2ee87384" title="Deletes the virus scanner. " alt="" coords="227,56,385,83"/>
+<area shape="rect" id="node3" href="$classVirusScan.html#a32c65f47da574a393ec553af1eb97887" title="Creates a new thread for managing the scan engine. " alt="" coords="433,5,600,32"/>
+<area shape="rect" id="node4" href="$classVirusScan.html#ab40427bf6e5350231aea0943da04c0db" title="Initializes virus scan engine. " alt="" coords="648,5,799,32"/>
+</map>

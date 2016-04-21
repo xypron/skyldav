@@ -1,0 +1,5 @@
+<map id="src/skyldav/FanotifyPolling.h" name="src/skyldav/FanotifyPolling.h">
+<area shape="rect" id="node2" href="$FanotifyPolling_8cc.html" title="Poll fanotify events. " alt="" coords="5,80,203,107"/>
+<area shape="rect" id="node3" href="$main_8cc.html" title="Online virus scanner. " alt="" coords="227,80,365,107"/>
+<area shape="rect" id="node4" href="$MountPolling_8cc.html" title="Poll /proc/mounts to detect mount events. " alt="" coords="389,80,576,107"/>
+</map>

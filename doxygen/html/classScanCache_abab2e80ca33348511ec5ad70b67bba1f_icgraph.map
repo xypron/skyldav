@@ -1,0 +1,10 @@
+<map id="ScanCache::clear" name="ScanCache::clear">
+<area shape="rect" id="node2" href="$classMountPolling.html#a69f0659a8eb8cfd7dd1a3d1091f80b50" title="Tracks mountevents. " alt="" coords="191,31,344,57"/>
+<area shape="rect" id="node5" href="$classScanCache.html#ac1500bdc820125b52a4de4303047c080" title="ScanCache::ScanCache" alt="" coords="184,81,351,108"/>
+<area shape="rect" id="node6" href="$classScanCache.html#ae9e5161a0ddd3cc6f38fb743de24c71d" title="ScanCache::~ScanCache" alt="" coords="180,132,355,159"/>
+<area shape="rect" id="node7" href="$classVirusScan.html#a98d7670681d5d0da63cd0c74f683196c" title="Thread to update engine. " alt="" coords="201,183,334,209"/>
+<area shape="rect" id="node3" href="$classMountPolling.html#a01ba55253ce8a455ededae6a6f693feb" title="Thread listening to mount events. " alt="" coords="425,5,547,32"/>
+<area shape="rect" id="node4" href="$classMountPolling.html#a43cc45b069852759298fd0a7d6e5a6af" title="MountPolling::MountPolling" alt="" coords="617,31,797,57"/>
+<area shape="rect" id="node8" href="$classVirusScan.html#a32c65f47da574a393ec553af1eb97887" title="Creates a new thread for managing the scan engine. " alt="" coords="403,183,569,209"/>
+<area shape="rect" id="node9" href="$classVirusScan.html#ab40427bf6e5350231aea0943da04c0db" title="Initializes virus scan engine. " alt="" coords="632,183,783,209"/>
+</map>

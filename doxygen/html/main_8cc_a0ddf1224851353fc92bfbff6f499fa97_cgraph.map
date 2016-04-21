@@ -1,0 +1,27 @@
+<map id="main" name="main">
+<area shape="rect" id="node2" href="$classEnvironment.html#a7274ddf8523f1f3965bbe34ed72d3b91" title="sets the number of threads used to call the virus scanner. " alt="" coords="319,57,500,98"/>
+<area shape="rect" id="node3" href="$main_8cc.html#ad8c51bbfda76f19f61c727838e6eee30" title="Prints help message and exits. " alt="" coords="157,169,203,196"/>
+<area shape="rect" id="node4" href="$main_8cc.html#a8fd0d93500cc0785f6fc728dbe3c6a85" title="Shows version information and exits. " alt="" coords="148,220,212,247"/>
+<area shape="rect" id="node5" href="$conf_8c.html#ae56a1c63f39f1290f39eee02fafc68b6" title="Parses configuration file. If cb is NULL the key value pairs are output to the console. Returns 0 if successful. " alt="" coords="104,63,256,89"/>
+<area shape="rect" id="node8" href="$main_8cc.html#a48a1e2980824137f695d472695064533" title="Callback function for reading configuration file. " alt="" coords="107,321,253,348"/>
+<area shape="rect" id="node16" href="$main_8cc.html#ab467b6241cd03efc93544e27677b8cdf" title="Checks authorization. " alt="" coords="139,372,221,399"/>
+<area shape="rect" id="node18" href="$main_8cc.html#a8a8c5ccc35ee96e543d6f57666b1db58" title="Daemonizes. " alt="" coords="137,423,223,449"/>
+<area shape="rect" id="node19" href="$classMessaging.html#a0479bd8d2f2664c813640573ee65f2fa" title="Sets message level. " alt="" coords="109,473,251,500"/>
+<area shape="rect" id="node22" href="$main_8cc.html#a41c065dfe352bebb202a9859ee3c6adc" title="Creates pidfile for daemon. " alt="" coords="152,575,208,601"/>
+<area shape="rect" id="node23" href="$classMessaging.html#ab64c1b4671c006ff521c9cc8575b870a" title="Sends message. " alt="" coords="336,625,483,652"/>
+<area shape="rect" id="node24" href="$classMessaging.html#a32042b6eed89e6aff00fa2ea809048f2" title="Sends an error message based on errno. " alt="" coords="121,524,239,551"/>
+<area shape="rect" id="node25" href="$main_8cc.html#a20411f60914f6da83280d5a3a26b8a4a" title="Handles signal. " alt="" coords="161,676,199,703"/>
+<area shape="rect" id="node26" href="$classMessaging.html#aa318fabddda7ea5ec4468f9b18025084" title="Deletes the singleton. " alt="" coords="107,727,253,753"/>
+<area shape="rect" id="node6" href="$conf_8c.html#a82ac53baead60a7b7c130d12f766a05d" title="Gets token. " alt="" coords="371,5,447,32"/>
+<area shape="rect" id="node7" href="$conf_8c.html#aa57aef434a7c34a23fdf4f20a7526b5b" title="Skips comment. " alt="" coords="594,5,697,32"/>
+<area shape="rect" id="node9" href="$classEnvironment.html#ad4331c549a7749c75e205c227bd5a787" title="Sets the maximum number of entries in the cache with scan results. " alt="" coords="304,407,515,433"/>
+<area shape="rect" id="node10" href="$classEnvironment.html#a583261b2927c9c13ee93b78c20f8a4c5" title="Sets if cache shall be cleaned when the virus scanner receives a new pattern file. " alt="" coords="313,458,506,499"/>
+<area shape="rect" id="node11" href="$classEnvironment.html#a9157ef379f74d9490d224f23f6014c0f" title="Gets the set of paths that shall not be scanned. " alt="" coords="308,123,511,149"/>
+<area shape="rect" id="node12" href="$classStringSet.html#aacef6bd0f7fa035ec05c9e336037327f" title="Adds entry to string set. " alt="" coords="357,173,462,200"/>
+<area shape="rect" id="node13" href="$classEnvironment.html#a9046cadff0428f93537db006005c4f04" title="Gets the list of file systems considered local. This list can be used to decide if scan results shall..." alt="" coords="323,225,496,266"/>
+<area shape="rect" id="node14" href="$classEnvironment.html#acc1603f56757d6523ccc6ce61b1aad09" title="Gets the list of file systems that shall not be scanned. " alt="" coords="315,290,503,331"/>
+<area shape="rect" id="node15" href="$classEnvironment.html#ad2e8d5f949feec95dfffa13166cfa5e6" title="Gets the list of mounts not to be scanned. " alt="" coords="304,356,515,383"/>
+<area shape="rect" id="node17" href="$main_8cc.html#a5f9ee0525dd637ad7df8a0163ddda0f8" title="Check if the process has a capability. " alt="" coords="376,524,443,551"/>
+<area shape="rect" id="node20" href="$classMessaging.html#a5ec4a7b49d4537a404edeb4082b569db" title="Retrieves the messaging singleton. " alt="" coords="563,600,728,627"/>
+<area shape="rect" id="node21" href="$classMessaging.html#ad0cbbf3c3d159becda91f3fef412afc4" title="Creates the singleton. " alt="" coords="776,600,932,627"/>
+</map>

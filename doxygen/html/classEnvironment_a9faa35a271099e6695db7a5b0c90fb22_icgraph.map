@@ -1,0 +1,9 @@
+<map id="Environment::getCacheMaxSize" name="Environment::getCacheMaxSize">
+<area shape="rect" id="node2" href="$classScanCache.html#a5605933bd17b213f7c64a0b3f5854c6c" title="Adds scan result to cache. " alt="" coords="264,35,383,61"/>
+<area shape="rect" id="node3" href="$classFanotifyPolling.html#a2ef1645764ad0c97309b55b609e7ddbe" title="Writes fanotify response. " alt="" coords="431,35,633,61"/>
+<area shape="rect" id="node4" href="$classFanotifyPolling.html#a8c69ca2e4eef2f0e360bbfc8a2f28d05" title="Scans a file. " alt="" coords="949,5,1114,32"/>
+<area shape="rect" id="node6" href="$classFanotifyPolling.html#a3ffd2c60179a9e0c331ab3acd5555b6b" title="Handle fanotify events. " alt="" coords="681,57,883,98"/>
+<area shape="rect" id="node5" href="$classFanotifyPolling.html#ae96f5002a56628ec01dc20957d74e250" title="Starts polling fanotify events. " alt="" coords="1363,27,1525,69"/>
+<area shape="rect" id="node7" href="$classFanotifyPolling.html#a188ddad02a3ee9944160d319949fa8c5" title="Handle fanotify events. " alt="" coords="931,57,1132,98"/>
+<area shape="rect" id="node8" href="$classFanotifyPolling.html#ace94a01dbc2d6a33dfad9276c78f211a" title="Thread listening to fanotify events. " alt="" coords="1180,60,1315,87"/>
+</map>

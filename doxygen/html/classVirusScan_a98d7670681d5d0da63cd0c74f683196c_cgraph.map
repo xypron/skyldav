@@ -1,0 +1,12 @@
+<map id="VirusScan::updater" name="VirusScan::updater">
+<area shape="rect" id="node2" href="$classVirusScan.html#ad7f2a43a71e68993b60f0e66723dcb30" title="Checks if database has changed. &#160;0 = unchanged, 1 = changed. " alt="" coords="197,5,365,32"/>
+<area shape="rect" id="node3" href="$classMessaging.html#ab64c1b4671c006ff521c9cc8575b870a" title="Sends message. " alt="" coords="424,132,571,159"/>
+<area shape="rect" id="node6" href="$classVirusScan.html#a94cb00a72fbb27a96e2431baff515fcc" title="Creates a new virus scan engine. " alt="" coords="198,325,365,352"/>
+<area shape="rect" id="node8" href="$classVirusScan.html#afd46abb0604bcee2cda0bd78b5cffeb5" title="VirusScan::destroyEngine" alt="" coords="195,157,368,184"/>
+<area shape="rect" id="node9" href="$classEnvironment.html#a34fc2172b12d0860d442edf0099e6bbb" title="Determines if cache shall be cleaned when the virus scanner receives a new pattern file..." alt="" coords="189,209,374,250"/>
+<area shape="rect" id="node10" href="$classEnvironment.html#a1ec8694ae56de2500c04ded4b3bd4357" title="Gets the scan cache. " alt="" coords="187,275,376,301"/>
+<area shape="rect" id="node11" href="$classScanCache.html#abab2e80ca33348511ec5ad70b67bba1f" title="Removes all entries from the cache. " alt="" coords="218,56,345,83"/>
+<area shape="rect" id="node4" href="$classMessaging.html#a5ec4a7b49d4537a404edeb4082b569db" title="Retrieves the messaging singleton. " alt="" coords="619,132,784,159"/>
+<area shape="rect" id="node5" href="$classMessaging.html#ad0cbbf3c3d159becda91f3fef412afc4" title="Creates the singleton. " alt="" coords="832,132,988,159"/>
+<area shape="rect" id="node7" href="$notify_8cc.html#a8fd0d93500cc0785f6fc728dbe3c6a85" title="Shows version information and exits. " alt="" coords="465,325,529,352"/>
+</map>
