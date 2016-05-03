@@ -51,5 +51,5 @@ sudo cp examples/etc/init.d/skyldav /etc/init.d
 sudo update-rc.d skyldav defaults
 
 # Copy desktop starter for notification.
-sudo cp examples/usr/share/autostart/skyldavnotify.desktop /usr/share/autostart
+sudo cp examples/etc/xdg/autostart/skyldavnotify.desktop /etc/xdg/autostart
 
