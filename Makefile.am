@@ -24,10 +24,10 @@ install-skyldav-conf:
 
 if NOTIFICATION
 install-skyldavnotify-desktop:
-	mkdir -p /etc/xdg/autostart/
-	test -e /etc/xdg/autostart/skyldavnotify.desktop || \
+	mkdir -p $(DESTDIR)/etc/xdg/autostart/
+	test -e $(DESTDIR)/etc/xdg/autostart/skyldavnotify.desktop || \
 	cp examples/etc/xdg/autostart/skyldavnotify.desktop \
-	/etc/xdg/autostart/
+	$(DESTDIR)/etc/xdg/autostart/
 else
 install-skyldavnotify-desktop:
 endif
