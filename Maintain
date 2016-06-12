@@ -1,0 +1,24 @@
+== Preparing a new release ==
+
+Update version information in
+
+Changelog            - release information
+configure.ac         - release number
+debian/changelog     - release information (use dch)
+Doxyfile             - release number
+man/skyldav.1        - release number, date
+man/skyldavnotify.1  - release number, date
+src/skyldav/Makefile - library version number
+
+./autogen.sh
+./configure
+make clean
+git commit -as
+make
+make check
+git tag -s <release number>
+./build-dpkg.sh
+dput
+
+doxygen
+update gh-pages branch
