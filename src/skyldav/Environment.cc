@@ -33,7 +33,7 @@ Environment::Environment() {
     nomarkmnt = new StringSet();
     scache = new ScanCache(this);
     nThreads = 4;
-    cacheMaxSize = 10000;
+    cacheMaxSize = 500000;
     cleanCacheOnUpdate = 1;
 }
 
