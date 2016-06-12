@@ -46,9 +46,9 @@ public:
     virtual ~ThreadPool();
 private:
     enum status status;
-    int createThread();
+    int createThread(const char *);
     void exitThread(void *retval);
-    int isStopping();
+    int isStopping() const;
     pthread_cond_t cond;
     static void *worker (void *);
     pthread_mutex_t mutexThread;

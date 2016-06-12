@@ -171,6 +171,7 @@ int VirusScan::createThread() {
     if (pthread_create(&updateThread, NULL, updater, this)) {
         ret = 1;
     } else {
+        ret = pthread_setname_np(updateThread, "skyldav-u");
         ret = 0;
     }
     return ret;

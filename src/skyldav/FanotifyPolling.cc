@@ -371,6 +371,7 @@ FanotifyPolling::FanotifyPolling(Environment * env) {
         Messaging::message(Messaging::ERROR, msg.str());
         throw FAILURE;
     }
+    ret = pthread_setname_np(thread, "skyldav-f");
     waiting_time_req.tv_sec = 0;
     waiting_time_req.tv_nsec = 100;
     while (status == INITIAL) {

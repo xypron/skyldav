@@ -97,7 +97,7 @@ void * MountPolling::run(void *obj) {
          * number of structures with nonzero revents fields, 0 = timeout
          */
         int ret;
-        ret = poll(&fds, nfds, 1);
+        ret = poll(&fds, nfds, 50);
         if (ret > 0) {
             if (fds.revents & POLLERR) {
                 mp->callback();
@@ -230,6 +230,7 @@ MountPolling::MountPolling(int ffd, Environment *e) {
         Messaging::message(Messaging::ERROR, msg.str());
         throw FAILURE;
     }
+    ret = pthread_setname_np(thread, "skyldav-m");
     waiting_time_req.tv_sec = 0;
     waiting_time_req.tv_nsec = 100;
     while (status == INITIAL) {

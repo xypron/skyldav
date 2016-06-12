@@ -20,6 +20,7 @@
  * @file ThreadPool.cc
  * @brief Implements the thread pool pattern.
  */
+#include <sstream>
 #include <pthread.h>
 #include <time.h>
 #include "ThreadPool.h"
@@ -32,6 +33,7 @@
  */
 ThreadPool::ThreadPool(int nThreads, void* (*workRoutine) (void *)) {
     int i;
+    std::ostringstream name;
 
     thread_count = 0;
     status = RUNNING;
@@ -41,8 +43,16 @@ ThreadPool::ThreadPool(int nThreads, void* (*workRoutine) (void *)) {
     pthread_mutex_init(&mutexWorkItem, NULL);
     pthread_cond_init(&cond, NULL);
 
-    for (i = 0; i < nThreads; i++) {
-        createThread();
+    /* Limit the number of threads. */
+    if (nThreads > 256) {
+        nThreads = 256;
+    } else if (nThreads < 1) {
+        nThreads = 1;
+    }
+    for (i = 1; i <= nThreads; i++) {
+        name.str("");
+        name << "skyldav-" << i;
+        createThread(name.str().c_str());
     }
     return;
 }
@@ -62,15 +72,19 @@ void ThreadPool::add(void *workItem) {
 /**
  * @brief Creates a new worker thread.
  *
+ * @param name thread name or NULL
  * @return success = 0
  */
-int ThreadPool::createThread() {
+int ThreadPool::createThread(const char *name) {
     int ret;
     pthread_t thread;
 
     if (pthread_create(&thread, NULL, worker, this)) {
         ret = 1;
     } else {
+        if (name) {
+            ret = pthread_setname_np(thread, name);
+        }
         pthread_mutex_lock(&mutexThread);
         thread_count++;
         pthread_mutex_unlock(&mutexThread);
@@ -80,7 +94,7 @@ int ThreadPool::createThread() {
 }
 
 /**
- * @brief Exits a worker thread
+ * @brief Exits a worker thread.
  *
  * @param retval return value
  */
@@ -131,7 +145,7 @@ long ThreadPool::getWorklistSize() {
  *
  * @return thread pool is stopping
  */
-int ThreadPool::isStopping() {
+int ThreadPool::isStopping() const {
     return status == STOPPING;
 }
 
