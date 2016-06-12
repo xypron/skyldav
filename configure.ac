@@ -1,7 +1,7 @@
 dnl Skyld AV
 
 dnl Initialization
-AC_INIT([skyldav], [0.7], [xypron.glpk@gmx.de])
+AC_INIT([skyldav], [0.8], [xypron.glpk@gmx.de])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 
 dnl Archiver support.
