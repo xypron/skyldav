@@ -245,8 +245,11 @@ int VirusScan::scan(const int fd) {
     int success = SCANOK;
     int ret;
     const char *virname;
+    struct cl_scan_options options = {
+        .parse = ~0U,
+    };
 
-    ret = cl_scandesc(fd, &virname, NULL, getEngine(), CL_SCAN_STDOPT);
+    ret = cl_scandesc(fd, NULL, &virname, NULL, getEngine(), &options);
     switch (ret) {
         case CL_CLEAN:
             success = SCANOK;
