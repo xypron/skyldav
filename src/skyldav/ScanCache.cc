@@ -189,6 +189,7 @@ ScanCache::~ScanCache() {
     msg << "Cache size " << s->size() <<
         ", cache hits " << hits << ", cache misses " << misses << ".";
     clear();
+    delete s;
     pthread_mutex_destroy(&mutex);
     Messaging::message(Messaging::INFORMATION, msg.str());
 }
