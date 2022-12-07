@@ -139,6 +139,7 @@ static void pidfile() {
         std::stringstream msg;
         msg << "Cannot create pid file '" << filename << "'";
         Messaging::message(Messaging::ERROR, msg.str());
+	return;
     }
     len = snprintf(buffer, sizeof (buffer), "%d", (int) getpid());
     ret = write(fd, buffer, len);
