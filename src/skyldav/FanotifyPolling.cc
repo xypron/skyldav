@@ -225,7 +225,10 @@ void FanotifyPolling::handleFanotifyEvent(
     int ret;
     pid_t pid;
     struct stat statbuf;
-    struct fanotify_response response;
+    struct fanotify_response response = {
+        .fd = metadata->fd,
+        .response = FAN_DENY,
+    };
     int tobeclosed = 1;
 
     ret = fstat(metadata->fd, &statbuf);
