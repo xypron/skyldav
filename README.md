@@ -6,7 +6,7 @@ Overview
 
  Skyld AV provides on access virus scanning for Linux.
 
- The <a href="http://www.xypron.de/projects/fanotify-manpages">fanotify</a>
+ The <a href="https://man7.org/linux/man-pages/man7/fanotify.7.html">fanotify</a>
  API is used to control file access. This requires a kernel compiled with
 
  <pre>CONFIG\_FANOTIFY=y
