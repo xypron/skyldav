@@ -1,6 +1,8 @@
 Skyld AV - on access virus scanner
 ==================================
 
+**This project is not maintained anymore.**
+
 Overview
 --------
 
